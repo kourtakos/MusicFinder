@@ -4,9 +4,9 @@ Fast, offline-first Windows DJ music library organizer and finder. Instant searc
 music folders, a folder tree, cover art, genre/tag organisation and a safe tag editor.
 See `CLAUDE.md` for the full implementation contract.
 
-**Status: M1 (search), M2 (covers, genres, tags), M3 (DJ session and drag-out), the Quick Search pop-up, M7 (smart Greek search, Find Similar), M5 (online identification) and a BPM/key audio analysis are implemented.**
-MusicFinder only changes your music files when you press *Write* in the tag editor, after a preview, and never silently.
-It never renames, moves or deletes files. It makes no network connection unless you turn on **online identification** in Settings, after being shown exactly what is sent (`docs/identification.md`).
+**Status: M1 (search), M2 (covers, genres, tags), M3 (DJ session and drag-out), the Quick Search pop-up, M7 (smart Greek search, Find Similar), M5 (online identification), a BPM/key audio analysis, M6 (library health, duplicates, rename/move) and M8 (backup/restore, self-contained package) are implemented.**
+MusicFinder only changes your music files when you press *Write* in the tag editor, or confirm a batch rename/move, after a full preview and never silently (rename and move have a journal and undo; Traktor and VirtualDJ lose cue points for renamed files).
+It never deletes files. It makes no network connection unless you turn on **online identification** in Settings, after being shown exactly what is sent (`docs/identification.md`).
 
 ## Requirements
 
@@ -38,7 +38,7 @@ Command-line options for the app:
    accent- and case-insensitive for Greek and Latin text, and finds Greek names typed in Greeklish or with the wrong keyboard layout (`docs/greek-search.md`).
 3. Combine search with the folder selection and the Genre / BPM / Decade / Tags filters.
 4. Select tracks to see cover art and details. Use the `+` buttons to give them DJ tags or your own genres (works on a whole selection).
-5. `F2` (or *Edit tags…*) opens the tag editor: change fields, preview the before/after, then write. See `docs/tags-and-genres.md`.
+5. `F2` (or *Edit tagsβ€¦*) opens the tag editor: change fields, preview the before/after, then write. See `docs/tags-and-genres.md`.
 6. The **Tags** tab manages the genre taxonomy, aliases and DJ tags, and lists genre text from your files that matches nothing yet,
    so you can map it with one click.
 7. `Ctrl+C` copies the selected file paths, `Ctrl+O` shows the file in Explorer. `Delete` never deletes anything.
@@ -76,11 +76,15 @@ docs/                           architecture, database, search syntax, Greek sea
   "General Indie Pop" or "Eurodance"); map them in the Tags tab.
 - Panel widths, window size and the folder-scope toggles are saved; visible/resized grid columns are not yet.
 - UI strings are English only; the Greek resource files are not added yet.
-- Search was benchmarked on 100,000 synthetic tracks (`docs/performance.md`): typical queries meet 50 ms, very broad ones (two-letter prefixes, a word on a quarter of the library) take 70–85 ms. Real-library use is tested on about 3,700 tracks only.
-- Greek ↔ Greeklish matching is heuristic (`docs/greek-search.md`); names such as `Daft Punk` / `νταφτ πανκ` need an alias. Wrong-layout input understands the standard Windows Greek layout only.
+- Search was benchmarked on 100,000 synthetic tracks (`docs/performance.md`): typical queries meet 50 ms, very broad ones (two-letter prefixes, a word on a quarter of the library) take 70β€“85 ms. Real-library use is tested on about 3,700 tracks only.
+- Greek β†” Greeklish matching is heuristic (`docs/greek-search.md`); names such as `Daft Punk` / `Ξ½Ο„Ξ±Ο†Ο„ Ο€Ξ±Ξ½ΞΊ` need an alias. Wrong-layout input understands the standard Windows Greek layout only.
 - Find Similar compares metadata only (genre, BPM, key, DJ tags), never how the music sounds; tracks without BPM, key or genre cannot be compared (`docs/find-similar.md`).
 - Favorites (shown in the reference design) need a database migration and are not implemented.
 - Drag-out is verified with Windows Media Player and Winamp only; Traktor and VirtualDJ are untested (checklist in `docs/dj-session.md`).
 - No DJ-history import yet (M4), so nothing is "confirmed" except by you. File organisation, duplicates and Library Health (M6) and backup (M8) are later milestones.
 - BPM and key analysis was measured on 150 files of the author's own library: confident tempos agreed with the tags 92 % of the time, keys only about 6 in 10 even at high confidence (`docs/audio-analysis.md`). Which key notation Traktor and VirtualDJ read from a tag is not verified.
 - Online identification (including covers from the Cover Art Archive) is tested with fake services only; it has not yet been run against the real MusicBrainz and AcoustID with a real key and fpcalc. `fpcalc.exe` is not bundled (its licence is not verified); you supply it. BPM and key are never looked up online (`docs/identification.md`).
+
+## Release package
+
+`.\build\publish.ps1` builds `dist\MusicFinder-<version>-win-x64.zip`: self-contained (no .NET install needed), portable, with `THIRD-PARTY-NOTICES.md`. See `docs/release-checklist.md` (includes the clean-VM test that still needs a person) and `CHANGELOG.md`.
