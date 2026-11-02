@@ -31,6 +31,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
         _fpcalcPath = s.FpcalcPath ?? "";
         _suggestGenres = s.SuggestGenresFromMusicBrainz;
         _useCoverArt = s.UseCoverArtArchive;
+        _embedCoverByDefault = s.EmbedCoverByDefault;
         _loading = false;
         RefreshStatus();
     }
@@ -46,6 +47,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
     [ObservableProperty] private string _fpcalcPath;
     [ObservableProperty] private bool _suggestGenres;
     [ObservableProperty] private bool _useCoverArt;
+    [ObservableProperty] private bool _embedCoverByDefault;
     [ObservableProperty] private string _fingerprinterStatus = "";
     [ObservableProperty] private string _readinessText = "";
     [ObservableProperty] private string _cacheText = "";
@@ -77,6 +79,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
     partial void OnFpcalcPathChanged(string value) { if (!_loading) { Save(s => s.FpcalcPath = NullIfBlank(value)); RefreshStatus(); } }
     partial void OnSuggestGenresChanged(bool value) { if (!_loading) Save(s => s.SuggestGenresFromMusicBrainz = value); }
     partial void OnUseCoverArtChanged(bool value) { if (!_loading) Save(s => s.UseCoverArtArchive = value); }
+    partial void OnEmbedCoverByDefaultChanged(bool value) { if (!_loading) Save(s => s.EmbedCoverByDefault = value); }
 
     [RelayCommand]
     private void BrowseFpcalc()

@@ -15,6 +15,12 @@ public partial class IdentifyWindow : Window
         Loaded += async (_, _) => await viewModel.StartAsync();
     }
 
+    /// <summary>Ticking a line of the list changes how many files Write will touch; tell the view model so the button text follows.</summary>
+    private void Include_Changed(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is IdentifyViewModel vm) vm.NotifyIncludeChanged();
+    }
+
     protected override void OnSourceInitialized(EventArgs e)
     {
         base.OnSourceInitialized(e);

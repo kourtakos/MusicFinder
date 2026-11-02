@@ -248,7 +248,7 @@ public class IdentifyUiTests
     });
 
     [Fact]
-    public Task FromLookupToFile_PreviewThenConfirm_WritesTheFile_AndTheGridFollows() => Ui.RunAsync(async () =>
+    public Task FromLookupToFile_TheTableIsThePreview_OneWriteButton_AndTheGridFollows() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();
         await using var _ = c.App;
@@ -259,17 +259,18 @@ public class IdentifyUiTests
         await vm.WhenIdle;
         vm.Proposals.Single(p => p.Field == TagField.Title).Selected = true;         // the user decides to take the title
 
-        vm.PreviewCommand.Execute(null);
-        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
-
-        Assert.Contains(vm.PreviewRows, r => r.Field == TagField.Title && r.Before == "unknown track" && r.After == "Ξανά στη ζωή μου");
-        using (var untouched = TagLib.File.Create(path)) Assert.Equal("unknown track", untouched.Tag.Title);   // preview wrote nothing
+        // The table shows now and proposed side by side, and the summary says what Write will do; nothing is written yet.
+        var title = vm.Proposals.Single(p => p.Field == TagField.Title);
+        Assert.Equal(("unknown track", "Ξανά στη ζωή μου"), (title.Current, title.Proposed));
+        Assert.StartsWith("Will write: ", vm.ChangeSummary);
+        Assert.Contains("Title", vm.ChangeSummary);
+        using (var untouched = TagLib.File.Create(path)) Assert.Equal("unknown track", untouched.Tag.Title);
 
         vm.WriteCommand.Execute(null);
         await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
 
-        Assert.Contains("Written", vm.ResultSummary);
-        Assert.Equal("Applied", vm.Queue[0].Status);
+        Assert.Contains("1 file written", vm.ResultSummary);
+        Assert.Equal("Written", vm.Queue[0].Status);
         using (var f = TagLib.File.Create(path))
         {
             Assert.Equal("Ξανά στη ζωή μου", f.Tag.Title);
@@ -283,7 +284,7 @@ public class IdentifyUiTests
     });
 
     [Fact]
-    public Task NothingTicked_CannotBePreviewed() => Ui.RunAsync(async () =>
+    public Task NothingTicked_CannotBeWritten() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();
         await using var _ = c.App;
@@ -292,8 +293,9 @@ public class IdentifyUiTests
         await vm.WhenIdle;
         await vm.WhenIdle;
         foreach (var p in vm.Proposals) p.Selected = false;
+        vm.UseCover = false;
 
-        vm.PreviewCommand.Execute(null);
+        vm.WriteCommand.Execute(null);
         await Task.Delay(100);
 
         Assert.Equal(IdentifyStep.Choose, vm.Step);
@@ -399,16 +401,17 @@ public class IdentifyUiTests
         window.Show();
         try
         {
-            await Ui.WaitUntilAsync(() => vm.Candidates.Count == 1 && vm.Proposals.Count > 0, what: "choose step filled");
+            await Ui.WaitUntilAsync(() => vm.Queue.All(q => q.Plan is not null), what: "list planned");
+            Assert.Equal(IdentifyStep.Overview, vm.Step);
             await Task.Delay(300);
-            Assert.Empty(BindingAudit.FindBroken(window));
+            Assert.Empty(BindingAudit.FindBroken(window));                  // the list
 
-            vm.Proposals.Single(p => p.Field == TagField.Title).Selected = true;
-            vm.PreviewCommand.Execute(null);
-            await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
+            vm.ReviewCommand.Execute(vm.Queue[0]);
+            await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Choose && vm.Proposals.Count > 0, what: "detail shown");
             await Task.Delay(300);
-            Assert.Empty(BindingAudit.FindBroken(window));
+            Assert.Empty(BindingAudit.FindBroken(window));                  // one track in detail
 
+            vm.BackToListCommand.Execute(null);
             vm.WriteCommand.Execute(null);
             await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "done");
             await Task.Delay(300);
@@ -528,7 +531,7 @@ public class IdentifyUiTests
     // ===== covers =====
 
     [Fact]
-    public Task TheChosenReleasesCover_IsOffered_NeverTickedForTheUser_AndNotWrittenUnlessTicked() => Ui.RunAsync(async () =>
+    public Task TheChosenReleasesCover_IsTickedByDefaultWhenTheFileHasNone_AndCanBeUnticked() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();
         await using var _ = c.App;
@@ -542,14 +545,13 @@ public class IdentifyUiTests
         Assert.True(vm.HasCover);
         Assert.NotNull(vm.CoverPicture);
         Assert.Contains("PNG", vm.CoverStatus);
-        Assert.False(vm.UseCover);                                       // offered, never ticked for the user
+        Assert.True(vm.UseCover);                                        // ticked by default: the file has no cover (it is still written only on Write)
         Assert.False(vm.TrackHasCover);
+        Assert.Contains("Cover", vm.ChangeSummary);
         Assert.Equal(["rel-1"], c.Covers.Requests);
 
-        vm.Proposals.Single(p => p.Field == TagField.MusicBrainzRecordingId).Selected = true;
-        vm.PreviewCommand.Execute(null);
-        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
-        Assert.DoesNotContain(vm.PreviewRows, r => r.Field == TagField.Cover);
+        vm.UseCover = false;                                             // the user changes their mind
+        Assert.DoesNotContain("Cover", vm.ChangeSummary);
         vm.WriteCommand.Execute(null);
         await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
 
@@ -558,7 +560,7 @@ public class IdentifyUiTests
     });
 
     [Fact]
-    public Task TickingTheCover_ShowsItInThePreview_AndEmbedsItAfterConfirmation() => Ui.RunAsync(async () =>
+    public Task TheCoverAlone_IsSummarisedBeforeWrite_AndEmbeddedOnWrite() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();
         await using var _ = c.App;
@@ -568,15 +570,9 @@ public class IdentifyUiTests
         await vm.WhenIdle;
         await vm.WhenIdle;
         foreach (var p in vm.Proposals) p.Selected = false;               // cover only
-        vm.UseCover = true;
-
-        vm.PreviewCommand.Execute(null);
-        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
-
-        var row = Assert.Single(vm.PreviewRows);
-        Assert.Equal(("Cover", (string?)null), (row.FieldLabel, row.Before));
-        Assert.Contains("PNG", row.After);
-        using (var untouched = TagLib.File.Create(path)) Assert.Empty(untouched.Tag.Pictures);       // the preview wrote nothing
+        Assert.True(vm.UseCover);
+        Assert.Equal("Will write: Cover", vm.ChangeSummary);
+        using (var untouched = TagLib.File.Create(path)) Assert.Empty(untouched.Tag.Pictures);       // nothing is written before Write
 
         vm.WriteCommand.Execute(null);
         await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
@@ -631,18 +627,17 @@ public class IdentifyUiTests
         await vm.WhenIdle;
         Assert.True(vm.TrackHasCover);
         foreach (var p in vm.Proposals) p.Selected = false;
+        Assert.False(vm.UseCover);                                           // the file has a cover: not ticked for the user
         vm.UseCover = true;
 
-        vm.PreviewCommand.Execute(null);
+        vm.WriteCommand.Execute(null);
         await Task.Delay(150);
         Assert.Equal(IdentifyStep.Choose, vm.Step);
         Assert.Contains("Replace the cover the file has", vm.Message);       // told how, not silently skipped
         using (var f = TagLib.File.Create(path)) Assert.Equal(other.Data, f.Tag.Pictures.Single().Data.Data);
 
         vm.ReplaceCover = true;
-        vm.PreviewCommand.Execute(null);
-        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
-        Assert.Equal("embedded cover", vm.PreviewRows.Single().Before);
+        Assert.Equal("Will write: Cover", vm.ChangeSummary);
         vm.WriteCommand.Execute(null);
         await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
 
@@ -697,6 +692,234 @@ public class IdentifyUiTests
             Assert.Empty(BindingAudit.FindBroken(window));
         }
         finally { window.Close(); }
+    });
+
+    // ===== many tracks at once =====
+
+    /// <summary>A track whose candidate is a poor audio match, so it must be left for the user to decide.</summary>
+    private static void MakeOneDoubtful(Ctx c, string doubtfulTitle)
+    {
+        var doubtfulId = c.Search.Results.Single(r => r.Title == doubtfulTitle).Id;
+        c.Service.Respond = request => new IdentificationResult(request.TrackId, IdentificationMethod.AcoustIdFingerprint, IdentificationOutcome.Found,
+            [FakeIdentification.Candidate(score: request.TrackId == doubtfulId ? 0.60 : 0.97)], null, false, DateTime.UtcNow);
+    }
+
+    [Fact]
+    public Task Many_ClearMatchesAreTicked_DoubtfulOnesAreLeftWithTheirReason_AndOneButtonWritesTheTicked() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        MakeOneDoubtful(c, "Charlie");
+        var pathA = Path.Combine(c.App.MusicDir, "a.mp3");
+        var pathC = Path.Combine(c.App.MusicDir, "c.mp3");
+        var hashC = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(pathC)));
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo"), Row(c, "Charlie")]);
+
+        await vm.StartAsync();
+
+        Assert.Equal(IdentifyStep.Overview, vm.Step);                          // the list, not a track in detail
+        Assert.Equal([true, true, false], vm.Queue.Select(q => q.Include));
+        Assert.Contains("Needs your decision", vm.Queue[2].Attention);
+        Assert.Contains("0.60", vm.Queue[2].Attention);
+        Assert.Equal("2 of 3 ready to write · 1 need your decision", vm.OverviewSummary);
+        Assert.Equal("Write 2 files", vm.WriteButtonText);
+        var first = vm.Queue[0];
+        Assert.Equal("Ξανά στη ζωή μου — Χάρις Αλεξίου (AcoustID score 0.97)", first.MatchText);
+        Assert.Equal("Το Τραγούδι", first.ReleaseText);
+        Assert.Equal("Album artist, Year, Track no., MusicBrainz id, Cover", first.ChangesText);   // exactly what Write does; titles are kept
+        Assert.Equal(["rel-1"], c.Covers.Requests.Distinct());
+
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+
+        Assert.Equal("2 files written.", vm.ResultSummary);
+        using (var f = TagLib.File.Create(pathA))
+        {
+            Assert.Equal("unknown track", f.Tag.Title);                       // existing values kept
+            Assert.Equal((1985u, 5u), (f.Tag.Year, f.Tag.Track));             // empty fields filled
+            Assert.Equal(FakeCoverArt.Image().Data, f.Tag.Pictures.Single().Data.Data);   // the cover, ticked by default
+        }
+        Assert.Equal(hashC, Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(pathC))));   // the doubtful one is untouched
+        Assert.Equal(["Written", "Written"], vm.Queue.Take(2).Select(q => q.Status));
+        Assert.False(vm.Queue[2].Resolved);
+
+        vm.ContinueCommand.Execute(null);
+        Assert.Equal(IdentifyStep.Overview, vm.Step);
+        Assert.Equal("0 of 3 ready to write · 1 need your decision", vm.OverviewSummary);
+    });
+
+    [Fact]
+    public Task Many_ADoubtfulTrack_CanBeReviewed_AndTickingInTheDetailAddsItToTheList() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        MakeOneDoubtful(c, "Charlie");
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Charlie")]);
+        await vm.StartAsync();
+        var doubtful = vm.Queue[1];
+        Assert.False(doubtful.Include);
+        Assert.True(doubtful.CanInclude);                                      // it has proposals: it can be ticked in the list too
+
+        vm.ReviewCommand.Execute(doubtful);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Choose && vm.Proposals.Count > 0, what: "detail");
+        await vm.WhenIdle;
+
+        Assert.Same(doubtful, vm.Current);
+        Assert.Equal("Το Τραγούδι · 1985 · GR · Album", vm.SelectedRelease!.Text);          // the same release the automatic choice made
+        Assert.True(vm.UseCover);
+        var year = vm.Proposals.Single(p => p.Field == TagField.Year);
+        Assert.True(year.Selected);                                            // empty field: ticked by the rules
+        Assert.False(doubtful.Include);                                        // looking is not deciding
+
+        year.Selected = false;                                                 // the user changes a tick ...
+        year.Selected = true;                                                  // ... and changes it back: that is a decision
+        Assert.True(doubtful.Include);
+        Assert.StartsWith("Will write: ", vm.ChangeSummary);
+
+        vm.BackToListCommand.Execute(null);
+        Assert.Equal(IdentifyStep.Overview, vm.Step);
+        Assert.Equal("Write 2 files", vm.WriteButtonText);
+    });
+
+    [Fact]
+    public Task Many_ChangesMadeInTheDetail_AreRememberedWhenComingBack() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+        await vm.StartAsync();
+
+        vm.ReviewCommand.Execute(vm.Queue[0]);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Choose && vm.Proposals.Count > 0, what: "detail");
+        vm.Proposals.Single(p => p.Field == TagField.Year).Selected = false;
+        vm.UseCover = false;
+        vm.BackToListCommand.Execute(null);
+        Assert.DoesNotContain("Year", vm.Queue[0].ChangesText);
+        Assert.DoesNotContain("Cover", vm.Queue[0].ChangesText);
+
+        vm.ReviewCommand.Execute(vm.Queue[1]);
+        await Ui.WaitUntilAsync(() => ReferenceEquals(vm.Current, vm.Queue[1]) && vm.Proposals.Count > 0, what: "second track");
+        vm.ReviewCommand.Execute(vm.Queue[0]);
+        await Ui.WaitUntilAsync(() => ReferenceEquals(vm.Current, vm.Queue[0]) && vm.Proposals.Count > 0, what: "back on the first");
+
+        Assert.False(vm.Proposals.Single(p => p.Field == TagField.Year).Selected);        // as the user left it
+        Assert.False(vm.UseCover);
+    });
+
+    [Fact]
+    public Task Many_TickAllClearMatches_AndUntickAll() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        MakeOneDoubtful(c, "Charlie");
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo"), Row(c, "Charlie")]);
+        await vm.StartAsync();
+
+        vm.IncludeNoneCommand.Execute(null);
+        Assert.Equal("Write 0 files", vm.WriteButtonText);
+        Assert.False(vm.CanWrite);
+        vm.IncludeAllReadyCommand.Execute(null);
+
+        Assert.Equal([true, true, false], vm.Queue.Select(q => q.Include));           // the doubtful one is never ticked by "all clear matches"
+        Assert.True(vm.CanWrite);
+    });
+
+    [Fact]
+    public Task Many_WritingWithNothingTicked_SaysSo() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+        await vm.StartAsync();
+        vm.IncludeNoneCommand.Execute(null);
+
+        vm.WriteCommand.Execute(null);
+        await Task.Delay(100);
+
+        Assert.Equal(IdentifyStep.Overview, vm.Step);
+        Assert.Contains("Tick at least one track", vm.Message);
+    });
+
+    [Fact]
+    public Task Many_ATrackWithNoMatch_IsInTheListWithItsReason_AndCannotBeTicked() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var noMatchId = Row(c, "Bravo").Id;
+        c.Service.Respond = r => r.TrackId == noMatchId
+            ? IdentificationResult.Failed(r.TrackId, r.Method, IdentificationOutcome.NoMatch, "No recording matched. Try the other method, or edit the tags by hand.")
+            : new IdentificationResult(r.TrackId, IdentificationMethod.AcoustIdFingerprint, IdentificationOutcome.Found, [FakeIdentification.Candidate()], null, false, DateTime.UtcNow);
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+
+        await vm.StartAsync();
+
+        var item = vm.Queue[1];
+        Assert.Equal("No match", item.Status);
+        Assert.Contains("No recording matched", item.Attention);
+        Assert.False(item.Include);
+        Assert.False(item.CanInclude);
+        Assert.Equal("1 of 2 ready to write · 1 with no match or a problem", vm.OverviewSummary);
+    });
+
+    [Fact]
+    public Task TheCoverIsNotTickedByDefault_WhenTheSettingIsOff() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var s = c.Saved;
+        s.EmbedCoverByDefault = false;
+        c.App.Settings.Save(s);
+        var many = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+        var one = NewVm(c, [Row(c, "unknown track")]);
+
+        await many.StartAsync();
+        await one.StartAsync();
+        await one.WhenIdle;
+        await one.WhenIdle;
+
+        Assert.All(many.Queue, q => Assert.DoesNotContain("Cover", q.ChangesText));
+        Assert.True(one.HasCover);                                              // still offered
+        Assert.False(one.UseCover);                                             // but not ticked
+    });
+
+    [Fact]
+    public Task AFileThatHasACover_IsNotOfferedAReplacement_InAList() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var other = FakeCoverArt.Image() with { Data = [.. FakeCoverArt.Image().Data, 0, 0] };
+        await c.App.Service<ITagEditingService>().ApplyAsync([Row(c, "unknown track").Id],
+            new TagChangeSet(new Dictionary<TagField, string?>(), other), new TagWriteOptions(), null, default);
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+
+        await vm.StartAsync();
+
+        Assert.DoesNotContain("Cover", vm.Queue[0].ChangesText);                // its cover is kept: replacing is never automatic
+        Assert.Contains("Cover", vm.Queue[1].ChangesText);                      // the one without a cover gets one
+    });
+
+    [Fact]
+    public Task Many_WritingCanBeStopped_AndFailuresAreListedWithoutStoppingTheRest() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+        await vm.StartAsync();
+        var readOnly = Path.Combine(c.App.MusicDir, "b.mp3");
+        File.SetAttributes(readOnly, FileAttributes.ReadOnly);
+        try
+        {
+            vm.WriteCommand.Execute(null);
+            await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "done");
+
+            Assert.Equal(1, vm.Queue.Count(q => q.Status == "Written"));
+            Assert.True(vm.HasFailures);
+            Assert.Contains("Bravo", vm.Failures.Single());
+            Assert.Contains("read-only", vm.Failures.Single());
+            Assert.Contains("1 file written", vm.ResultSummary);
+            Assert.Contains("1 problem", vm.ResultSummary);
+        }
+        finally { File.SetAttributes(readOnly, FileAttributes.Normal); }
     });
 
     private static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject

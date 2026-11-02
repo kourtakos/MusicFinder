@@ -63,4 +63,6 @@ public sealed class AppSettings
     public bool SuggestGenresFromMusicBrainz { get; set; } = true;
     /// <summary>Offer the Cover Art Archive front cover of the chosen release in the identify window. Fetched only on request, embedded only if the user ticks it.</summary>
     public bool UseCoverArtArchive { get; set; } = true;
+    /// <summary>Tick "Embed this cover" for the user when the file has no cover yet. It is still written only after the user presses Write.</summary>
+    public bool EmbedCoverByDefault { get; set; } = true;
 }

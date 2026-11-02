@@ -1,10 +1,8 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MusicFinder.App.Services;
 using MusicFinder.Application.Identification;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -12,9 +10,46 @@ using MusicFinder.Infrastructure;
 
 namespace MusicFinder.App.ViewModels;
 
-public enum IdentifyStep { Choose, Preview, Writing, Done }
+/// <summary>Overview = the list of many tracks; Choose = one track in detail; then writing and the result.</summary>
+public enum IdentifyStep { Overview, Choose, Writing, Done }
 
-/// <summary>One track waiting to be identified, and where its lookup stands.</summary>
+/// <summary>Everything decided for one track so far: recording, release, ticked fields and cover. Kept when the user moves between tracks.</summary>
+public sealed class ItemPlan
+{
+    public required CandidateItem Candidate { get; init; }
+    public ReleaseSummary? Release { get; init; }
+    public required IReadOnlyList<ProposalRow> Proposals { get; init; }
+    public bool TrackHasCover { get; init; }
+    public CoverImage? Cover { get; init; }
+    public ImageSource? CoverPicture { get; init; }
+    public string CoverStatus { get; init; } = "";
+    public bool UseCover { get; set; }
+    public bool ReplaceCover { get; set; }
+    public bool Confident { get; init; }
+    public string Reason { get; init; } = "";
+
+    /// <summary>The change set this plan would write: the ticked fields and, if ticked, the cover.</summary>
+    public TagChangeSet ToChangeSet()
+    {
+        var text = IdentificationProposalBuilder.ToChangeSet(Proposals.Select(p => p.ToProposal()));
+        return UseCover && Cover is not null ? text with { Cover = Cover, ReplaceExistingCover = ReplaceCover } : text;
+    }
+
+    /// <summary>"Album artist, Year, Track no., Cover": what pressing Write would change, in words.</summary>
+    public string Summary
+    {
+        get
+        {
+            var parts = Proposals.Where(p => p.Selected).Select(p => p.FieldLabel).ToList();
+            if (UseCover && Cover is not null && (!TrackHasCover || ReplaceCover)) parts.Add("Cover");
+            return string.Join(", ", parts);
+        }
+    }
+
+    public bool HasChanges => Summary.Length > 0;
+}
+
+/// <summary>One track in the list, and where its lookup and plan stand.</summary>
 public sealed partial class IdentifyQueueItem : ObservableObject
 {
     public long TrackId { get; }
@@ -23,6 +58,16 @@ public sealed partial class IdentifyQueueItem : ObservableObject
 
     [ObservableProperty] private string _status = "Waiting";
     [ObservableProperty] private bool _resolved;
+    /// <summary>Whether Write on the list includes this track.</summary>
+    [ObservableProperty] private bool _include;
+    [ObservableProperty] private string _matchText = "";
+    [ObservableProperty] private string _releaseText = "";
+    [ObservableProperty] private string _changesText = "";
+    /// <summary>Why a track was not ticked for the user ("the title differs from your tag").</summary>
+    [ObservableProperty] private string _attention = "";
+    [ObservableProperty] private bool _canInclude;
+
+    public ItemPlan? Plan { get; set; }
 
     public IdentifyQueueItem(TrackRowViewModel track)
     {
@@ -44,7 +89,7 @@ public sealed class CandidateItem
     public string EvidenceText => string.Join(" · ", Candidate.Evidence);
 }
 
-/// <summary>A release the recording appeared on. Album, year and track number depend on this choice.</summary>
+/// <summary>A release the recording appeared on. Album, year, track number and cover depend on this choice.</summary>
 public sealed record ReleaseChoice(ReleaseSummary? Release, string Text);
 
 /// <summary>One line of the "what would change" table: the user ticks the fields to apply.</summary>
@@ -84,9 +129,6 @@ public static class FieldLabels
     };
 }
 
-/// <summary>One line of the preview table: what the file holds now and what it would hold after the write.</summary>
-public sealed record PreviewLine(TagField Field, string FieldLabel, string? Before, string? After);
-
 public sealed class MethodOption
 {
     public IdentificationMethod Method { get; }
@@ -95,8 +137,10 @@ public sealed class MethodOption
 }
 
 /// <summary>
-/// Looks up the selected tracks online, lets the user choose a recording and release, shows what would change, and writes only
-/// after a preview and confirmation, through the same safe tag-writing path as the tag editor.
+/// Looks up the selected tracks online and shows what would change, in one screen: the table of current and proposed values
+/// (or, for many tracks, one list with a line per track) is the preview, and a single Write button applies exactly what is
+/// ticked, through the same safe tag-writing path as the tag editor. For many tracks, clear matches are chosen and ticked
+/// automatically; anything doubtful is left unticked with the reason, for the user to decide.
 /// </summary>
 public sealed partial class IdentifyViewModel : ObservableObject
 {
@@ -117,7 +161,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
     public ObservableCollection<CandidateItem> Candidates { get; } = [];
     public ObservableCollection<ReleaseChoice> Releases { get; } = [];
     public ObservableCollection<ProposalRow> Proposals { get; } = [];
-    public ObservableCollection<PreviewLine> PreviewRows { get; } = [];
+    public ObservableCollection<string> Failures { get; } = [];
     public IReadOnlyList<MethodOption> Methods { get; } =
     [
         new(IdentificationMethod.Auto, "Best available"),
@@ -126,7 +170,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         new(IdentificationMethod.ExistingRecordingId, "Use the file's MusicBrainz id")
     ];
 
-    [ObservableProperty] private IdentifyStep _step = IdentifyStep.Choose;
+    [ObservableProperty] private IdentifyStep _step;
     [ObservableProperty] private IdentifyQueueItem? _current;
     [ObservableProperty] private CandidateItem? _selectedCandidate;
     [ObservableProperty] private ReleaseChoice? _selectedRelease;
@@ -134,7 +178,8 @@ public sealed partial class IdentifyViewModel : ObservableObject
     [ObservableProperty] private string? _message;
     [ObservableProperty] private bool _isLookingUp;
     [ObservableProperty] private string _progressText = "";
-    [ObservableProperty] private string _previewSummary = "";
+    [ObservableProperty] private int _progressDone;
+    [ObservableProperty] private int _progressTotal = 1;
     [ObservableProperty] private string _resultSummary = "";
     [ObservableProperty] private bool _keepBackup;
     [ObservableProperty] private string _methodNote = "";
@@ -148,20 +193,47 @@ public sealed partial class IdentifyViewModel : ObservableObject
     [ObservableProperty] private bool _trackHasCover;
 
     public string Heading { get; }
+    public bool IsMany => Queue.Count > 1;
+    public bool IsOverviewStep => Step == IdentifyStep.Overview;
     public bool IsChooseStep => Step == IdentifyStep.Choose;
-    public bool IsPreviewStep => Step == IdentifyStep.Preview;
     public bool IsWritingStep => Step == IdentifyStep.Writing;
     public bool IsDoneStep => Step == IdentifyStep.Done;
     public bool HasMessage => !string.IsNullOrEmpty(Message);
     public bool HasQueue => Queue.Count > 1;
     public bool HasCandidates => Candidates.Count > 0;
     public bool HasCover => Cover is not null;
+    public bool HasFailures => Failures.Count > 0;
     /// <summary>Whether the cover section is offered at all: identification is on and covers are allowed in Settings.</summary>
     public bool CoverEnabled => _settings.Load().UseCoverArtArchive && _service.GetReadiness().CanTagSearch;
     public bool HasNext => Queue.Any(q => !q.Resolved && q != Current);
-    public string WriteButtonText => "Write 1 file";
     public Task WhenIdle => _pending;
     public event EventHandler? CloseRequested;
+
+    /// <summary>What Write would change for the track on screen, in words (the table above it shows the values).</summary>
+    public string ChangeSummary => Current?.Plan is { HasChanges: true } p ? "Will write: " + p.Summary : "Nothing is ticked to write.";
+
+    /// <summary>The tracks Write applies to: the ticked ones of the list, or the one track on screen.</summary>
+    private IReadOnlyList<IdentifyQueueItem> Targets() =>
+        IsMany
+            ? Queue.Where(q => q.Include && q.Plan is { HasChanges: true }).ToList()
+            : Current?.Plan is { HasChanges: true } ? [Current] : [];
+
+    public int WriteCount => Targets().Count;
+    public string WriteButtonText => !IsMany ? "Write changes" : WriteCount == 1 ? "Write 1 file" : $"Write {WriteCount} files";
+    public bool CanWrite => WriteCount > 0 && !IsLookingUp;
+    public string OverviewSummary
+    {
+        get
+        {
+            var ready = Queue.Count(q => q.Include);
+            var attention = Queue.Count(q => q.Plan is not null && !q.Include && !q.Resolved);
+            var none = Queue.Count(q => q.Result is { } r && r.Outcome != IdentificationOutcome.Found);
+            var parts = new List<string> { $"{ready} of {Queue.Count} ready to write" };
+            if (attention > 0) parts.Add($"{attention} need your decision");
+            if (none > 0) parts.Add($"{none} with no match or a problem");
+            return string.Join(" · ", parts);
+        }
+    }
 
     public IdentifyViewModel(IReadOnlyList<TrackRowViewModel> tracks, IIdentificationService service, ITagEditingService editing,
         ITrackRepository trackRepository, ICoverArtClient coverArt, ISettingsStore settings, AppPaths paths)
@@ -176,6 +248,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         _method = Methods[0];
         foreach (var t in tracks) Queue.Add(new IdentifyQueueItem(t));
         Heading = tracks.Count == 1 ? "Identify online" : $"Identify {tracks.Count} tracks online";
+        _step = tracks.Count > 1 ? IdentifyStep.Overview : IdentifyStep.Choose;
         _current = Queue.FirstOrDefault();
         UpdateMethodNote();
     }
@@ -216,7 +289,16 @@ public sealed partial class IdentifyViewModel : ObservableObject
                 item.Status = StatusFor(result);
                 done++;
                 if (result.Outcome == IdentificationOutcome.Cancelled) break;
-                if (ReferenceEquals(item, Current)) await ShowCurrentAsync();
+
+                if (IsMany)
+                {
+                    // Many tracks: choose and tick what is clear, so the list is ready to read. The detail view is filled only when asked for.
+                    item.Status = item.Status + " · planning…";
+                    await PlanItemAsync(item, cts.Token);
+                    item.Status = StatusFor(result);
+                    if (ReferenceEquals(item, Current) && Step == IdentifyStep.Choose) await ShowCurrentAsync();
+                }
+                else if (ReferenceEquals(item, Current)) await ShowCurrentAsync();
                 else if (Current is null) Current = item;
             }
             ProgressText = items.Count > 1 ? $"{done} of {items.Count} looked up" : "";
@@ -228,6 +310,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
             IsLookingUp = false;
             if (ReferenceEquals(_lookupCts, cts)) _lookupCts = null;
             cts.Dispose();
+            RefreshSummaries();
         }
     }
 
@@ -266,9 +349,113 @@ public sealed partial class IdentifyViewModel : ObservableObject
         };
     }
 
+    // ===== planning (many tracks): choose recording, release and cover without touching the detail view =====
+
+    private async Task PlanItemAsync(IdentifyQueueItem item, CancellationToken ct)
+    {
+        item.Plan = null;
+        item.Include = false;
+        item.CanInclude = false;
+        item.MatchText = "";
+        item.ReleaseText = "";
+        item.ChangesText = "";
+        item.Attention = "";
+
+        var result = item.Result;
+        if (result is null || result.Outcome != IdentificationOutcome.Found || result.Candidates.Count == 0)
+        {
+            item.Attention = result?.Message ?? "no result";
+            return;
+        }
+        var track = await _tracks.GetAsync(item.TrackId, ct);
+        if (track is null) { item.Attention = "the track is no longer in the library"; return; }
+
+        var decision = AutoChoice.Decide(track, result.Candidates);
+        var candidate = decision.Candidate ?? result.Candidates[0];
+        var release = AutoChoice.PickRelease(track, candidate);
+        var details = release is null ? null : await LoadDetailsAsync(release.ReleaseId, ct);
+        var proposals = IdentificationProposalBuilder.Build(track, candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
+        var (cover, picture, status) = await LoadCoverForAsync(release, ct);
+
+        var hasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
+        var plan = new ItemPlan
+        {
+            Candidate = new CandidateItem(candidate),
+            Release = release,
+            Proposals = proposals.Select(p => new ProposalRow(p)).ToList(),
+            TrackHasCover = hasCover,
+            Cover = cover,
+            CoverPicture = picture,
+            CoverStatus = status,
+            UseCover = cover is not null && !hasCover && _settings.Load().EmbedCoverByDefault,
+            Confident = decision.Confident,
+            Reason = decision.Reason
+        };
+        AttachPlan(item, plan);
+        item.Include = plan.Confident && plan.HasChanges;
+        item.Attention = plan.Confident ? "" : "Needs your decision: " + plan.Reason;
+    }
+
+    /// <summary>Stores a plan on its item and keeps the list line (match, release, changes) in step with it.</summary>
+    private void AttachPlan(IdentifyQueueItem item, ItemPlan plan)
+    {
+        item.Plan = plan;
+        // A tick the user makes on a track is a decision to write it: the track joins the list of files to write.
+        foreach (var row in plan.Proposals) row.PropertyChanged += (_, _) => { RefreshItem(item); if (plan.HasChanges) item.Include = true; };
+        RefreshItem(item);
+    }
+
+    private void RefreshItem(IdentifyQueueItem item)
+    {
+        if (item.Plan is not { } plan) return;
+        item.MatchText = $"{plan.Candidate.Title} — {plan.Candidate.ArtistCredit} ({plan.Candidate.ScoreText})";
+        item.ReleaseText = plan.Release?.Title ?? "(no release)";
+        item.ChangesText = plan.HasChanges ? plan.Summary : "nothing to change";
+        item.CanInclude = plan.HasChanges;
+        if (!plan.HasChanges) item.Include = false;
+        RefreshSummaries();
+    }
+
+    /// <summary>The view calls this when a line of the list is ticked or unticked.</summary>
+    public void NotifyIncludeChanged() => RefreshSummaries();
+
+    private void RefreshSummaries()
+    {
+        OnPropertyChanged(nameof(ChangeSummary));
+        OnPropertyChanged(nameof(WriteCount));
+        OnPropertyChanged(nameof(WriteButtonText));
+        OnPropertyChanged(nameof(CanWrite));
+        OnPropertyChanged(nameof(OverviewSummary));
+    }
+
+    private async Task<ReleaseDetails?> LoadDetailsAsync(string releaseId, CancellationToken ct)
+    {
+        try { return await _service.GetReleaseDetailsAsync(releaseId, ct); }
+        catch (IdentificationHttpException) { return null; }
+    }
+
+    /// <summary>The release's front cover, cached for the window's lifetime. Returns what to show: the image, its picture and a status line.</summary>
+    private async Task<(CoverImage? Cover, ImageSource? Picture, string Status)> LoadCoverForAsync(ReleaseSummary? release, CancellationToken ct)
+    {
+        if (release is null || !CoverEnabled) return (null, null, "");
+        if (!_covers.TryGetValue(release.ReleaseId, out var cover))
+        {
+            try { cover = await _coverArt.GetFrontAsync(release.ReleaseId, ct); }
+            catch (IdentificationHttpException) { return (null, null, "Could not reach the Cover Art Archive."); }
+            _covers[release.ReleaseId] = cover;
+        }
+        if (cover is null) return (null, null, "No cover is on file for this release.");
+        var picture = Decode(cover.Data);
+        return picture is null ? (null, null, "The cover could not be displayed, so it is not offered.") : (cover, picture, cover.Description);
+    }
+
     // ===== showing one track's result =====
 
-    partial void OnCurrentChanged(IdentifyQueueItem? value) => Pend(ShowCurrentAsync());
+    partial void OnCurrentChanged(IdentifyQueueItem? value)
+    {
+        if (Step is IdentifyStep.Choose) Pend(ShowCurrentAsync());
+        RefreshSummaries();
+    }
 
     private async Task ShowCurrentAsync()
     {
@@ -279,14 +466,20 @@ public sealed partial class IdentifyViewModel : ObservableObject
         Proposals.Clear();
         SelectedCandidate = null;
         SelectedRelease = null;
+        SetCover(null, "");
+        UseCover = false;
+        ReplaceCover = false;
+        TrackHasCover = false;
         _suppress = false;
         OnPropertyChanged(nameof(HasCandidates));
 
-        var result = Current?.Result;
+        var item = Current;
+        var result = item?.Result;
         Message = result is { Outcome: not IdentificationOutcome.Found } && !string.IsNullOrEmpty(result.Message) ? result.Message : null;
-        if (result is null || result.Outcome != IdentificationOutcome.Found)
+        if (item is null || result is null || result.Outcome != IdentificationOutcome.Found)
         {
             OnPropertyChanged(nameof(HasNext));
+            RefreshSummaries();
             return;
         }
 
@@ -294,8 +487,41 @@ public sealed partial class IdentifyViewModel : ObservableObject
         OnPropertyChanged(nameof(HasCandidates));
         OnPropertyChanged(nameof(HasNext));
         if (version != _showVersion) return;
-        SelectedCandidate = Candidates[0];   // the best candidate is only pre-selected: nothing is applied until the user confirms
+
+        if (item.Plan is { } plan)
+        {
+            RestorePlan(plan);
+            return;
+        }
+        SelectedCandidate = Candidates[0];   // the best candidate is only pre-selected: nothing is applied until the user presses Write
         await Task.CompletedTask;
+    }
+
+    /// <summary>Shows a stored plan in the detail view exactly as it was left (same candidate, release, ticks and cover choice).</summary>
+    private void RestorePlan(ItemPlan plan)
+    {
+        _suppress = true;
+        var candidate = Candidates.FirstOrDefault(c => c.Candidate.RecordingId == plan.Candidate.Candidate.RecordingId) ?? Candidates[0];
+        SelectedCandidate = candidate;
+        FillReleases(candidate);
+        SelectedRelease = Releases.FirstOrDefault(r => r.Release?.ReleaseId == plan.Release?.ReleaseId) ?? Releases[0];
+        Proposals.Clear();
+        foreach (var p in plan.Proposals) Proposals.Add(p);
+        TrackHasCover = plan.TrackHasCover;
+        SetCover(plan.Cover, plan.CoverStatus, plan.CoverPicture);
+        UseCover = plan.UseCover;
+        ReplaceCover = plan.ReplaceCover;
+        _suppress = false;
+        OnPropertyChanged(nameof(CoverEnabled));
+        RefreshSummaries();
+    }
+
+    private void FillReleases(CandidateItem candidate)
+    {
+        Releases.Clear();
+        Releases.Add(new ReleaseChoice(null, "No release (title, artist and id only)"));
+        foreach (var r in AutoChoice.OrderReleases(candidate.Candidate.Releases))
+            Releases.Add(new ReleaseChoice(r, DescribeRelease(r)));
     }
 
     partial void OnSelectedCandidateChanged(CandidateItem? value)
@@ -305,15 +531,17 @@ public sealed partial class IdentifyViewModel : ObservableObject
         SelectedRelease = null;
         Proposals.Clear();
         if (value is null) return;
+        FillReleases(value);
+        Pend(ChooseDefaultReleaseAsync(value));
+    }
 
-        Releases.Add(new ReleaseChoice(null, "No release (title, artist and id only)"));
-        foreach (var r in value.Candidate.Releases
-                     .OrderBy(r => r.Status == "Official" ? 0 : 1)
-                     .ThenBy(r => r.PrimaryType == "Album" ? 0 : 1)
-                     .ThenBy(r => r.SecondaryTypes.Count)
-                     .ThenBy(r => r.Date ?? "9999", StringComparer.Ordinal))
-            Releases.Add(new ReleaseChoice(r, DescribeRelease(r)));
-        SelectedRelease = Releases.Count > 1 ? Releases[1] : Releases[0];
+    /// <summary>The release whose title is the album already in the file, otherwise the usual best one.</summary>
+    private async Task ChooseDefaultReleaseAsync(CandidateItem candidate)
+    {
+        var track = Current is { } item ? await _tracks.GetAsync(item.TrackId) : null;
+        var release = track is null ? AutoChoice.OrderReleases(candidate.Candidate.Releases).FirstOrDefault() : AutoChoice.PickRelease(track, candidate.Candidate);
+        if (!ReferenceEquals(SelectedCandidate, candidate)) return;
+        SelectedRelease = Releases.FirstOrDefault(r => r.Release?.ReleaseId == release?.ReleaseId) ?? Releases[0];
     }
 
     partial void OnSelectedReleaseChanged(ReleaseChoice? value)
@@ -333,11 +561,12 @@ public sealed partial class IdentifyViewModel : ObservableObject
         return string.Join(" · ", parts);
     }
 
+    /// <summary>The user chose a recording or a release: build the proposals and the cover for it, and make that the track's plan.</summary>
     private async Task RebuildProposalsAsync(ReleaseChoice choice)
     {
         var version = ++_showVersion;
         var item = Current;
-        var candidate = SelectedCandidate?.Candidate;
+        var candidate = SelectedCandidate;
         if (item is null || candidate is null) return;
 
         ReleaseDetails? details = null;
@@ -353,42 +582,45 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var track = await _tracks.GetAsync(item.TrackId);
         if (track is null || version != _showVersion) return;
 
-        var proposals = IdentificationProposalBuilder.Build(track, candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
+        var proposals = IdentificationProposalBuilder.Build(track, candidate.Candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
+        var rows = proposals.Select(p => new ProposalRow(p)).ToList();
+        var hasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
+
+        _suppress = true;
         Proposals.Clear();
-        foreach (var p in proposals) Proposals.Add(new ProposalRow(p));
-        TrackHasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
-
-        await LoadCoverAsync(choice, version);
-    }
-
-    /// <summary>Looks for the chosen release's front cover. It is only offered: nothing is embedded unless the user ticks it.</summary>
-    private async Task LoadCoverAsync(ReleaseChoice choice, int version)
-    {
-        SetCover(null, "");
+        foreach (var row in rows) Proposals.Add(row);
+        TrackHasCover = hasCover;
+        SetCover(null, choice.Release is null ? "" : "Looking for the cover…");
         UseCover = false;
         ReplaceCover = false;
+        _suppress = false;
         OnPropertyChanged(nameof(CoverEnabled));
-        if (choice.Release is null || !CoverEnabled) return;
 
-        var id = choice.Release.ReleaseId;
-        CoverImage? cover;
-        if (!_covers.TryGetValue(id, out cover))
-        {
-            CoverStatus = "Looking for the cover…";
-            try { cover = await _coverArt.GetFrontAsync(id, default); }
-            catch (IdentificationHttpException)
-            {
-                if (version == _showVersion) CoverStatus = "Could not reach the Cover Art Archive.";
-                return;
-            }
-            _covers[id] = cover;
-        }
+        var (cover, picture, status) = await LoadCoverForAsync(choice.Release, default);
         if (version != _showVersion) return;
-        if (cover is null) { SetCover(null, "No cover is on file for this release."); return; }
+        var decision = AutoChoice.Decide(track, item.Result?.Candidates ?? []);
 
-        var picture = Decode(cover.Data);
-        if (picture is null) { SetCover(null, "The cover could not be displayed, so it is not offered."); return; }
-        SetCover(cover, cover.Description, picture);
+        var plan = new ItemPlan
+        {
+            Candidate = candidate,
+            Release = choice.Release,
+            Proposals = rows,
+            TrackHasCover = hasCover,
+            Cover = cover,
+            CoverPicture = picture,
+            CoverStatus = status,
+            UseCover = cover is not null && !hasCover && _settings.Load().EmbedCoverByDefault,
+            Confident = decision.Confident && decision.Candidate?.RecordingId == candidate.Candidate.RecordingId,
+            Reason = decision.Reason
+        };
+
+        _suppress = true;
+        SetCover(plan.Cover, plan.CoverStatus, plan.CoverPicture);
+        UseCover = plan.UseCover;
+        _suppress = false;
+        AttachPlan(item, plan);
+        // The user looked at this track and chose: it is theirs to include, whatever the automatic rule thought.
+        if (plan.HasChanges) item.Include = true;
     }
 
     private void SetCover(CoverImage? cover, string status, ImageSource? picture = null)
@@ -419,7 +651,65 @@ public sealed partial class IdentifyViewModel : ObservableObject
         }
     }
 
-    // ===== skipping, previewing, writing =====
+    partial void OnUseCoverChanged(bool value)
+    {
+        if (_suppress) return;
+        if (Current?.Plan is { } plan) { plan.UseCover = value; RefreshItem(Current); if (plan.HasChanges) Current.Include = true; }
+        RefreshSummaries();
+    }
+
+    partial void OnReplaceCoverChanged(bool value)
+    {
+        if (_suppress) return;
+        if (value && !UseCover) UseCover = true;          // replacing implies embedding
+        if (Current?.Plan is { } plan) { plan.ReplaceCover = value; RefreshItem(Current); if (plan.HasChanges) Current.Include = true; }
+        RefreshSummaries();
+    }
+
+    // ===== the list =====
+
+    [RelayCommand]
+    private void IncludeAllReady()
+    {
+        foreach (var q in Queue.Where(q => q.Plan is { Confident: true, HasChanges: true } && !q.Resolved)) q.Include = true;
+        RefreshSummaries();
+    }
+
+    [RelayCommand]
+    private void IncludeNone()
+    {
+        foreach (var q in Queue) q.Include = false;
+        RefreshSummaries();
+    }
+
+    partial void OnStepChanged(IdentifyStep value)
+    {
+        OnPropertyChanged(nameof(IsOverviewStep));
+        OnPropertyChanged(nameof(IsChooseStep));
+        OnPropertyChanged(nameof(IsWritingStep));
+        OnPropertyChanged(nameof(IsDoneStep));
+    }
+
+    /// <summary>Opens one track of the list in detail, to change the recording, release or ticks.</summary>
+    [RelayCommand]
+    private void Review(IdentifyQueueItem? item)
+    {
+        item ??= Current;
+        if (item is null) return;
+        Message = null;
+        Step = IdentifyStep.Choose;
+        if (ReferenceEquals(Current, item)) Pend(ShowCurrentAsync());
+        else Current = item;          // OnCurrentChanged shows it
+    }
+
+    /// <summary>Back from the detail of one track to the list of all.</summary>
+    [RelayCommand]
+    private void BackToList()
+    {
+        Message = null;
+        Step = IdentifyStep.Overview;
+        RefreshSummaries();
+    }
 
     [RelayCommand]
     private void Skip()
@@ -427,7 +717,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
         if (Current is null) return;
         Current.Status = "Skipped";
         Current.Resolved = true;
+        Current.Include = false;
         MoveToNext();
+        RefreshSummaries();
     }
 
     private void MoveToNext()
@@ -437,91 +729,114 @@ public sealed partial class IdentifyViewModel : ObservableObject
         OnPropertyChanged(nameof(HasNext));
     }
 
-    private TagChangeSet BuildChanges()
-    {
-        var text = IdentificationProposalBuilder.ToChangeSet(Proposals.Select(p => p.ToProposal()));
-        return UseCover && Cover is not null ? text with { Cover = Cover, ReplaceExistingCover = ReplaceCover } : text;
-    }
+    // ===== writing =====
 
-    [RelayCommand]
-    private async Task PreviewAsync()
-    {
-        Message = null;
-        if (Current is null) return;
-        if (!Proposals.Any(p => p.Selected) && !(UseCover && Cover is not null))
-        {
-            Message = "Tick at least one field to apply.";
-            return;
-        }
-        var plan = await _editing.PreviewAsync([Current.TrackId], BuildChanges());
-        if (plan.Errors.Count > 0)
-        {
-            Message = string.Join(" ", plan.Errors);
-            return;
-        }
-        if (plan.Changes.Count == 0)
-        {
-            Message = UseCover && TrackHasCover && !ReplaceCover
-                ? "The file already has a cover and these values, so nothing would change. Tick \"Replace the cover the file has\" to swap the cover."
-                : "The file already has these values, so nothing would change.";
-            return;
-        }
-        PreviewRows.Clear();
-        foreach (var row in plan.Changes) PreviewRows.Add(new PreviewLine(row.Field, FieldLabels.For(row.Field), row.Before, row.After));
-        PreviewSummary = $"{plan.Changes.Count} change(s) in this file. Nothing is written until you confirm.";
-        Step = IdentifyStep.Preview;
-    }
-
-    [RelayCommand]
-    private void Back()
-    {
-        Message = null;
-        Step = IdentifyStep.Choose;
-    }
-
+    /// <summary>
+    /// Writes what is ticked: for one track the table on screen, for many the ticked lines of the list. The table or list is the
+    /// preview; nothing is written before this is pressed, and every file goes through the verified temporary-copy writer.
+    /// </summary>
     [RelayCommand]
     private async Task WriteAsync()
     {
-        if (Step != IdentifyStep.Preview || Current is null) return;
-        var item = Current;
+        if (Step is IdentifyStep.Writing or IdentifyStep.Done || IsLookingUp) return;
+        Message = null;
+        var targets = Targets();
+        if (targets.Count == 0)
+        {
+            Message = IsMany ? "Tick at least one track to write."
+                : Current?.Plan is { UseCover: true, TrackHasCover: true, ReplaceCover: false }
+                    ? "The file already has a cover, and the cover is all that is ticked. Tick \"Replace the cover the file has\" to swap it."
+                    : "Tick at least one field to apply.";
+            return;
+        }
+
+        if (!IsMany)
+        {
+            // One track: check now, so a problem or "nothing would change" is explained here instead of after a write.
+            var plan = await _editing.PreviewAsync([targets[0].TrackId], targets[0].Plan!.ToChangeSet());
+            if (plan.Errors.Count > 0) { Message = string.Join(" ", plan.Errors); return; }
+            if (plan.Changes.Count == 0)
+            {
+                var p = targets[0].Plan!;
+                Message = p.UseCover && p.TrackHasCover && !p.ReplaceCover
+                    ? "The file already has a cover and these values, so nothing would change. Tick \"Replace the cover the file has\" to swap the cover."
+                    : "The file already has these values, so nothing would change.";
+                return;
+            }
+        }
+
+        Failures.Clear();
+        OnPropertyChanged(nameof(HasFailures));
+        ProgressDone = 0;
+        ProgressTotal = Math.Max(1, targets.Count);
+        ProgressText = "";
         Step = IdentifyStep.Writing;
         _writeCts = new CancellationTokenSource();
+        var written = 0;
+        var unchanged = 0;
+        var cancelled = false;
         try
         {
             var options = new TagWriteOptions(KeepBackup, KeepBackup ? _backupDirectory : null);
-            var changes = BuildChanges();
-            var summary = await Task.Run(() => _editing.ApplyAsync([item.TrackId], changes, options, null, _writeCts.Token));
-            var failed = summary.Files.FirstOrDefault(f => f.Outcome == TagEditOutcome.Failed);
-            if (summary.Written > 0)
+            for (var i = 0; i < targets.Count; i++)
             {
-                item.Status = "Applied";
-                item.Resolved = true;
-                ResultSummary = "Written. " + (failed is null ? "" : failed.Error);
-            }
-            else
-            {
-                ResultSummary = failed is not null ? "Not written: " + failed.Error + " The file was left untouched." : "Nothing needed to change.";
+                if (_writeCts.IsCancellationRequested) { cancelled = true; break; }
+                var item = targets[i];
+                ProgressText = $"Writing {i + 1} of {targets.Count}: {item.Label}";
+                var changes = item.Plan!.ToChangeSet();
+                TagEditSummary summary;
+                try { summary = await Task.Run(() => _editing.ApplyAsync([item.TrackId], changes, options, null, _writeCts.Token)); }
+                catch (ArgumentException ex) { Failures.Add($"{item.Label}: {ex.Message}"); continue; }
+                catch (OperationCanceledException) { cancelled = true; break; }
+
+                var file = summary.Files.FirstOrDefault();
+                if (file?.Outcome == TagEditOutcome.Written)
+                {
+                    written++;
+                    item.Status = "Written";
+                    item.Resolved = true;
+                    item.Include = false;
+                    item.Plan = null;            // the file changed: a new look at it starts from what it holds now
+                    item.ChangesText = "";
+                    item.CanInclude = false;
+                    if (file.Warning is not null) Failures.Add($"{item.Label}: {file.Warning}");
+                }
+                else if (file?.Outcome == TagEditOutcome.Unchanged) { unchanged++; item.Status = "Already up to date"; item.Resolved = true; item.Include = false; }
+                else Failures.Add($"{item.Label}: {file?.Error ?? "not written"} The file was left untouched.");
+                ProgressDone = i + 1;
             }
         }
         catch (Exception ex)
         {
-            ResultSummary = "The write stopped: " + ex.Message;
+            Failures.Add("The write stopped: " + ex.Message);
         }
         finally
         {
             _writeCts?.Dispose();
             _writeCts = null;
         }
+
+        var parts = new List<string> { written == 1 ? "1 file written" : $"{written} files written" };
+        if (unchanged > 0) parts.Add($"{unchanged} already up to date");
+        if (Failures.Count > 0) parts.Add($"{Failures.Count} problem(s): those files were left untouched");
+        if (cancelled) parts.Add("stopped before the remaining files");
+        ResultSummary = string.Join(" · ", parts) + ".";
+        OnPropertyChanged(nameof(HasFailures));
         OnPropertyChanged(nameof(HasNext));
+        RefreshSummaries();
         Step = IdentifyStep.Done;
     }
 
-    /// <summary>After a write: on to the next track that still has to be decided.</summary>
     [RelayCommand]
-    private void Next()
+    private void CancelWriting() => _writeCts?.Cancel();
+
+    /// <summary>After a write: back to the list (many tracks) or to the track on screen (one).</summary>
+    [RelayCommand]
+    private void Continue()
     {
-        Step = IdentifyStep.Choose;
-        MoveToNext();
+        Step = IsMany ? IdentifyStep.Overview : IdentifyStep.Choose;
+        if (!IsMany) Pend(ShowCurrentAsync());
+        RefreshSummaries();
     }
 
     partial void OnKeepBackupChanged(bool value)
@@ -531,13 +846,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         _settings.Save(s);
     }
 
-    partial void OnStepChanged(IdentifyStep value)
-    {
-        OnPropertyChanged(nameof(IsChooseStep));
-        OnPropertyChanged(nameof(IsPreviewStep));
-        OnPropertyChanged(nameof(IsWritingStep));
-        OnPropertyChanged(nameof(IsDoneStep));
-    }
+    partial void OnIsLookingUpChanged(bool value) => RefreshSummaries();
 
     partial void OnMessageChanged(string? value) => OnPropertyChanged(nameof(HasMessage));
 
@@ -549,7 +858,5 @@ public sealed partial class IdentifyViewModel : ObservableObject
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
-
     private void Pend(Task work) => _pending = _pending.ContinueWith(_ => work, TaskScheduler.FromCurrentSynchronizationContext()).Unwrap();
 }
-

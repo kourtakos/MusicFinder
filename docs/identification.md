@@ -1,6 +1,6 @@
 # Online identification
 
-MusicFinder can look a track up on MusicBrainz and propose tags for it. It is **off until you agree**, never needed for search or the library, and it **never writes anything without a preview and your confirmation**.
+MusicFinder can look a track up on MusicBrainz and propose tags for it. It is **off until you agree**, never needed for search or the library, and it **never writes anything until you press Write**, and what is shown on screen at that moment (current and proposed values side by side, with a line "Will write: …") is exactly what is written.
 
 **What it is not.** It does not give BPM or key (MusicBrainz does not reliably have them, so they are never proposed). It does not download covers. A candidate is a suggestion, not a verdict.
 
@@ -37,12 +37,21 @@ releases of one recording have different albums, years and track numbers, so **y
 ## What gets proposed, and what is ticked
 
 Title, artist, album, album artist, year, track number, MusicBrainz recording id and (optionally) genres. A field that is **empty in your file starts ticked**; a field that **already holds a different value starts unticked**, so
-nothing you wrote is replaced unless you tick it. The recording id starts ticked (it only links the file). MusicBrainz community genres are only ever a suggestion and never start ticked. Then *Preview changes* shows
-before and after, and *Write* uses the same safe path as the tag editor: a verified temporary copy replaces the original, a failure leaves the file untouched, the library and search follow, the cover is kept.
+nothing you wrote is replaced unless you tick it. The recording id starts ticked (it only links the file). MusicBrainz community genres are only ever a suggestion and never start ticked. The table shows the current and the proposed value of every field, and *Write changes* uses the same safe path as the tag editor: a verified temporary copy replaces the original, a failure leaves the file untouched, the library and search follow, the cover is kept. There is no separate preview step: the table and the "Will write" line are the preview.
+
+## Many tracks at once
+
+Select as many tracks as you like and choose *Identify online*. MusicFinder looks each one up (one after the other, within the services' limits) and **chooses for you**, then shows **one list**: a line per track with what was found, the release, and a *Will change* column that says exactly what Write will do to that file.
+
+- **Clear matches are ticked**: an audio match of at least 0.90 that beats the runner-up by 0.10, or a tag-search hit of at least 90 whose title, artist and length agree with your file, or the file's own MusicBrainz id. Anything doubtful (a low score, two near-equal matches, a different title or length, a file with no title tag) is **left unticked, with the reason** shown under the match; open it with *Review…*, decide, and tick it.
+- The release is the one whose title is the album already in your file, otherwise the usual best one (official, plain album, earliest). Fields that already hold a value are kept, empty ones are filled, and the cover is embedded when the file has none.
+- *Tick all clear matches* and *Untick all* help with long lists; *Write N files* writes the ticked ones with a progress bar, one file at a time, and lists any file that could not be written (those are left untouched) while the rest go on. *Stop after this file* ends it early.
+- Changes made in *Review…* are remembered; a track you change there is added to the list to write.
+
 
 ## Covers
 
-When you choose a release, MusicFinder asks the **Cover Art Archive** for its front cover and shows a small preview next to the release. It is **only offered**: *Embed this cover* starts unticked, and the cover is written only after you preview and confirm, through the same safe path as the tags (a verified temporary copy replaces the original; a failure leaves the file untouched).
+When you choose a release, MusicFinder asks the **Cover Art Archive** for its front cover and shows a small preview next to the release. It is **ticked by default when the file has no cover** (you can turn that default off in Settings), and it is written only when you press Write, through the same safe path as the tags (a verified temporary copy replaces the original; a failure leaves the file untouched).
 
 - A file that **already has a cover is left alone**. Tick *Replace the cover the file has* to swap the front cover; your other pictures (back cover, booklet) are kept.
 - What arrives is accepted only if its first bytes say JPEG or PNG and it is under 8 MB; the server's word is not trusted. The 500-pixel version is used (the original if that size does not exist).

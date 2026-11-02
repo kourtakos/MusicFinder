@@ -45,7 +45,7 @@ Command-line options for the app:
 8. **Find similar** (right-click a track) lists tracks that fit next to it by genre, BPM, key and DJ tags, with the reason for each match (`docs/find-similar.md`).
 9. Drag tracks from the grid into VirtualDJ, Traktor or any player that accepts files. The **Session** tab lists what you dragged and what MusicFinder
    infers about it ("exported", "possibly played" after a quiet period, "confirmed" only when you say so). See `docs/dj-session.md`.
-10. **Identify online** (`Ctrl+I`, right-click, or the button in the details panel) looks tracks up on MusicBrainz, optionally by audio fingerprint through AcoustID, and proposes tags (and the release's cover) that you tick, preview and confirm. Off until you agree (`docs/identification.md`).
+10. **Identify online** (`Ctrl+I`, right-click, or the button in the details panel) looks tracks up on MusicBrainz, optionally by audio fingerprint through AcoustID, and proposes tags (and the release's cover) and shows exactly what Write will change. Many tracks at once get one list with the clear matches ticked. Off until you agree (`docs/identification.md`).
 11. Press **Ctrl+Alt+Space** in any program to open a small always-on-top search window; drag results into your player and move the window out of the way.
    Change the shortcut in Settings. See `docs/quick-search.md`.
 

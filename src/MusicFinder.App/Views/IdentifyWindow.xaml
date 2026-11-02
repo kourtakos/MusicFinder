@@ -20,13 +20,91 @@
         <StackPanel>
             <TextBlock Text="{Binding Heading}" FontSize="20" FontWeight="SemiBold"/>
             <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
-                       Text="Candidates come from MusicBrainz. Nothing is changed until you tick fields, preview and confirm."/>
+                       Text="Candidates come from MusicBrainz. What is ticked below is exactly what Write will change; nothing is written before you press it."/>
         </StackPanel>
 
         <Border Grid.Row="1" Margin="0,12,0,0" Padding="12,8" CornerRadius="8" Background="{StaticResource MF.Brush.AccentSoft}"
                 Visibility="{Binding HasMessage, Converter={StaticResource BoolToVis}}">
             <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="{StaticResource MF.Brush.Warning}"/>
         </Border>
+
+
+        <!-- ===== Overview: many tracks in one list ===== -->
+        <Grid Grid.Row="2" Margin="0,14,0,0" Visibility="{Binding IsOverviewStep, Converter={StaticResource BoolToVis}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding OverviewSummary}" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding ProgressText}" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center" Margin="14,0,0,0"/>
+                    <Button Content="Stop" Style="{StaticResource MF.PillButton}" Height="30" Padding="14,0" Margin="10,0,0,0"
+                            Command="{Binding CancelLookupsCommand}" Visibility="{Binding IsLookingUp, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+                <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,8"
+                           Text="Clear matches are ticked for you. Tracks that need your decision are left unticked, with the reason: open them with Review. The column “Will change” is what Write does to each file; empty fields are filled, values you already have are kept."/>
+            </StackPanel>
+
+            <Border Grid.Row="1" Style="{StaticResource MF.Panel}">
+                <DataGrid x:Name="OverviewGrid" ItemsSource="{Binding Queue}" Style="{StaticResource MF.TrackGrid}" SelectionMode="Single"
+                          SelectedItem="{Binding Current, Mode=TwoWay}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="4">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                            <Setter Property="MinHeight" Value="48"/>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="Write" Width="60">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Include, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanInclude}"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Checked="Include_Changed" Unchecked="Include_Changed"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Track" Binding="{Binding Label}" Width="1.2*" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Found" Width="1.6*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding MatchText}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Attention}" Foreground="{StaticResource MF.Brush.Warning}" FontSize="12" TextTrimming="CharacterEllipsis"
+                                                   ToolTip="{Binding Attention}" Visibility="{Binding Attention, Converter={StaticResource NotNullToVis}}"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Release" Binding="{Binding ReleaseText}" Width="1.1*" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="Will change" Width="1.7*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ChangesText}" TextWrapping="Wrap" VerticalAlignment="Center" ToolTip="{Binding ChangesText}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100" IsReadOnly="True"/>
+                        <DataGridTemplateColumn Header="" Width="104">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Review…" Style="{StaticResource MF.PillButton}" Height="28" Padding="10,0"
+                                            Command="{Binding DataContext.ReviewCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="Tick all clear matches" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Command="{Binding IncludeAllReadyCommand}"/>
+                <Button Content="Untick all" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="8,0,0,0" Command="{Binding IncludeNoneCommand}"/>
+            </StackPanel>
+        </Grid>
 
         <!-- ===== Choose ===== -->
         <Grid Grid.Row="2" Margin="0,14,0,0" Visibility="{Binding IsChooseStep, Converter={StaticResource BoolToVis}}">
@@ -116,7 +194,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Text="Which release? (album, year, track number and cover depend on it)" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                        <TextBlock Text="Which release? (album, year, track no., cover)" FontWeight="SemiBold" Margin="0,0,0,6"/>
                         <ComboBox Style="{StaticResource MF.ComboBox}" ItemsSource="{Binding Releases}" SelectedItem="{Binding SelectedRelease, Mode=TwoWay}"
                                   Height="34" VerticalContentAlignment="Center">
                             <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Text}" TextTrimming="CharacterEllipsis"/></DataTemplate></ComboBox.ItemTemplate>
@@ -142,6 +220,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Text="What would change (tick the fields to apply)" FontWeight="SemiBold" Margin="0,0,0,6"/>
                     <Border Grid.Row="1" Style="{StaticResource MF.Panel}">
@@ -161,69 +240,125 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
+                    <TextBlock Grid.Row="2" Text="{Binding ChangeSummary}" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,10,0,0"/>
                 </Grid>
             </Grid>
         </Grid>
 
-        <!-- ===== Preview ===== -->
-        <Grid Grid.Row="2" Margin="0,14,0,0" Visibility="{Binding IsPreviewStep, Converter={StaticResource BoolToVis}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="{Binding PreviewSummary}" TextWrapping="Wrap" Margin="0,0,0,10"/>
-            <Border Grid.Row="1" Style="{StaticResource MF.Panel}">
-                <DataGrid ItemsSource="{Binding PreviewRows}" Style="{StaticResource MF.TrackGrid}" SelectionMode="Single" Margin="4">
-                    <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
-                            <Setter Property="MinHeight" Value="34"/>
-                        </Style>
-                    </DataGrid.RowStyle>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Field" Binding="{Binding FieldLabel}" Width="150"/>
-                        <DataGridTextColumn Header="Before" Binding="{Binding Before, TargetNullValue='(empty)'}" Width="*"/>
-                        <DataGridTextColumn Header="After" Binding="{Binding After, TargetNullValue='(will be cleared)'}" Width="*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Border>
-            <StackPanel Grid.Row="2" Margin="0,12,0,0">
-                <CheckBox Content="Keep a backup copy of the file before changing it" IsChecked="{Binding KeepBackup}"/>
-                <TextBlock Style="{StaticResource MF.Secondary}" Margin="26,4,0,0" TextWrapping="Wrap"
-                           Text="Backups are stored in MusicFinder's data folder, never next to your music. The file is written through a verified temporary copy, so a failure leaves the original untouched."/>
-            </StackPanel>
-        </Grid>
 
         <!-- ===== Writing ===== -->
-        <StackPanel Grid.Row="2" Margin="0,60,0,0" VerticalAlignment="Top" MaxWidth="560"
+        <StackPanel Grid.Row="2" Margin="0,60,0,0" VerticalAlignment="Top" MaxWidth="620"
                     Visibility="{Binding IsWritingStep, Converter={StaticResource BoolToVis}}">
             <TextBlock Text="Writing tags…" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
-            <ProgressBar Margin="0,16,0,8" Height="6" IsIndeterminate="True"/>
+            <ProgressBar Margin="0,16,0,8" Height="6" Minimum="0" Maximum="{Binding ProgressTotal}" Value="{Binding ProgressDone, Mode=OneWay}"/>
+            <TextBlock Text="{Binding ProgressText}" Style="{StaticResource MF.Secondary}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"/>
         </StackPanel>
 
         <!-- ===== Done ===== -->
-        <StackPanel Grid.Row="2" Margin="0,30,0,0" Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}">
-            <TextBlock Text="{Binding ResultSummary}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
-        </StackPanel>
+        <ScrollViewer Grid.Row="2" Margin="0,30,0,0" VerticalScrollBarVisibility="Auto" Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="{Binding ResultSummary}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                <ItemsControl ItemsSource="{Binding Failures}" Margin="0,16,0,0" Visibility="{Binding HasFailures, Converter={StaticResource BoolToVis}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource MF.Brush.RowAlt}" CornerRadius="8" Padding="12,8" Margin="0,0,0,8">
+                                <TextBlock Text="{Binding}" Foreground="{StaticResource MF.Brush.Warning}" TextWrapping="Wrap"/>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
 
         <!-- ===== Buttons ===== -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
-            <Button Content="Skip" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding SkipCommand}"
-                    Visibility="{Binding IsChooseStep, Converter={StaticResource BoolToVis}}"/>
-            <Button Content="Close" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding CloseCommand}"
-                    Visibility="{Binding IsChooseStep, Converter={StaticResource BoolToVis}}"/>
-            <Button Content="Preview changes" Style="{StaticResource MF.AccentButton}" Command="{Binding PreviewCommand}"
-                    Visibility="{Binding IsChooseStep, Converter={StaticResource BoolToVis}}"/>
+        <Grid Grid.Row="3" Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-            <Button Content="Back" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding BackCommand}"
-                    Visibility="{Binding IsPreviewStep, Converter={StaticResource BoolToVis}}"/>
-            <Button Content="{Binding WriteButtonText}" Style="{StaticResource MF.AccentButton}" Command="{Binding WriteCommand}"
-                    Visibility="{Binding IsPreviewStep, Converter={StaticResource BoolToVis}}"/>
+            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                <CheckBox Content="Keep a backup copy of each file before changing it" IsChecked="{Binding KeepBackup}">
+                    <CheckBox.Style>
+                        <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOverviewStep}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                <DataTrigger Binding="{Binding IsChooseStep}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </CheckBox.Style>
+                </CheckBox>
+                <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" MaxWidth="560" Margin="26,2,0,0"
+                           Text="Backups go to MusicFinder's data folder, never next to your music. Every file is written through a verified temporary copy: a failure leaves the original untouched."
+                           Visibility="{Binding KeepBackup, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
 
-            <Button Content="Next track" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding NextCommand}"
-                    Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}"/>
-            <Button Content="Close" Style="{StaticResource MF.AccentButton}" Command="{Binding CloseCommand}"
-                    Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}"/>
-        </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                <!-- list of many -->
+                <Button Content="Close" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding CloseCommand}"
+                        Visibility="{Binding IsOverviewStep, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="{Binding WriteButtonText}" Style="{StaticResource MF.AccentButton}" Command="{Binding WriteCommand}" IsEnabled="{Binding CanWrite}"
+                        Visibility="{Binding IsOverviewStep, Converter={StaticResource BoolToVis}}"/>
+
+                <!-- one track in detail -->
+                <Button Content="Back to the list" Margin="0,0,10,0" Command="{Binding BackToListCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource MF.PillButton}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsChooseStep}" Value="True"/>
+                                        <Condition Binding="{Binding IsMany}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Content="Close" Margin="0,0,10,0" Command="{Binding CloseCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource MF.PillButton}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsChooseStep}" Value="True"/>
+                                        <Condition Binding="{Binding IsMany}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Content="Write changes" Command="{Binding WriteCommand}" IsEnabled="{Binding CanWrite}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource MF.AccentButton}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsChooseStep}" Value="True"/>
+                                        <Condition Binding="{Binding IsMany}" Value="False"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Content="Stop after this file" Style="{StaticResource MF.PillButton}" Command="{Binding CancelWritingCommand}"
+                        Visibility="{Binding IsWritingStep, Converter={StaticResource BoolToVis}}"/>
+
+                <Button Content="Continue" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding ContinueCommand}"
+                        Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="Close" Style="{StaticResource MF.AccentButton}" Command="{Binding CloseCommand}"
+                        Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
