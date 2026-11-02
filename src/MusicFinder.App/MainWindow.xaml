@@ -32,11 +32,8 @@
         <Border Background="{StaticResource MF.Brush.HeaderBg}" BorderBrush="{StaticResource MF.Brush.PanelBorder}" BorderThickness="0,0,0,1">
             <Grid Margin="20,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <Grid Width="42" Height="42" Margin="0,0,12,0">
-                        <Ellipse Fill="{StaticResource MF.Brush.Logo}"/>
-                        <Ellipse Width="14" Height="14" Fill="{StaticResource MF.Brush.HeaderBg}"/>
-                        <Ellipse Width="5" Height="5" Fill="{StaticResource MF.Brush.AccentHover}"/>
-                    </Grid>
+                    <Image Width="44" Height="44" Margin="0,0,12,0" RenderOptions.BitmapScalingMode="HighQuality"
+                           Source="pack://application:,,,/MusicFinder;component/Assets/icon.png"/>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="MusicFinder" FontSize="{StaticResource MF.Size.Logo}" FontWeight="Bold" LineHeight="24"/>
                         <TextBlock Text="DJ Music Organizer" Style="{StaticResource MF.Secondary}"/>
