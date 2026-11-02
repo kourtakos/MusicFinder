@@ -102,6 +102,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<TagsViewModel>();
         services.AddSingleton<HealthViewModel>();
+        services.AddSingleton<RenameViewModelFactory>();
         services.AddSingleton<SessionViewModel>();
         services.AddSingleton<QuickSearchViewModel>();
         services.AddSingleton<Views.QuickSearchWindow>();

@@ -13,7 +13,9 @@ internal sealed class FakeDialogs : IUserDialogs
     public TagEditorViewModel? Editor { get; private set; }
     public List<string> Infos { get; } = [];
     public string? PickFolder() => null;
-    public bool Confirm(string title, string message) => true;
+    public List<string> Confirmed { get; } = [];
+    public bool ConfirmAnswer { get; set; } = true;
+    public bool Confirm(string title, string message) { Confirmed.Add(title); return ConfirmAnswer; }
     public void ShowError(string title, string message) { }
     public void ShowInfo(string title, string message) => Infos.Add(message);
     public void RevealInExplorer(string path) { }
@@ -30,6 +32,10 @@ internal sealed class FakeDialogs : IUserDialogs
     public void ShowAnalyze(AnalyzeViewModel viewModel) => Analyze = viewModel;
     public DuplicatesViewModel? Duplicates { get; private set; }
     public void ShowDuplicates(DuplicatesViewModel viewModel) => Duplicates = viewModel;
+    public RenameViewModel? Rename { get; private set; }
+    public void ShowRename(RenameViewModel viewModel) => Rename = viewModel;
+    public string? SavePicked { get; set; }
+    public string? PickSaveFile(string title, string filter, string defaultName) => SavePicked;
     public string? PickFile(string title, string filter) => FilePicked;
 }
 

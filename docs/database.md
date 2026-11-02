@@ -127,3 +127,8 @@ data the row already has; nothing is hashed or decoded. `ScanUnsupported(RootId,
 
 `FileHashes(TrackId PK -> Tracks ON DELETE CASCADE, FileSize, ModifiedUtc, Algorithm 'SHA256', Hash, ComputedUtc)` holds a content hash only for files a duplicate scan has read (never filled by indexing). Trigger `Tracks_au_hashStale` deletes a track's row when its `FileSize` or `ModifiedUtc` changes, so a
 remembered hash always describes the bytes the track has now; a rename or move keeps it. `DuplicateDismissals(Hash PK, DismissedUtc)` records "not a duplicate" decisions by content hash. Groups are not stored: they are `FileHashes` rows that share a hash among present files, so they are always current.
+
+## File operations journal (M6, migration 0011)
+
+The unused `FileOperations` table from 0001 is replaced. `FileOperationBatches(Id, Kind, Template, CreatedUtc)` and `FileOperations(Id, BatchId -> batch ON DELETE CASCADE, TrackId, Role 'Track'|'Sidecar', OldPath, NewPath, State, Error, CreatedUtc, CompletedUtc)`.
+States: `Planned -> InProgress -> Done | Failed | Skipped`, and `Done -> UndoInProgress -> Undone`. A row is set to `InProgress`/`UndoInProgress` **before** the file is touched; startup recovery reads those rows. The `Tracks` row of a renamed file is updated (path, file name, search text) in the same transaction that marks its operation `Done`, so history, genres, tags and analysis (keyed by `Tracks.Id`) follow the file.

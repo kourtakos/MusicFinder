@@ -22,6 +22,10 @@ public interface IUserDialogs
     void ShowAnalyze(ViewModels.AnalyzeViewModel viewModel);
     /// <summary>Shows the duplicate files review as a modal dialog over the main window.</summary>
     void ShowDuplicates(ViewModels.DuplicatesViewModel viewModel);
+    /// <summary>Shows the batch rename window as a modal dialog over the main window.</summary>
+    void ShowRename(ViewModels.RenameViewModel viewModel);
+    /// <summary>A save-as picker; null when cancelled.</summary>
+    string? PickSaveFile(string title, string filter, string defaultName);
     /// <summary>A file picker; <paramref name="filter"/> is in the Windows form "Name|*.ext|Name2|*.ext2". Null when cancelled.</summary>
     string? PickFile(string title, string filter);
 }
@@ -70,6 +74,15 @@ public sealed class UserDialogs : IUserDialogs
 
     public void ShowDuplicates(ViewModels.DuplicatesViewModel viewModel) =>
         new Views.DuplicatesWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public void ShowRename(ViewModels.RenameViewModel viewModel) =>
+        new Views.RenameWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public string? PickSaveFile(string title, string filter, string defaultName)
+    {
+        var dialog = new SaveFileDialog { Title = title, Filter = filter, FileName = defaultName, OverwritePrompt = true };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
 
     public string? PickFile(string title, string filter)
     {

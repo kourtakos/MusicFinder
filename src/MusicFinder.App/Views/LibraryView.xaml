@@ -239,6 +239,8 @@
                                           Command="{Binding PlacementTarget.DataContext.IdentifyCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Analyze BPM and key…  (Ctrl+B)"
                                           Command="{Binding PlacementTarget.DataContext.AnalyzeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Rename files…  (F6)"
+                                          Command="{Binding PlacementTarget.DataContext.RenameFilesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Find similar"
                                           Command="{Binding PlacementTarget.DataContext.Search.FindSimilarCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <Separator/>

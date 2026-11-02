@@ -33,12 +33,14 @@ public sealed class LibraryScanner : IIndexer
     private readonly ITrackRepository _tracks;
     private readonly IMetadataReader _reader;
     private readonly ILogger<LibraryScanner> _log;
+    private readonly ILibraryWriteLock? _writeLock;
 
     public int ReaderConcurrency { get; set; } = 3;
 
     public LibraryScanner(ILibraryRootRepository roots, IFolderRepository folders, ITrackRepository tracks,
-        IMetadataReader reader, ILogger<LibraryScanner>? log = null)
+        IMetadataReader reader, ILogger<LibraryScanner>? log = null, ILibraryWriteLock? writeLock = null)
     {
+        _writeLock = writeLock;
         _roots = roots;
         _folders = folders;
         _tracks = tracks;
@@ -50,6 +52,8 @@ public sealed class LibraryScanner : IIndexer
 
     public async Task ScanRootAsync(long rootId, IProgress<ScanProgress>? progress, CancellationToken ct)
     {
+        // A scan waits for a running batch of file renames; renames refuse to start while a scan runs.
+        using var gate = _writeLock is null ? null : await _writeLock.EnterAsync(ct).ConfigureAwait(false);
         var root = await _roots.GetAsync(rootId, ct) ?? throw new InvalidOperationException($"Unknown library root {rootId}.");
 
         if (!Directory.Exists(root.Path))

@@ -18,6 +18,8 @@ public sealed partial class MainViewModel : ObservableObject
     public SessionViewModel Session { get; }
     public HealthViewModel Health { get; }
     private readonly Services.SearchIndexCoordinator _searchIndex;
+    private readonly MusicFinder.Domain.Contracts.IFileOperationService _fileOperations;
+    private readonly Services.IUserDialogs _dialogs;
 
     /// <summary>"Preparing Greek search… 1,200 left" while the smart-search index is built in the background.</summary>
     public string IndexStatusText => _searchIndex.StatusText;
@@ -28,8 +30,11 @@ public sealed partial class MainViewModel : ObservableObject
     private AppTab _selectedTab = AppTab.Library;
 
     public MainViewModel(LibraryViewModel library, SettingsViewModel settings, TagsViewModel tags, SessionViewModel session,
-        HealthViewModel health, Services.SearchIndexCoordinator searchIndex)
+        HealthViewModel health, Services.SearchIndexCoordinator searchIndex,
+        MusicFinder.Domain.Contracts.IFileOperationService fileOperations, Services.IUserDialogs dialogs)
     {
+        _fileOperations = fileOperations;
+        _dialogs = dialogs;
         Library = library;
         Settings = settings;
         Tags = tags;
@@ -67,8 +72,18 @@ public sealed partial class MainViewModel : ObservableObject
         Library.RequestFocusSearch();
     }
 
+    /// <summary>Settles a rename a crash left half-done, before the first scan could mistake it for a deleted file.</summary>
+    private async Task RecoverFileOperationsAsync()
+    {
+        var result = await _fileOperations.RecoverAsync(CancellationToken.None);
+        if (result.NeedAttention.Count > 0)
+            _dialogs.ShowInfo("Files need a look", "A rename was interrupted and these files could not be settled automatically:\n"
+                + string.Join("\n", result.NeedAttention.Take(10).Select(f => Path.GetFileName(f.Path) + ": " + f.Reason)));
+    }
+
     public async Task InitializeAsync()
     {
+        await RecoverFileOperationsAsync();
         await Library.InitializeAsync();
         await Settings.ReloadAsync();
         await Tags.ReloadAsync();

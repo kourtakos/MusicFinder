@@ -42,13 +42,16 @@ public partial class LibraryViewModel : ObservableObject
     private readonly ICoverArtClient _coverArt;
     private readonly IAudioAnalysisService _analysis;
     private readonly MusicFinder.Application.Analysis.AnalysisRunner _analysisRunner;
+    private readonly RenameViewModelFactory _renameFactory;
 
     public LibraryViewModel(FolderTreeViewModel tree, SearchViewModel search, ScanCoordinator scans,
         ILibraryRootRepository roots, ITrackRepository tracks, ISettingsStore settings, GenreMappingJob genreJob,
         ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths,
         IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time, ICoverArtClient coverArt,
-        IAudioAnalysisService analysis, MusicFinder.Application.Analysis.AnalysisRunner analysisRunner)
+        IAudioAnalysisService analysis, MusicFinder.Application.Analysis.AnalysisRunner analysisRunner,
+        RenameViewModelFactory renameFactory)
     {
+        _renameFactory = renameFactory;
         Tree = tree;
         Search = search;
         _scans = scans;
@@ -176,6 +179,24 @@ public partial class LibraryViewModel : ObservableObject
         var ids = Search.SelectedItems.Select(i => i.Id).ToList();
         if (ids.Count == 0) return;
         OpenAnalysis(ids);
+    }
+
+    /// <summary>
+    /// Opens the batch rename for the selected tracks: a preview of every new name that is also the confirmation. Refused while indexing.
+    /// </summary>
+    [RelayCommand]
+    private void RenameFiles()
+    {
+        var ids = Search.SelectedItems.Select(i => i.Id).ToList();
+        if (ids.Count == 0) return;
+        if (_scans.IsScanning)
+        {
+            _dialogs.ShowInfo("Rename files", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            return;
+        }
+        var vm = _renameFactory.Create(ids);
+        vm.FilesChanged += async (_, _) => await Search.RefreshAsync();
+        _dialogs.ShowRename(vm);
     }
 
     /// <summary>The tracks of the library (or the folder selected in the tree) that have no BPM or no key.</summary>

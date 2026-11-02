@@ -6,7 +6,7 @@ Slices, in order. Each ends with build and tests green, docs, and a push. All te
 |---|---|---|---|
 | 1 | Library Health tab, quality facts, new search filters | No | **Done** (`docs/library-health.md`) |
 | 2 | Exact duplicates: streaming SHA-256 on same-size files, hash cache, scan with cancel and resume, review window, `dup:` filter | No | **Done** (`docs/duplicates.md`) |
-| 3 | Batch rename in place: template, sanitizer, preview that is the confirmation, journal before every move, crash recovery, undo, CSV path map, DJ-software warning | Rename only | Next |
+| 3 | Batch rename in place: template, sanitizer, preview that is the confirmation, journal before every move, crash recovery, undo, CSV path map, DJ-software warning | Rename only | **Done** (`docs/rename.md`) |
 | 4 | Move/organize into a folder template (same volume). Cross-volume copy-verify-delete is opt-in and deferred | Yes | |
 | 5 | Probable same recording and other versions (remix, edit, live), shown apart, never merged | No | |
 

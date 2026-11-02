@@ -97,6 +97,13 @@ App ──► Application ──► Domain
 - **Infrastructure**: `Duplicates/StreamingFileHasher` (shared read, 1 MB chunks, throttled, cancellable), `FileHashRepository`, migration 0010, the `dup:` filter in `SearchSqlBuilder`.
 - **App**: `DuplicatesViewModel` / `DuplicatesWindow` (opened from the Health tab; no delete, move or rename command exists).
 
+## Batch rename (M6)
+
+- **Domain**: `Contracts/FileOperations.cs` (`IFileMover`, `ILibraryWriteLock`, `IFileOperationJournal`, `IRenameSourceReader`, `IFileOperationService`), `Models/OrganizeModels.cs`, `Models/FileOperationModels.cs`.
+- **Application/Organize**: `FileNameTemplate`, `PathSanitizer`, `FileOperationPlanner` (pure; asks `IFileProbe` only whether a path exists), `FileOperationService` (journal first, never overwrite, recovery, undo), `PathMapCsv`.
+- **Infrastructure**: `FileOperations/SystemFileMover` (the only `File.Move`), `LibraryWriteLock`, `FileOperationJournalRepository`, migration 0011; `LibraryScanner` takes the write lock.
+- **App**: `RenameViewModel` / `RenameWindow` (preview is the confirmation), `MainViewModel` runs recovery before the first scan.
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

@@ -1,0 +1,114 @@
+<Window x:Class="MusicFinder.App.Views.RenameWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Rename files" Style="{StaticResource MF.Window}"
+        Width="1180" Height="780" MinWidth="880" MinHeight="560"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+
+    <Grid Margin="22,18,22,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="Rename files" FontSize="20" FontWeight="SemiBold"/>
+            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
+                       Text="{Binding ReminderText}"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Margin="0,12,0,8" Visibility="{Binding HasTracks, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="New file name" FontWeight="SemiBold"/>
+            <TextBox x:Name="TemplateBox" Margin="0,4,0,0" Height="32" Text="{Binding Template, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Tokens: {Artist} {Title} {Album} {AlbumArtist} {Year} {Track:00} {Genre} {Bpm} {Key} {FileName} {Extension}. Add :upper, :lower or :title to change case. The extension is kept automatically."/>
+            <TextBlock Text="{Binding TemplateError}" Foreground="{StaticResource MF.Brush.Possible}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+            <ItemsControl ItemsSource="{x:Static vm:RenameViewModel.Presets}" Margin="0,6,0,0" Focusable="False"
+                          xmlns:vm="clr-namespace:MusicFinder.App.ViewModels">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding}" Style="{StaticResource MF.PillButton}" Height="26" Padding="10,0" Margin="0,0,6,4"
+                                Command="{Binding DataContext.UsePresetCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <CheckBox Content="Rename lyrics (.lrc) and cue sheets (.cue) with the track" IsChecked="{Binding IncludeSidecars}" Margin="0,0,24,0"/>
+                <CheckBox Content="Use “Unknown Artist/Title…” when a tag is missing (otherwise those files are skipped)" IsChecked="{Binding UsePlaceholders}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <DataGrid Grid.Row="2" ItemsSource="{Binding Rows}" AutoGenerateColumns="False" IsReadOnly="True" HeadersVisibility="Column"
+                  CanUserAddRows="False" CanUserResizeRows="False" SelectionMode="Single" Margin="0,4,0,0"
+                  Visibility="{Binding HasTracks, Converter={StaticResource BoolToVis}}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Now" Binding="{Binding OldName}" Width="*"/>
+                <DataGridTextColumn Header="Will be" Binding="{Binding NewName}" Width="*"/>
+                <DataGridTextColumn Header="What happens" Binding="{Binding StatusText}" Width="150"/>
+                <DataGridTextColumn Header="Why not" Binding="{Binding Reason}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid Grid.Row="3" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="{Binding SummaryText}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"/>
+                <ProgressBar Margin="0,6,0,0" Maximum="{Binding ProgressMax}" Value="{Binding ProgressValue}"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="12,0,0,0" VerticalAlignment="Center">
+                <Button Content="Stop" Style="{StaticResource MF.PillButton}" Height="34" Padding="16,0" Margin="0,0,8,0"
+                        Command="{Binding StopCommand}" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+                <Button x:Name="RenameButton" Content="{Binding RenameButtonText}" Style="{StaticResource MF.AccentButton}" Height="34" Padding="18,0"
+                        Command="{Binding RenameCommand}" Visibility="{Binding HasTracks, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="Close" Style="{StaticResource MF.PillButton}" Height="34" Padding="18,0" Margin="8,0,0,0" Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="4" Style="{StaticResource MF.Panel}" Padding="14,10" Margin="0,12,0,0" MaxHeight="190">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Earlier renames" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+                    <ItemsControl ItemsSource="{Binding Batches}" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding Detail}" Style="{StaticResource MF.Secondary}"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Save old and new paths…" Style="{StaticResource MF.PillButton}" Height="28" Padding="12,0" Margin="8,0,0,0"
+                                            Command="{Binding DataContext.SavePathMapCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
+                                    <Button Grid.Column="2" Content="Undo this rename" Style="{StaticResource MF.PillButton}" Height="28" Padding="12,0" Margin="8,0,0,0"
+                                            Visibility="{Binding CanUndo, Converter={StaticResource BoolToVis}}"
+                                            Command="{Binding DataContext.UndoCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

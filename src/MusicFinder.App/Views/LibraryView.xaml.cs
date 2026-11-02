@@ -117,6 +117,7 @@ public partial class LibraryView : UserControl
         if (ctrl && e.Key == Key.C) { _vm.Search.CopyPathsCommand.Execute(null); e.Handled = true; }
         else if (ctrl && e.Key == Key.O) { _vm.Search.RevealInExplorerCommand.Execute(null); e.Handled = true; }
         else if (e.Key == Key.F2) { _vm.EditTagsCommand.Execute(null); e.Handled = true; }
+        else if (e.Key == Key.F6) { _vm.RenameFilesCommand.Execute(null); e.Handled = true; }
         else if (ctrl && e.Key == Key.I) { _vm.IdentifyCommand.Execute(null); e.Handled = true; }
         else if (ctrl && e.Key == Key.B) { _vm.AnalyzeCommand.Execute(null); e.Handled = true; }
         else if (e.Key == Key.Delete) e.Handled = true; // MusicFinder never deletes music files

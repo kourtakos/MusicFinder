@@ -54,6 +54,14 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IMetadataHealthService, Health.MetadataHealthService>();
         services.AddSingleton<IFileHashService, Duplicates.StreamingFileHasher>();
         services.AddSingleton<IFileHashStore, FileHashRepository>();
+        services.AddSingleton<FileOperationJournalRepository>();
+        services.AddSingleton<IFileOperationJournal>(sp => sp.GetRequiredService<FileOperationJournalRepository>());
+        services.AddSingleton<IRenameSourceReader>(sp => sp.GetRequiredService<FileOperationJournalRepository>());
+        services.AddSingleton<FileOperations.SystemFileMover>();
+        services.AddSingleton<IFileMover>(sp => sp.GetRequiredService<FileOperations.SystemFileMover>());
+        services.AddSingleton<MusicFinder.Application.Organize.IFileProbe>(sp => sp.GetRequiredService<FileOperations.SystemFileMover>());
+        services.AddSingleton<ILibraryWriteLock, FileOperations.LibraryWriteLock>();
+        services.AddSingleton<IFileOperationService, MusicFinder.Application.Organize.FileOperationService>();
         services.AddSingleton<IDuplicateScanService, MusicFinder.Application.Duplicates.DuplicateScanService>();
         services.AddSingleton<ISearchDiagnostics>(sp => sp.GetRequiredService<SqliteSearchService>());
         services.AddSingleton<ISearchAliasService, MusicFinder.Application.Search.SearchAliasService>();
