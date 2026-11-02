@@ -374,7 +374,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var candidate = await _service.EnrichAsync(decision.Candidate ?? result.Candidates[0], ct);   // genres, for hits that came from a search
         var release = AutoChoice.PickRelease(track, candidate);
         var details = release is null ? null : await LoadDetailsAsync(release.ReleaseId, ct);
-        var proposals = IdentificationProposalBuilder.Build(track, candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
+        var proposals = IdentificationProposalBuilder.Build(track, candidate, details, _settings.Load().SuggestGenresFromMusicBrainz, _settings.Load().MusicBrainzGenreMode);
         var (cover, picture, status) = await LoadCoverForAsync(release, ct);
 
         var hasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
@@ -584,7 +584,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
 
         var enriched = await _service.EnrichAsync(candidate.Candidate, default);
         if (version != _showVersion) return;
-        var proposals = IdentificationProposalBuilder.Build(track, enriched, details, _settings.Load().SuggestGenresFromMusicBrainz);
+        var proposals = IdentificationProposalBuilder.Build(track, enriched, details, _settings.Load().SuggestGenresFromMusicBrainz, _settings.Load().MusicBrainzGenreMode);
         var rows = proposals.Select(p => new ProposalRow(p)).ToList();
         var hasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
 

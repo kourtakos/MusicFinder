@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
+using MusicFinder.Domain.Enums;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -32,6 +33,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
         _suggestGenres = s.SuggestGenresFromMusicBrainz;
         _useCoverArt = s.UseCoverArtArchive;
         _embedCoverByDefault = s.EmbedCoverByDefault;
+        _genreMode = GenreModes.First(m => m.Mode == s.MusicBrainzGenreMode);
         _loading = false;
         RefreshStatus();
     }
@@ -48,6 +50,14 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
     [ObservableProperty] private bool _suggestGenres;
     [ObservableProperty] private bool _useCoverArt;
     [ObservableProperty] private bool _embedCoverByDefault;
+    [ObservableProperty] private GenreModeOption _genreMode;
+
+    public static IReadOnlyList<GenreModeOption> GenreModes { get; } =
+    [
+        new(GenreApplyMode.Add, "Add them to the genres the file already has (ticked)"),
+        new(GenreApplyMode.Fill, "Only fill a file that has no genre"),
+        new(GenreApplyMode.Replace, "Replace the file's genres (ticked)")
+    ];
     [ObservableProperty] private string _fingerprinterStatus = "";
     [ObservableProperty] private string _readinessText = "";
     [ObservableProperty] private string _cacheText = "";
@@ -79,6 +89,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
     partial void OnFpcalcPathChanged(string value) { if (!_loading) { Save(s => s.FpcalcPath = NullIfBlank(value)); RefreshStatus(); } }
     partial void OnSuggestGenresChanged(bool value) { if (!_loading) Save(s => s.SuggestGenresFromMusicBrainz = value); }
     partial void OnUseCoverArtChanged(bool value) { if (!_loading) Save(s => s.UseCoverArtArchive = value); }
+    partial void OnGenreModeChanged(GenreModeOption value) { if (!_loading) Save(s => s.MusicBrainzGenreMode = value.Mode); }
     partial void OnEmbedCoverByDefaultChanged(bool value) { if (!_loading) Save(s => s.EmbedCoverByDefault = value); }
 
     [RelayCommand]
@@ -138,3 +149,6 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
 
     private static string? NullIfBlank(string value) => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
 }
+
+/// <summary>One choice of how MusicBrainz genres meet the genres a file already has.</summary>
+public sealed record GenreModeOption(GenreApplyMode Mode, string Label);

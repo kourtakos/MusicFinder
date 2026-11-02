@@ -247,7 +247,7 @@ public class IdentifyUiTests
         Assert.Equal("1985", byField[TagField.Year].Proposed);
         Assert.Equal("Το Τραγούδι", byField[TagField.Album].Proposed);
         Assert.False(byField[TagField.Title].Selected);                    // the file's own title differs: not ticked for the user
-        Assert.False(byField[TagField.Genre].Selected);
+        Assert.Equal(("Disco", "Disco; Laiko", true), (byField[TagField.Genre].Current, byField[TagField.Genre].Proposed, byField[TagField.Genre].Selected));   // added after the file's own
         Assert.True(byField[TagField.MusicBrainzRecordingId].Selected);
         Assert.DoesNotContain(vm.Proposals, p => p.Field is TagField.Bpm or TagField.Key);
 
@@ -287,7 +287,7 @@ public class IdentifyUiTests
             Assert.Equal(1985u, f.Tag.Year);
             Assert.Equal(5u, f.Tag.Track);
             Assert.Equal(FakeIdentification.RecordingId, f.Tag.MusicBrainzTrackId);
-            Assert.Equal(["Disco"], f.Tag.Genres);                                   // the genre suggestion was never ticked
+            Assert.Equal(["Disco", "Laiko"], f.Tag.Genres);                           // the file's own genre kept, MusicBrainz's added
         }
         await Ui.WaitUntilAsync(() => c.Search.Results.Any(r => r.Title == "Ξανά στη ζωή μου"), what: "grid refreshed");
     });
@@ -735,7 +735,7 @@ public class IdentifyUiTests
         var first = vm.Queue[0];
         Assert.Equal("Ξανά στη ζωή μου — Χάρις Αλεξίου (AcoustID score 0.97)", first.MatchText);
         Assert.Equal("Το Τραγούδι", first.ReleaseText);
-        Assert.Equal("Album artist, Year, Track no., MusicBrainz id, Cover", first.ChangesText);   // exactly what Write does; titles are kept
+        Assert.Equal("Album artist, Year, Track no., Genre, MusicBrainz id, Cover", first.ChangesText);   // exactly what Write does; titles are kept
         Assert.Equal(["rel-1"], c.Covers.Requests.Distinct());
 
         vm.WriteCommand.Execute(null);
@@ -970,10 +970,35 @@ public class IdentifyUiTests
     });
 
     [Fact]
-    public Task AGenreTheFileAlreadyHas_IsShownBesideTheProposal_ButNotTicked() => Ui.RunAsync(async () =>
+    public Task ByDefault_AGenreTheFileHas_IsKept_AndMusicBrainzsAreAddedAfterIt() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();
         await using var _ = c.App;
+        c.Service.Enrich = cand => cand with { GenreSuggestions = ["rock", "pop"], GenreLevel = "recording" };
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        var genre = vm.Proposals.Single(p => p.Field == TagField.Genre);
+        Assert.Equal(("Disco", "Disco; Rock; Pop"), (genre.Current, genre.Proposed));
+        Assert.True(genre.Selected);                                             // ticked: nothing the file has is lost
+
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+        using var f = TagLib.File.Create(path);
+        Assert.Equal(["Disco", "Rock", "Pop"], f.Tag.Genres);
+    });
+
+    [Fact]
+    public Task InFillMode_AGenreTheFileHas_IsShownBesideTheProposal_ButNotTicked() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var s = c.Saved;
+        s.MusicBrainzGenreMode = MusicFinder.Domain.Enums.GenreApplyMode.Fill;
+        c.App.Settings.Save(s);
         c.Service.Enrich = cand => cand with { GenreSuggestions = ["rock"], GenreLevel = "recording" };
         var path = Path.Combine(c.App.MusicDir, "a.mp3");
         var vm = NewVm(c, [Row(c, "unknown track")]);
@@ -992,10 +1017,48 @@ public class IdentifyUiTests
     });
 
     [Fact]
-    public Task InAList_TheGenreIsPartOfWhatWillChange_ForFilesWithoutOne() => Ui.RunAsync(async () =>
+    public Task InReplaceMode_TheFilesGenresAreReplaced() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();
         await using var _ = c.App;
+        var s = c.Saved;
+        s.MusicBrainzGenreMode = MusicFinder.Domain.Enums.GenreApplyMode.Replace;
+        c.App.Settings.Save(s);
+        c.Service.Enrich = cand => cand with { GenreSuggestions = ["rock"], GenreLevel = "recording" };
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+
+        using var f = TagLib.File.Create(path);
+        Assert.Equal(["Rock"], f.Tag.Genres);
+    });
+
+    [Fact]
+    public Task TheGenreModeSetting_IsSavedAtOnce_AndAddIsTheDefault() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var settings = c.App.Main.Settings.Identification;
+        Assert.Equal(MusicFinder.Domain.Enums.GenreApplyMode.Add, settings.GenreMode.Mode);
+
+        settings.GenreMode = IdentificationSettingsViewModel.GenreModes.Single(m => m.Mode == MusicFinder.Domain.Enums.GenreApplyMode.Replace);
+
+        Assert.Equal(MusicFinder.Domain.Enums.GenreApplyMode.Replace, c.Saved.MusicBrainzGenreMode);
+    });
+
+    [Fact]
+    public Task InAList_InFillMode_TheGenreIsPartOfWhatWillChange_OnlyForFilesWithoutOne() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var fill = c.Saved;
+        fill.MusicBrainzGenreMode = MusicFinder.Domain.Enums.GenreApplyMode.Fill;
+        c.App.Settings.Save(fill);
         await ClearGenreAsync(c, "unknown track");
         c.Service.Enrich = cand => cand with { GenreSuggestions = ["disco"], GenreLevel = "recording" };
         var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);

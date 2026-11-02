@@ -1,6 +1,7 @@
 using System.Globalization;
 using MusicFinder.Application.Tags;
 using MusicFinder.Domain.Entities;
+using MusicFinder.Domain.Enums;
 using MusicFinder.Domain.Models;
 
 namespace MusicFinder.Application.Identification;
@@ -19,7 +20,8 @@ public static class IdentificationProposalBuilder
     public const int MaxGenres = 3;
 
     public static IReadOnlyList<FieldProposal> Build(
-        Track track, IdentificationCandidate recording, ReleaseDetails? release, bool suggestGenres = true)
+        Track track, IdentificationCandidate recording, ReleaseDetails? release, bool suggestGenres = true,
+        GenreApplyMode genreMode = GenreApplyMode.Add)
     {
         var list = new List<FieldProposal>();
 
@@ -37,20 +39,43 @@ public static class IdentificationProposalBuilder
                     position.Position.ToString(CultureInfo.InvariantCulture), FromRelease);
         }
 
-        if (suggestGenres && recording.GenreSuggestions.Count > 0)
-        {
-            var proposed = string.Join("; ", recording.GenreSuggestions.Take(MaxGenres).Select(TitleCase));
-            // Community genres are rough: they fill a file that has no genre, but never replace one the user chose.
-            if (!Same(track.GenreRaw, proposed))
-                list.Add(new FieldProposal(TagField.Genre, track.GenreRaw, proposed, Selected: string.IsNullOrWhiteSpace(track.GenreRaw),
-                    recording.GenreLevel == "artist" ? FromArtistTags : FromCommunityTags));
-        }
+        if (suggestGenres && recording.GenreSuggestions.Count > 0) AddGenre(list, track, recording, genreMode);
 
         // Linking the file to its recording is useful and harmless, so it starts ticked unless it is already there.
         if (!Same(track.MusicBrainzRecordingId, recording.RecordingId))
             list.Add(new FieldProposal(TagField.MusicBrainzRecordingId, track.MusicBrainzRecordingId, recording.RecordingId, Selected: true, FromRecording));
 
         return list;
+    }
+
+    private static void AddGenre(List<FieldProposal> list, Track track, IdentificationCandidate recording, GenreApplyMode mode)
+    {
+        var suggested = recording.GenreSuggestions.Take(MaxGenres).Select(TitleCase).ToList();
+        var existing = TagChangeValidator.SplitGenres(track.GenreRaw ?? "");
+        var source = recording.GenreLevel == "artist" ? FromArtistTags : FromCommunityTags;
+
+        string proposed;
+        bool selected;
+        switch (mode)
+        {
+            case GenreApplyMode.Replace:
+                proposed = string.Join("; ", suggested);
+                selected = true;
+                break;
+            case GenreApplyMode.Add:
+                // What the file has stays, in its own order; only genres it does not have yet are added after it.
+                var merged = existing.Concat(suggested.Where(s => !existing.Contains(s, StringComparer.OrdinalIgnoreCase))).ToList();
+                if (merged.Count == existing.Count) return;                        // nothing new to add
+                proposed = string.Join("; ", merged);
+                selected = true;
+                break;
+            default:
+                proposed = string.Join("; ", suggested);
+                selected = existing.Count == 0;                                    // community genres are rough: they only fill a gap
+                break;
+        }
+        if (!Same(track.GenreRaw, proposed))
+            list.Add(new FieldProposal(TagField.Genre, track.GenreRaw, proposed, selected, source));
     }
 
     /// <summary>"classic rock" -> "Classic Rock": MusicBrainz writes genres in lower case.</summary>

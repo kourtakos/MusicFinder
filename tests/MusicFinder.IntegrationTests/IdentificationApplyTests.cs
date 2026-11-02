@@ -95,7 +95,7 @@ public class IdentificationApplyTests
             Assert.Equal(1985u, f.Tag.Year);
             Assert.Equal(5u, f.Tag.Track);
             Assert.Equal(Rec, f.Tag.MusicBrainzTrackId);
-            Assert.Equal(["Disco"], f.Tag.Genres);                                            // the community-tag suggestion was never ticked
+            Assert.Equal(["Disco", "Laiko"], f.Tag.Genres);                                   // the file's genre is kept; MusicBrainz's is added after it
             Assert.Equal(0u, f.Tag.BeatsPerMinute);                                           // nothing invented
             Assert.Single(f.Tag.Pictures);
         }
@@ -112,8 +112,8 @@ public class IdentificationApplyTests
         await e.IndexAsync(title: "My own title", artist: "My Artist", album: "My Album");
         var track = (await e.Db.Tracks.GetAsync(e.TrackId))!;
         var proposals = IdentificationProposalBuilder.Build(track, Candidate, Release);
-        // Only fields that are empty in the file (and the recording id) start ticked: whatever would replace a value stays as it is.
-        Assert.Equal([TagField.AlbumArtist, TagField.Year, TagField.TrackNumber, TagField.MusicBrainzRecordingId],
+        // Fields that are empty in the file, the recording id and the added genres start ticked: whatever would replace a value stays as it is.
+        Assert.Equal([TagField.AlbumArtist, TagField.Genre, TagField.Year, TagField.TrackNumber, TagField.MusicBrainzRecordingId],
             proposals.Where(p => p.Selected).Select(p => p.Field).OrderBy(x => (int)x).ToArray());
 
         var summary = await e.Service.ApplyAsync([e.TrackId], IdentificationProposalBuilder.ToChangeSet(proposals), new TagWriteOptions(), null, default);

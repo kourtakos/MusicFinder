@@ -5,7 +5,7 @@ Read this first on a fresh machine or in a fresh Claude Code session. `CLAUDE.md
 ## Set up
 
 1. Install Git, the **.NET SDK 9.0.x** (`global.json` pins the band; .NET 10 upgrade = set `NetVersion` in `Directory.Build.props` to `10.0` and bump `Microsoft.*` in `Directory.Packages.props`), and Windows 10/11 x64.
-2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect **1258 green**: 600 unit, 467 integration, 191 UI smoke; UI tests need an interactive desktop session).
+2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect **1264 green**: 603 unit, 467 integration, 194 UI smoke; UI tests need an interactive desktop session).
 3. Run: `src\MusicFinder.App\bin\Debug\net9.0-windows\MusicFinder.exe --portable --software` (`--portable` keeps data in `Data\` beside the exe; `--software` avoids GPU rendering problems).
    Stop a running `MusicFinder.exe` before building (it locks the exe).
 4. Self-contained test package: `dotnet publish src\MusicFinder.App\MusicFinder.App.csproj -c Release -r win-x64 --self-contained true -o dist\MusicFinder-win-x64`, add an empty `portable.flag`, zip.

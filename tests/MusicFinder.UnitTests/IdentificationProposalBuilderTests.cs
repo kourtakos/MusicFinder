@@ -1,5 +1,6 @@
 using MusicFinder.Application.Identification;
 using MusicFinder.Domain.Entities;
+using MusicFinder.Domain.Enums;
 using MusicFinder.Domain.Models;
 
 namespace MusicFinder.UnitTests;
@@ -73,14 +74,38 @@ public class IdentificationProposalBuilderTests
     }
 
     [Fact]
-    public void AGenreTheUserAlreadyHas_IsNeverReplacedUnlessTicked()
+    public void ByDefault_MusicBrainzGenresAreAddedAfterTheOnesTheFileHas_TickedAndNothingIsLost()
     {
-        var p = IdentificationProposalBuilder.Build(new Track { GenreRaw = "Laiko" }, Candidate(["disco"]), null);
+        var p = IdentificationProposalBuilder.Build(new Track { GenreRaw = "Laiko; Pop" }, Candidate(["disco", "pop", "funk"]), null);
 
         var genre = Get(p, TagField.Genre);
-        Assert.False(genre.Selected);
-        Assert.Equal(("Laiko", "Disco"), (genre.Current, genre.Proposed));
-        Assert.DoesNotContain(IdentificationProposalBuilder.ToChangeSet(p).Changes.Keys, k => k == TagField.Genre);
+        Assert.Equal(("Laiko; Pop", "Laiko; Pop; Disco; Funk"), (genre.Current, genre.Proposed));   // "Pop" was there: not repeated
+        Assert.True(genre.Selected);
+        Assert.Equal("Laiko; Pop; Disco; Funk", IdentificationProposalBuilder.ToChangeSet(p).Changes[TagField.Genre]);
+    }
+
+    [Fact]
+    public void AddingGenres_WhenTheFileHasThemAll_ProposesNothing() =>
+        Assert.DoesNotContain(IdentificationProposalBuilder.Build(new Track { GenreRaw = "disco; FUNK" }, Candidate(["Disco", "funk"]), null), p => p.Field == TagField.Genre);
+
+    [Fact]
+    public void FillMode_NeverTouchesAGenreTheFileHas()
+    {
+        var have = IdentificationProposalBuilder.Build(new Track { GenreRaw = "Laiko" }, Candidate(["disco"]), null, genreMode: GenreApplyMode.Fill);
+        var none = IdentificationProposalBuilder.Build(new Track(), Candidate(["disco"]), null, genreMode: GenreApplyMode.Fill);
+
+        Assert.False(Get(have, TagField.Genre).Selected);
+        Assert.Equal(("Laiko", "Disco"), (Get(have, TagField.Genre).Current, Get(have, TagField.Genre).Proposed));
+        Assert.True(Get(none, TagField.Genre).Selected);
+    }
+
+    [Fact]
+    public void ReplaceMode_ReplacesTheFilesGenres_Ticked_AndShowsTheOldOnesInTheNowColumn()
+    {
+        var p = IdentificationProposalBuilder.Build(new Track { GenreRaw = "Laiko; Pop" }, Candidate(["disco", "funk"]), null, genreMode: GenreApplyMode.Replace);
+
+        var genre = Get(p, TagField.Genre);
+        Assert.Equal(("Laiko; Pop", "Disco; Funk", true), (genre.Current, genre.Proposed, genre.Selected));
     }
 
     [Fact]
