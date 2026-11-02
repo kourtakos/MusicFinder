@@ -222,3 +222,21 @@ public interface IDuplicateScanService
     Task<IReadOnlyList<DuplicateGroup>> GetGroupsAsync(CancellationToken ct);
     Task DismissAsync(string hash, CancellationToken ct);
 }
+
+/// <summary>Where the probable-duplicate search reads tracks from, and where "not a duplicate" decisions are kept.</summary>
+public interface ISongCandidateStore
+{
+    Task<IReadOnlyList<SongCandidate>> GetCandidatesAsync(CancellationToken ct);
+    Task<IReadOnlySet<string>> GetDismissedKeysAsync(CancellationToken ct);
+    Task DismissAsync(string key, CancellationToken ct);
+}
+
+public interface IProbableDuplicateService
+{
+    /// <summary>
+    /// Groups of tracks that are probably the same recording, and, separately, songs that exist in more than one version.
+    /// Reads library data only. Nothing is ever merged, moved or deleted.
+    /// </summary>
+    Task<ProbableDuplicateResult> FindAsync(CancellationToken ct);
+    Task DismissAsync(string key, CancellationToken ct);
+}

@@ -5,7 +5,7 @@ Read this first on a fresh machine or in a fresh Claude Code session. `CLAUDE.md
 ## Set up
 
 1. Install Git, the **.NET SDK 9.0.x** (`global.json` pins the band; .NET 10 upgrade = set `NetVersion` in `Directory.Build.props` to `10.0` and bump `Microsoft.*` in `Directory.Packages.props`), and Windows 10/11 x64.
-2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect **1711 green**: 900 unit, 576 integration, 235 UI smoke; UI tests need an interactive desktop session).
+2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect **1747 green**: 930 unit, 578 integration, 239 UI smoke; UI tests need an interactive desktop session).
 3. Run: `src\MusicFinder.App\bin\Debug\net9.0-windows\MusicFinder.exe --portable --software` (`--portable` keeps data in `Data\` beside the exe; `--software` avoids GPU rendering problems).
    Stop a running `MusicFinder.exe` before building (it locks the exe).
 4. Self-contained test package: `dotnet publish src\MusicFinder.App\MusicFinder.App.csproj -c Release -r win-x64 --self-contained true -o dist\MusicFinder-win-x64`, add an empty `portable.flag`, zip.
@@ -27,7 +27,7 @@ Drag verified by hand only with Windows Media Player and Winamp (`docs/dj-sessio
 ## Architecture rules
 
 - Layers: Domain <- Application (pure logic) <- Infrastructure (SQLite, TagLib, scanner) <- App (WPF, MVVM, composition root `App.xaml.cs`). View models use interfaces only.
-- One serialized `SqliteWriteQueue` for writes, pooled reads. Schema changes = new embedded migration `src/MusicFinder.Infrastructure/Persistence/Migrations/NNNN_name.sql` (now 0001-0011). Tests use `MigrationRunner.LatestVersion`.
+- One serialized `SqliteWriteQueue` for writes, pooled reads. Schema changes = new embedded migration `src/MusicFinder.Infrastructure/Persistence/Migrations/NNNN_name.sql` (now 0001-0012). Tests use `MigrationRunner.LatestVersion`.
 - Time: `TimeProvider` everywhere; store UTC ISO via `DapperConfig.ToDb`, read via `UtcTime.Normalize`.
 - UI smoke tests run serially (one WPF dispatcher); integration tests run in parallel: never call the global `SqliteConnectionFactory.ReleaseAllPools()` in test cleanup, use `factory.ReleasePool()`.
 - Docs per feature in `docs/` (dj-session, quick-search, greek-search, find-similar, performance, database, architecture, search-syntax).

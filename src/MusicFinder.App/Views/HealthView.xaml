@@ -13,6 +13,10 @@
                     Margin="0,0,0,12" Command="{Binding FindDuplicatesCommand}"
                     ToolTip="Look for files with identical content. Nothing is deleted or changed."/>
 
+            <Button Content="Find probable duplicates and other versions…" Style="{StaticResource MF.PillButton}" HorizontalAlignment="Left" Height="34" Padding="16,0"
+                    Margin="0,0,0,12" Command="{Binding FindProbableDuplicatesCommand}"
+                    ToolTip="Same artist and title in several files, and songs that exist as a remix, edit or live version. Nothing is changed."/>
+
             <Border Style="{StaticResource MF.Panel}" Padding="14,10" Margin="0,0,0,12"
                     Visibility="{Binding HasUnsupported, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="{Binding UnsupportedText}" TextWrapping="Wrap"/>

@@ -132,3 +132,7 @@ remembered hash always describes the bytes the track has now; a rename or move k
 
 The unused `FileOperations` table from 0001 is replaced. `FileOperationBatches(Id, Kind, Template, CreatedUtc)` and `FileOperations(Id, BatchId -> batch ON DELETE CASCADE, TrackId, Role 'Track'|'Sidecar', OldPath, NewPath, State, Error, CreatedUtc, CompletedUtc)`.
 States: `Planned -> InProgress -> Done | Failed | Skipped`, and `Done -> UndoInProgress -> Undone`. A row is set to `InProgress`/`UndoInProgress` **before** the file is touched; startup recovery reads those rows. The `Tracks` row of a renamed file is updated (path, file name, search text) in the same transaction that marks its operation `Done`, so history, genres, tags and analysis (keyed by `Tracks.Id`) follow the file.
+
+## Probable duplicates (M6, migration 0012)
+
+`ProbableDismissals(Key PK, DismissedUtc)` holds "not a duplicate" decisions. A key names a song and, for same-recording groups, its version (`same|<artist>|<title>|<versions>` or `versions|<artist>|<title>`); groups themselves are computed from `Tracks` on demand.

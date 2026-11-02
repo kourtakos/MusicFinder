@@ -104,6 +104,13 @@ App ──► Application ──► Domain
 - **Infrastructure**: `FileOperations/SystemFileMover` (the only `File.Move`), `LibraryWriteLock`, `FileOperationJournalRepository`, migration 0011; `LibraryScanner` takes the write lock.
 - **App**: `RenameViewModel` / `RenameWindow` (preview is the confirmation), `MainViewModel` runs recovery before the first scan.
 
+## Probable duplicates (M6)
+
+- **Domain**: `Models/SongGroupModels.cs`, `ISongCandidateStore`, `IProbableDuplicateService`.
+- **Application/Duplicates**: `SongIdentity` (version words, feat., phonetic keys), `ProbableDuplicateService` (pure grouping, 3 s tolerance).
+- **Infrastructure**: `SongCandidateRepository`, migration 0012.
+- **App**: `ProbableDuplicatesViewModel` / window, opened from the Health tab; no delete, move or rename command.
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

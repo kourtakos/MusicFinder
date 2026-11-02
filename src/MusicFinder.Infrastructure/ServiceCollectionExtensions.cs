@@ -63,6 +63,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ILibraryWriteLock, FileOperations.LibraryWriteLock>();
         services.AddSingleton<IFileOperationService, MusicFinder.Application.Organize.FileOperationService>();
         services.AddSingleton<IDuplicateScanService, MusicFinder.Application.Duplicates.DuplicateScanService>();
+        services.AddSingleton<ISongCandidateStore, SongCandidateRepository>();
+        services.AddSingleton<IProbableDuplicateService, MusicFinder.Application.Duplicates.ProbableDuplicateService>();
         services.AddSingleton<ISearchDiagnostics>(sp => sp.GetRequiredService<SqliteSearchService>());
         services.AddSingleton<ISearchAliasService, MusicFinder.Application.Search.SearchAliasService>();
         services.AddSingleton<ISimilarCandidateSource, SimilarCandidateRepository>();

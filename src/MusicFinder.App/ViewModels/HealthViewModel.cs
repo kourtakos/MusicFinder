@@ -53,6 +53,7 @@ public sealed partial class HealthViewModel : ObservableObject
 {
     private readonly IMetadataHealthService _health;
     private readonly IDuplicateScanService _duplicates;
+    private readonly IProbableDuplicateService _probable;
     private readonly IUserDialogs _dialogs;
 
     public IReadOnlyList<HealthGroupViewModel> Groups { get; }
@@ -65,8 +66,9 @@ public sealed partial class HealthViewModel : ObservableObject
     /// <summary>Raised with the Library search that lists a card's tracks; the shell switches to the Library.</summary>
     public event EventHandler<string>? ShowInLibraryRequested;
 
-    public HealthViewModel(IMetadataHealthService health, IDuplicateScanService duplicates, IUserDialogs dialogs)
+    public HealthViewModel(IMetadataHealthService health, IDuplicateScanService duplicates, IUserDialogs dialogs, IProbableDuplicateService probable)
     {
+        _probable = probable;
         _health = health;
         _duplicates = duplicates;
         _dialogs = dialogs;
@@ -93,6 +95,14 @@ public sealed partial class HealthViewModel : ObservableObject
         var vm = new DuplicatesViewModel(_duplicates, _dialogs, query => ShowInLibraryRequested?.Invoke(this, query));
         _dialogs.ShowDuplicates(vm);
         await ReloadAsync();
+    }
+
+    [RelayCommand]
+    private async Task FindProbableDuplicatesAsync()
+    {
+        var vm = new ProbableDuplicatesViewModel(_probable, _dialogs, query => ShowInLibraryRequested?.Invoke(this, query));
+        _dialogs.ShowProbableDuplicates(vm);
+        await Task.CompletedTask;
     }
 
     private void OnShow(HealthCardViewModel card)
