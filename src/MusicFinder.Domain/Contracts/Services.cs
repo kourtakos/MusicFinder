@@ -193,3 +193,32 @@ public interface IMetadataHealthService
     /// <summary>Track ids with the given finding, ordered by id. Files that are gone count only for MissingFiles.</summary>
     Task<IReadOnlyList<long>> QueryIssuesAsync(HealthIssueKind kind, int skip, int take, CancellationToken ct);
 }
+
+/// <summary>Computes the SHA-256 of a file's bytes without loading it into memory.</summary>
+public interface IFileHashService
+{
+    /// <param name="maxBytesPerSecond">0 for no limit. Reading is paced so a scan does not saturate the disk.</param>
+    /// <param name="progress">Bytes read so far.</param>
+    Task<string> HashAsync(string path, long maxBytesPerSecond, IProgress<long>? progress, CancellationToken ct);
+}
+
+/// <summary>Remembered file hashes and "not a duplicate" decisions. A hash is dropped whenever the file's size or modified time changes.</summary>
+public interface IFileHashStore
+{
+    /// <summary>Files of the library (present, not Missing) that share their size with at least one other file.</summary>
+    Task<IReadOnlyList<HashCandidate>> GetCandidatesAsync(CancellationToken ct);
+    Task PutAsync(long trackId, long fileSize, DateTime modifiedUtc, string hash, CancellationToken ct);
+    /// <summary>Present files that share a hash with another present file, without the groups the user dismissed.</summary>
+    Task<IReadOnlyList<HashedMember>> GetHashedMembersAsync(CancellationToken ct);
+    Task DismissAsync(string hash, CancellationToken ct);
+    Task<int> RestoreDismissedAsync(CancellationToken ct);
+}
+
+public interface IDuplicateScanService
+{
+    /// <summary>Hashes the files that could be duplicates (same size as another file) and have no remembered hash. Cancellable and resumable: hashes already stored are kept.</summary>
+    Task<DuplicateScanSummary> ScanAsync(IProgress<DuplicateScanProgress>? progress, CancellationToken ct);
+    /// <summary>The groups of byte-identical files found so far. Reads stored hashes only; opens no file.</summary>
+    Task<IReadOnlyList<DuplicateGroup>> GetGroupsAsync(CancellationToken ct);
+    Task DismissAsync(string hash, CancellationToken ct);
+}

@@ -214,3 +214,48 @@ public class HealthServiceTests
         Assert.Equal(1, s.UnsupportedTotal);
     }
 }
+
+public class DuplicateHealthTests
+{
+    [Fact]
+    public async Task TheDuplicateCard_TheSearchFilter_AndTheScanGroups_AllAgree()
+    {
+        await using var db = new TestDb();
+        var root = await db.Roots.AddAsync(@"C:\Music");
+        var folder = await db.Folders.UpsertAsync(root.Id, null, @"C:\Music", "Music");
+        var tracks = new List<Track>();
+        foreach (var n in new[] { "a", "b", "c", "d", "e", "f" })
+        {
+            var t = TestDb.MakeTrack(folder, $@"C:\Music\{n}.mp3", n, "Artist", "Disco");
+            t.FileSize = n is "f" ? 777 : 1000;
+            tracks.Add(t);
+        }
+        await db.Tracks.UpsertBatchAsync(tracks);
+        long Id(string n) { using var c = db.Factory.Open(); return c.ExecuteScalar<long>("SELECT Id FROM Tracks WHERE Title = @n", new { n }); }
+        var modified = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        await db.Hashes.PutAsync(Id("a"), 1000, modified, "AAAAAAAAAAAAAAAA11", default);
+        await db.Hashes.PutAsync(Id("b"), 1000, modified, "AAAAAAAAAAAAAAAA11", default);   // a + b: a group
+        await db.Hashes.PutAsync(Id("c"), 1000, modified, "BBBBBBBBBBBBBBBB22", default);
+        await db.Hashes.PutAsync(Id("d"), 1000, modified, "BBBBBBBBBBBBBBBB22", default);
+        await db.Hashes.PutAsync(Id("e"), 1000, modified, "BBBBBBBBBBBBBBBB22", default);   // c + d + e: a group of three
+        await db.Hashes.PutAsync(Id("f"), 777, modified, "CCCCCCCCCCCCCCCC33", default);     // alone: no twin
+        var health = new MetadataHealthService(db.Factory, db.Roots);
+        var search = new SqliteSearchService(db.Factory);
+
+        async Task AgreeAsync(int expected)
+        {
+            Assert.Equal(expected, (await health.GetSummaryAsync(default)).CountOf(HealthIssueKind.ExactDuplicates));
+            Assert.Equal(expected, await search.CountAsync(new SearchQuery { Text = "dup:exact" }, default));
+        }
+
+        await AgreeAsync(5);
+        Assert.Equal(3, await search.CountAsync(new SearchQuery { Text = "dup:BBBBBBBB" }, default));    // one group by its hash
+        Assert.Equal(1, await search.CountAsync(new SearchQuery { Text = "dup:CCCCCCCC" }, default));    // a hash names its files whatever the group size; only dup:exact needs a twin
+
+        await db.Hashes.DismissAsync("AAAAAAAAAAAAAAAA11", default);
+        await AgreeAsync(3);
+
+        await db.Writes.EnqueueAsync((c, t) => c.Execute("UPDATE Tracks SET Missing = 1 WHERE Title = 'e'", transaction: t));
+        await AgreeAsync(2);
+    }
+}

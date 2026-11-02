@@ -23,19 +23,21 @@ public sealed class ParsedQuery
     public double? BitrateMin { get; set; }
     public double? BitrateMax { get; set; }
     public string? Codec { get; set; }
+    /// <summary>From <c>dup:exact</c> (every file that has a byte-identical twin) or <c>dup:</c> and the first letters of a content hash (one group).</summary>
+    public string? Duplicate { get; set; }
     /// <summary>Non-blocking validation messages; parsing never throws.</summary>
     public List<string> Warnings { get; } = [];
 }
 
 /// <summary>
 /// Lexer/parser for the search grammar: tokens, "quoted phrases", and field:value filters
-/// (artist, title, album, genre, ext, key, bpm, year, decade, missing, played, issue, bitrate, codec).
+/// (artist, title, album, genre, ext, key, bpm, year, decade, missing, played, issue, bitrate, codec, dup).
 /// </summary>
 public static class SearchQueryParser
 {
     private static readonly HashSet<string> TextFields = new(StringComparer.OrdinalIgnoreCase) { "artist", "title", "album", "genre" };
     private static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase)
-        { "artist", "title", "album", "genre", "ext", "key", "bpm", "year", "decade", "missing", "played", "issue", "bitrate", "codec" };
+        { "artist", "title", "album", "genre", "ext", "key", "bpm", "year", "decade", "missing", "played", "issue", "bitrate", "codec", "dup" };
     private static readonly HashSet<string> IssueNames = new(StringComparer.OrdinalIgnoreCase)
         { "any", "mojibake", "error", "lowbitrate", "samplerate", "mismatch", "size", "duration" };
     private static readonly HashSet<string> MissingFields = new(StringComparer.OrdinalIgnoreCase)
@@ -140,6 +142,11 @@ public static class SearchQueryParser
                 break;
             case "codec":
                 q.Codec = value;
+                break;
+            case "dup":
+                if (value.Equals("exact", StringComparison.OrdinalIgnoreCase) || value.Equals("any", StringComparison.OrdinalIgnoreCase)) q.Duplicate = "exact";
+                else if (value.Length >= 6 && value.All(Uri.IsHexDigit)) q.Duplicate = value.ToUpperInvariant();
+                else q.Warnings.Add($"Unknown dup:{value} (use dup:exact).");
                 break;
             case "played":
                 if (value.All(char.IsLetter) && Enum.TryParse<PlayedFilter>(value, ignoreCase: true, out var played))

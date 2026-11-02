@@ -65,3 +65,30 @@ public class HealthFilterParserTests
         Assert.Single(q.Missing);
     }
 }
+
+public class DuplicateFilterParserTests
+{
+    [Theory]
+    [InlineData("dup:exact", "exact")]
+    [InlineData("dup:any", "exact")]
+    [InlineData("DUP:Exact", "exact")]
+    [InlineData("dup:0a1b2c3d4e5f6a7b", "0A1B2C3D4E5F6A7B")]
+    public void DupFilters_AreParsed(string text, string expected)
+    {
+        var q = MusicFinder.Application.Search.SearchQueryParser.Parse(text);
+        Assert.Equal(expected, q.Duplicate);
+        Assert.Empty(q.Warnings);
+    }
+
+    [Theory]
+    [InlineData("dup:")]
+    [InlineData("dup:nonsense")]
+    [InlineData("dup:abc")]          // too short to name a group
+    [InlineData("dup:zzzzzzzz")]     // not hexadecimal
+    public void BadDupValues_WarnAndFilterNothing(string text)
+    {
+        var q = MusicFinder.Application.Search.SearchQueryParser.Parse(text);
+        Assert.Null(q.Duplicate);
+        Assert.Single(q.Warnings);
+    }
+}

@@ -28,6 +28,8 @@ internal sealed class FakeDialogs : IUserDialogs
     public void ShowIdentify(IdentifyViewModel viewModel) => Identify = viewModel;
     public AnalyzeViewModel? Analyze { get; private set; }
     public void ShowAnalyze(AnalyzeViewModel viewModel) => Analyze = viewModel;
+    public DuplicatesViewModel? Duplicates { get; private set; }
+    public void ShowDuplicates(DuplicatesViewModel viewModel) => Duplicates = viewModel;
     public string? PickFile(string title, string filter) => FilePicked;
 }
 

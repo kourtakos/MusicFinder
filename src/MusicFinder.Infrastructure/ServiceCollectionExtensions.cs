@@ -52,6 +52,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<SqliteSearchService>();
         services.AddSingleton<ISearchService>(sp => sp.GetRequiredService<SqliteSearchService>());
         services.AddSingleton<IMetadataHealthService, Health.MetadataHealthService>();
+        services.AddSingleton<IFileHashService, Duplicates.StreamingFileHasher>();
+        services.AddSingleton<IFileHashStore, FileHashRepository>();
+        services.AddSingleton<IDuplicateScanService, MusicFinder.Application.Duplicates.DuplicateScanService>();
         services.AddSingleton<ISearchDiagnostics>(sp => sp.GetRequiredService<SqliteSearchService>());
         services.AddSingleton<ISearchAliasService, MusicFinder.Application.Search.SearchAliasService>();
         services.AddSingleton<ISimilarCandidateSource, SimilarCandidateRepository>();

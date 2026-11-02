@@ -90,6 +90,13 @@ App ──► Application ──► Domain
 - **Infrastructure**: `Health/MetadataHealthService` (SQL counts, no file read), reader fields in `TagLibMetadataReader`, `ReadError` and unsupported-file counting in `LibraryScanner`, migration 0009.
 - **App**: `HealthViewModel` / `HealthView` (the Health tab), `LibraryViewModel.ShowFiltered` (a card opens the Library on its search).
 
+## Duplicates (M6)
+
+- **Domain**: `IFileHashService`, `IFileHashStore`, `IDuplicateScanService`, `Models/DuplicateModels.cs`.
+- **Application/Duplicates**: `DuplicateScanService` (size buckets, hash only what needs it, resume by the stored hashes), `KeepSuggestion`.
+- **Infrastructure**: `Duplicates/StreamingFileHasher` (shared read, 1 MB chunks, throttled, cancellable), `FileHashRepository`, migration 0010, the `dup:` filter in `SearchSqlBuilder`.
+- **App**: `DuplicatesViewModel` / `DuplicatesWindow` (opened from the Health tab; no delete, move or rename command exists).
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

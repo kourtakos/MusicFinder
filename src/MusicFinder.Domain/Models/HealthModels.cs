@@ -22,7 +22,9 @@ public enum HealthIssueKind
     OddSampleRate,
     CodecMismatch,
     SizeMismatch,
-    ZeroDuration
+    ZeroDuration,
+    // Duplicates
+    ExactDuplicates
 }
 
 public sealed record HealthSummary(

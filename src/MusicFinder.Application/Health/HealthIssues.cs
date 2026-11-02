@@ -23,6 +23,7 @@ public static class HealthIssues
         HealthIssueKind.CodecMismatch => "issue:mismatch",
         HealthIssueKind.SizeMismatch => "issue:size",
         HealthIssueKind.ZeroDuration => "issue:duration",
+        HealthIssueKind.ExactDuplicates => "dup:exact",
         _ => null
     };
 
@@ -45,6 +46,7 @@ public static class HealthIssues
         HealthIssueKind.CodecMismatch => "Codec differs from extension",
         HealthIssueKind.SizeMismatch => "Size does not fit the bitrate",
         HealthIssueKind.ZeroDuration => "No duration",
+        HealthIssueKind.ExactDuplicates => "Exact duplicates",
         _ => kind.ToString()
     };
 
@@ -62,6 +64,7 @@ public static class HealthIssues
         HealthIssueKind.CodecMismatch => "The audio inside is not the kind the file extension suggests.",
         HealthIssueKind.SizeMismatch => "The file is much smaller or larger than its bitrate and length imply; a smaller file may be cut short. A hint, not proof.",
         HealthIssueKind.ZeroDuration => "No length could be read from the file.",
+        HealthIssueKind.ExactDuplicates => "Files whose bytes are identical to another file (files, not groups). Only found once you scan for duplicates; nothing is deleted or changed.",
         _ => ""
     };
 }

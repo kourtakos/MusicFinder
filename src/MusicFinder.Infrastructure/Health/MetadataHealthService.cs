@@ -44,8 +44,14 @@ public sealed class MetadataHealthService : IMetadataHealthService
         HealthIssueKind.CodecMismatch => Flag(IssueFlags.CodecMismatch),
         HealthIssueKind.SizeMismatch => Flag(IssueFlags.SizeMismatch),
         HealthIssueKind.ZeroDuration => Flag(IssueFlags.ZeroDuration),
+        HealthIssueKind.ExactDuplicates => "t.Missing = 0 AND " + ExactDuplicate,
         _ => "1 = 0"
     };
+
+    /// <summary>Same test as the search filter dup:exact: the file has a remembered hash shared with another present file, and the group was not dismissed.</summary>
+    private const string ExactDuplicate =
+        "EXISTS (SELECT 1 FROM FileHashes dh WHERE dh.TrackId = t.Id AND dh.FileSize = t.FileSize AND dh.Hash NOT IN (SELECT Hash FROM DuplicateDismissals) " +
+        "AND (SELECT COUNT(*) FROM FileHashes d2 JOIN Tracks t2 ON t2.Id = d2.TrackId AND t2.Missing = 0 AND t2.FileSize = d2.FileSize WHERE d2.Hash = dh.Hash) > 1)";
 
     private static string Flag(IssueFlags f) => $"t.Missing = 0 AND (t.IssueFlags & {(int)f}) <> 0";
 

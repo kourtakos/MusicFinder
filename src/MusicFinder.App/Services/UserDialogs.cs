@@ -20,6 +20,8 @@ public interface IUserDialogs
     void ShowIdentify(ViewModels.IdentifyViewModel viewModel);
     /// <summary>Shows the BPM and key analysis window as a modal dialog over the main window.</summary>
     void ShowAnalyze(ViewModels.AnalyzeViewModel viewModel);
+    /// <summary>Shows the duplicate files review as a modal dialog over the main window.</summary>
+    void ShowDuplicates(ViewModels.DuplicatesViewModel viewModel);
     /// <summary>A file picker; <paramref name="filter"/> is in the Windows form "Name|*.ext|Name2|*.ext2". Null when cancelled.</summary>
     string? PickFile(string title, string filter);
 }
@@ -65,6 +67,9 @@ public sealed class UserDialogs : IUserDialogs
 
     public void ShowAnalyze(ViewModels.AnalyzeViewModel viewModel) =>
         new Views.AnalyzeWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public void ShowDuplicates(ViewModels.DuplicatesViewModel viewModel) =>
+        new Views.DuplicatesWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
 
     public string? PickFile(string title, string filter)
     {

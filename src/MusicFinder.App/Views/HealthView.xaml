@@ -9,6 +9,10 @@
             <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,0,0,12"
                        Text="Pick a finding to list those tracks in the Library. From there you can edit tags (F2), identify (Ctrl+I), analyze BPM and key (Ctrl+B) or open the file in Explorer. Nothing here changes a file."/>
 
+            <Button Content="Find duplicate files…" Style="{StaticResource MF.AccentButton}" HorizontalAlignment="Left" Height="34" Padding="16,0"
+                    Margin="0,0,0,12" Command="{Binding FindDuplicatesCommand}"
+                    ToolTip="Look for files with identical content. Nothing is deleted or changed."/>
+
             <Border Style="{StaticResource MF.Panel}" Padding="14,10" Margin="0,0,0,12"
                     Visibility="{Binding HasUnsupported, Converter={StaticResource BoolToVis}}">
                 <TextBlock Text="{Binding UnsupportedText}" TextWrapping="Wrap"/>

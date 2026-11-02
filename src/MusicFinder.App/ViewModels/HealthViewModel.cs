@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Services;
 using MusicFinder.Application.Health;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -51,6 +52,8 @@ public sealed record HealthGroupViewModel(string Title, string Subtitle, IReadOn
 public sealed partial class HealthViewModel : ObservableObject
 {
     private readonly IMetadataHealthService _health;
+    private readonly IDuplicateScanService _duplicates;
+    private readonly IUserDialogs _dialogs;
 
     public IReadOnlyList<HealthGroupViewModel> Groups { get; }
 
@@ -62,9 +65,11 @@ public sealed partial class HealthViewModel : ObservableObject
     /// <summary>Raised with the Library search that lists a card's tracks; the shell switches to the Library.</summary>
     public event EventHandler<string>? ShowInLibraryRequested;
 
-    public HealthViewModel(IMetadataHealthService health)
+    public HealthViewModel(IMetadataHealthService health, IDuplicateScanService duplicates, IUserDialogs dialogs)
     {
         _health = health;
+        _duplicates = duplicates;
+        _dialogs = dialogs;
         HealthCardViewModel Card(HealthIssueKind k) => new(k, OnShow);
         Groups =
         [
@@ -76,8 +81,18 @@ public sealed partial class HealthViewModel : ObservableObject
                  Card(HealthIssueKind.MissingKey), Card(HealthIssueKind.MissingArtwork), Card(HealthIssueKind.Mojibake)]),
             new("Quality", "Hints from the file's own properties. They are suspicions to look at, never proof, and nothing is changed because of them.",
                 [Card(HealthIssueKind.Unreadable), Card(HealthIssueKind.LowBitrate), Card(HealthIssueKind.OddSampleRate),
-                 Card(HealthIssueKind.CodecMismatch), Card(HealthIssueKind.SizeMismatch), Card(HealthIssueKind.ZeroDuration)])
+                 Card(HealthIssueKind.CodecMismatch), Card(HealthIssueKind.SizeMismatch), Card(HealthIssueKind.ZeroDuration)]),
+            new("Duplicates", "Files with identical content. Found by a scan you start yourself; the scan only reads files.",
+                [Card(HealthIssueKind.ExactDuplicates)])
         ];
+    }
+
+    [RelayCommand]
+    private async Task FindDuplicatesAsync()
+    {
+        var vm = new DuplicatesViewModel(_duplicates, _dialogs, query => ShowInLibraryRequested?.Invoke(this, query));
+        _dialogs.ShowDuplicates(vm);
+        await ReloadAsync();
     }
 
     private void OnShow(HealthCardViewModel card)

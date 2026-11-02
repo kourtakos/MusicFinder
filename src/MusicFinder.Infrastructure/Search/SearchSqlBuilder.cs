@@ -218,6 +218,18 @@ public static class SearchSqlBuilder
             });
         }
         AddRange(where, p, "t.BitrateKbps", "kbpsQ", parsed.BitrateMin, parsed.BitrateMax);
+        if (parsed.Duplicate is not null)
+        {
+            if (parsed.Duplicate == "exact")
+                where.Add("EXISTS (SELECT 1 FROM FileHashes dh WHERE dh.TrackId = t.Id AND dh.FileSize = t.FileSize " +
+                          "AND dh.Hash NOT IN (SELECT Hash FROM DuplicateDismissals) " +
+                          "AND (SELECT COUNT(*) FROM FileHashes d2 JOIN Tracks t2 ON t2.Id = d2.TrackId AND t2.Missing = 0 AND t2.FileSize = d2.FileSize WHERE d2.Hash = dh.Hash) > 1)");
+            else
+            {
+                where.Add("EXISTS (SELECT 1 FROM FileHashes dh WHERE dh.TrackId = t.Id AND dh.FileSize = t.FileSize AND dh.Hash LIKE @dupQ)");
+                p.Add("dupQ", parsed.Duplicate + "%");
+            }
+        }
         if (parsed.Codec is not null) { where.Add("t.Codec LIKE @codecQ ESCAPE '\\'"); p.Add("codecQ", "%" + EscapeLike(parsed.Codec) + "%"); }
 
         if (q.SessionId is { } sid) p.Add("sid", sid);

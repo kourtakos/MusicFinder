@@ -122,3 +122,8 @@ the file's new size and time (the audio did not change). "No estimate" is stored
 `0009_QualityAndHealth.sql` adds to `Tracks`: `Codec`, `Channels`, `BitDepth` (container facts from TagLib; NULL = unknown), `ReadError` (why the tags could not be read; NULL = read fine) and `IssueFlags` (bit mask, see `Domain/Enums/IssueFlags.cs`, 0 = nothing suspect),
 with a partial index on non-zero flags. `Track.CurrentMetaVersion` is now 2, so every row indexed earlier is re-read once by the next scan and gains the new facts. `IssueFlags` is computed in C# by `QualityRules` whenever a row is written (scan or tag write), from
 data the row already has; nothing is hashed or decoded. `ScanUnsupported(RootId, Extension, FileCount)` holds the per-root counts of audio-like files the scanner skips. Library Health counts are plain SQL over `Tracks` (`MetadataHealthService`), always current.
+
+## Duplicates (M6, migration 0010)
+
+`FileHashes(TrackId PK -> Tracks ON DELETE CASCADE, FileSize, ModifiedUtc, Algorithm 'SHA256', Hash, ComputedUtc)` holds a content hash only for files a duplicate scan has read (never filled by indexing). Trigger `Tracks_au_hashStale` deletes a track's row when its `FileSize` or `ModifiedUtc` changes, so a
+remembered hash always describes the bytes the track has now; a rename or move keeps it. `DuplicateDismissals(Hash PK, DismissedUtc)` records "not a duplicate" decisions by content hash. Groups are not stored: they are `FileHashes` rows that share a hash among present files, so they are always current.

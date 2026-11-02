@@ -70,6 +70,8 @@ public sealed class AppSettings
 
     /// <summary>Seconds of a track the BPM and key analysis listens to (the middle of the track). 30 - 240.</summary>
     public int AnalysisSeconds { get; set; } = 90;
+    /// <summary>How fast the duplicate scan may read files, in MB per second (0 = no limit).</summary>
+    public int HashThrottleMbPerSec { get; set; } = 40;
     /// <summary>How an estimated key is written into a tag. Camelot ("8A") is the default; Open Key ("1m") and note names ("Am") are the alternatives.</summary>
     public MusicFinder.Domain.Models.KeyNotation AnalysisKeyNotation { get; set; } = MusicFinder.Domain.Models.KeyNotation.Camelot;
     /// <summary>How many tracks are analysed at once (1 or 2; the work is heavy and runs at low priority).</summary>

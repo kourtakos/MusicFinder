@@ -27,6 +27,7 @@ Genre / BPM / Decade filters; filters never exclude one another.
 | `missing:art` | Tracks with no embedded cover (also `missing:cover`). |
 | `issue:any` | Tracks flagged by Library Health: `issue:mojibake`, `error`, `lowbitrate`, `samplerate`, `mismatch`, `size`, `duration`, or `any` (see library-health.md). |
 | `bitrate:320` / `bitrate:0-127` | Bitrate in kbps, exact or range. |
+| `dup:exact` | Files that have a byte-identical twin found by a duplicate scan; `dup:` and the first letters of a content hash lists one group. |
 | `codec:flac` | Part of the codec name the file reports. |
 | `played:never` | Never played (no possible or confirmed play). |
 | `played:possible` / `played:confirmed` | At least one possible / confirmed play. |

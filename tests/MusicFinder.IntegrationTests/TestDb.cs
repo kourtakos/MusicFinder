@@ -31,6 +31,7 @@ public sealed class TestDb : IAsyncDisposable
     public MusicFinder.Application.Search.SearchAliasIndexJob AliasJob { get; }
     public IdentificationCacheRepository Identification { get; }
     public TrackAnalysisRepository Analysis { get; }
+    public FileHashRepository Hashes { get; }
 
     public TestDb()
     {
@@ -56,6 +57,7 @@ public sealed class TestDb : IAsyncDisposable
         AliasJob = new MusicFinder.Application.Search.SearchAliasIndexJob(Aliases, AliasOverrides);
         Identification = new IdentificationCacheRepository(Factory, Writes);
         Analysis = new TrackAnalysisRepository(Factory, Writes);
+        Hashes = new FileHashRepository(Factory, Writes);
     }
 
     /// <summary>Seeds the starter genre taxonomy and DJ tags (the app does this at startup).</summary>
