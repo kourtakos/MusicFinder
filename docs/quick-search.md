@@ -7,7 +7,7 @@ software or player without bringing the MusicFinder window to the front.
 
 1. Press **Ctrl+Alt+Space** (the default) from any program. A search box opens on the screen your mouse is on, near the top, above all other windows.
 2. Type. Results from your whole library appear below (the folder you picked in the main window is ignored). Each row shows the cover, title,
-   artist, BPM, key and, if a DJ session is running, a chip with that track's status in it (Exported / Possible / Played).
+   artist, BPM, key and, if a DJ session is running, a coloured **pill** with that track's status in the current session: *Dragged this session* (outlined; you dragged it out, nothing more is known), *Possibly played* (amber; dragged out and then quiet for the session's quiet period: a guess, not proof) or *Played this session* (green; confirmed by you or by your DJ software's history). Hover the pill for the explanation. Tracks with no evidence in this session show no pill. It updates by itself when the quiet period ends.
 3. **Drag a result** straight into VirtualDJ, Traktor or any player that accepts files. Select several with Ctrl/Shift first to drag them together.
    The drag is recorded in the DJ session exactly like a drag from the library, and typing here counts as search activity for the
    "possibly played" heuristic (see `docs/dj-session.md`).

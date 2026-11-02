@@ -330,6 +330,54 @@ public class QuickSearchTests
         Assert.All(entries, e => Assert.Equal((SessionPlayStatus.Exported, "winamp"), (e.Status, e.Target)));
     });
 
+
+    [Fact]
+    public Task ThePopupShowsAColouredPill_ForATrackDraggedInThisSession_AndNoneForOthers() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var window = c.App.Service<MusicFinder.App.Views.QuickSearchWindow>();
+        window.Show();
+        try
+        {
+            c.Quick.Query = "a";
+            await Ui.WaitUntilAsync(() => c.Quick.Results.Count == 3, what: "results");
+            await Task.Delay(300);
+            Assert.Empty(PillTexts(window));                                        // nothing played yet: no pill on any row
+
+            c.Quick.SetSelectedItems([c.Quick.Results.Single(r => r.Title == "Alpha")]);
+            c.Quick.DragOut(new object());
+            await Ui.WaitUntilAsync(() => PillTexts(window).Count == 1, what: "pill after the drag");
+            Assert.Equal(["Dragged this session"], PillTexts(window));
+
+            await Task.Run(() => c.Clock.Advance(TimeSpan.FromSeconds(20)));
+            await Ui.WaitUntilAsync(() => PillTexts(window).SequenceEqual(["Possibly played"]), what: "possible pill");
+            var border = FindPills(window).Single();
+            Assert.Equal(System.Windows.Media.Color.FromRgb(0xEA, 0xB3, 0x08), ((System.Windows.Media.SolidColorBrush)border.Background).Color);   // amber
+            Assert.Contains("guess", ((string)border.ToolTip));
+            Assert.Empty(BindingAudit.FindBroken(window));
+        }
+        finally { window.Hide(); }
+    });
+
+    private static List<System.Windows.Controls.Border> FindPills(System.Windows.DependencyObject root)
+    {
+        var found = new List<System.Windows.Controls.Border>();
+        void Walk(System.Windows.DependencyObject d)
+        {
+            for (var i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(d); i++)
+            {
+                var child = System.Windows.Media.VisualTreeHelper.GetChild(d, i);
+                if (child is System.Windows.Controls.Border { Child: System.Windows.Controls.TextBlock { Name: "PillText" }, IsVisible: true } b) found.Add(b);
+                Walk(child);
+            }
+        }
+        Walk(root);
+        return found;
+    }
+
+    private static List<string> PillTexts(System.Windows.DependencyObject root) =>
+        FindPills(root).Select(b => ((System.Windows.Controls.TextBlock)b.Child).Text).ToList();
     [Fact]
     public Task AfterADrag_ThePopupShowsAPossibleBadge_ButTypingFirstKeepsItExported() => Ui.RunAsync(async () =>
     {
@@ -340,9 +388,13 @@ public class QuickSearchTests
         c.Quick.SetSelectedItems([c.Quick.Results[0]]);
         c.Quick.DragOut(new object());
         await Ui.WaitUntilAsync(() => c.Quick.Results[0].SessionBadge == "Exported", what: "exported badge");
+        Assert.Equal("Dragged this session", c.Quick.Results[0].SessionPillText);
+        Assert.Contains("cannot tell whether it was loaded or played", c.Quick.Results[0].SessionPillTip);
 
         await Task.Run(() => c.Clock.Advance(TimeSpan.FromSeconds(20)));
         await Ui.WaitUntilAsync(() => c.Quick.Results[0].SessionBadge == "Possible", what: "possible badge");
+        Assert.Equal("Possibly played", c.Quick.Results[0].SessionPillText);        // honest: a guess, not "played"
+        Assert.True(c.Quick.Results[0].IsSessionPossible);
 
         // A second drag, then typing in the pop-up before the window ends: activity, so it stays exported.
         c.Quick.DragOut(new object());

@@ -91,17 +91,27 @@
                             </StackPanel>
                             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
                                 <!-- This track's evidence in the live session (Exported / Possible / Played). -->
-                                <Border x:Name="Badge" Style="{StaticResource MF.Chip}" Margin="0,0,10,0"
+                                <Border x:Name="Pill" Style="{StaticResource MF.Chip}" Margin="0,0,12,0" Padding="10,3" BorderThickness="1"
+                                        BorderBrush="{StaticResource MF.Brush.TextMuted}" Background="Transparent" ToolTip="{Binding SessionPillTip}"
                                         Visibility="{Binding HasSessionBadge, Converter={StaticResource BoolToVis}}">
-                                    <TextBlock Text="{Binding SessionBadge}" FontSize="11" Foreground="White"/>
+                                    <TextBlock x:Name="PillText" Text="{Binding SessionPillText}" FontSize="11" FontWeight="SemiBold"
+                                               Foreground="{StaticResource MF.Brush.TextSecondary}"/>
                                 </Border>
                                 <TextBlock Text="{Binding BpmText}" Foreground="{StaticResource MF.Brush.TextSecondary}" Width="34" TextAlignment="Right"/>
                                 <TextBlock Text="{Binding KeyText}" Foreground="{StaticResource MF.Brush.TextSecondary}" Width="38" TextAlignment="Right"/>
                             </StackPanel>
                         </Grid>
                         <DataTemplate.Triggers>
+                            <!-- Dragged: outlined and quiet. Possibly played: amber. Played (confirmed): green. -->
+                            <DataTrigger Binding="{Binding IsSessionPossible}" Value="True">
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource MF.Brush.Possible}"/>
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{StaticResource MF.Brush.Possible}"/>
+                                <Setter TargetName="PillText" Property="Foreground" Value="#1A1400"/>
+                            </DataTrigger>
                             <DataTrigger Binding="{Binding IsSessionConfirmed}" Value="True">
-                                <Setter TargetName="Badge" Property="Background" Value="{StaticResource MF.Brush.Accent}"/>
+                                <Setter TargetName="Pill" Property="Background" Value="{StaticResource MF.Brush.Confirmed}"/>
+                                <Setter TargetName="Pill" Property="BorderBrush" Value="{StaticResource MF.Brush.Confirmed}"/>
+                                <Setter TargetName="PillText" Property="Foreground" Value="#04210F"/>
                             </DataTrigger>
                         </DataTemplate.Triggers>
                     </DataTemplate>

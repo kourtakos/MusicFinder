@@ -79,6 +79,25 @@ public sealed partial class TrackRowViewModel : ObservableObject
 
     public bool HasSessionBadge => Row.SessionStatus != SessionPlayStatus.None;
     public bool IsSessionConfirmed => Row.SessionStatus == SessionPlayStatus.Confirmed;
+    public bool IsSessionPossible => Row.SessionStatus == SessionPlayStatus.Possible;
+    public bool IsSessionExported => Row.SessionStatus == SessionPlayStatus.Exported;
+
+    /// <summary>The pill as the pop-up shows it: longer than the chip, and honest about how much is known.</summary>
+    public string SessionPillText => Row.SessionStatus switch
+    {
+        SessionPlayStatus.Exported => "Dragged this session",
+        SessionPlayStatus.Possible => "Possibly played",
+        SessionPlayStatus.Confirmed => "Played this session",
+        _ => ""
+    };
+
+    public string SessionPillTip => Row.SessionStatus switch
+    {
+        SessionPlayStatus.Exported => "You dragged this track out in the current session. MusicFinder cannot tell whether it was loaded or played.",
+        SessionPlayStatus.Possible => "Dragged out, then nothing else happened for the quiet period: probably played, but this is a guess, not proof.",
+        SessionPlayStatus.Confirmed => "Marked as played in the current session (by you or by your DJ software's history).",
+        _ => ""
+    };
 
     public string DurationText => Row.DurationMs is { } ms
         ? TimeSpan.FromMilliseconds(ms).ToString(ms >= 3_600_000 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
