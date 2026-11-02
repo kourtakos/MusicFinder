@@ -93,11 +93,19 @@ public sealed class ScanCoordinator : IDisposable
         lock (_pending) _pending.Remove(rootId);
     }
 
+    private int _disposed;
+
+    /// <summary>
+    /// Safe to call more than once: the application disposes it when it exits and the service container disposes it again after that.
+    /// </summary>
     public void Dispose()
     {
+        if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
         _cts.Cancel();
         _queue.Writer.TryComplete();
-        try { _worker.Wait(TimeSpan.FromSeconds(3)); } catch { /* shutting down */ }
-        _cts.Dispose();
+        var finished = true;
+        try { finished = _worker.Wait(TimeSpan.FromSeconds(3)); } catch { /* shutting down */ }
+        // A scan that is still unwinding keeps using the token: leave it to the garbage collector rather than pull it from under the scan.
+        if (finished) _cts.Dispose();
     }
 }
