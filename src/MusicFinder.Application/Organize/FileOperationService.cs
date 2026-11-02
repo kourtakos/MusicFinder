@@ -23,7 +23,7 @@ public sealed class FileOperationService : IFileOperationService
         _log = log;
     }
 
-    public async Task<BatchResult> RenameAsync(IReadOnlyList<PlanItem> plan, string template, IProgress<FileOperationProgress>? progress, CancellationToken ct)
+    public async Task<BatchResult> RenameAsync(IReadOnlyList<PlanItem> plan, string template, IProgress<FileOperationProgress>? progress, CancellationToken ct, string kind = "Rename")
     {
         var todo = plan.Where(p => p.WillMove).ToList();
         if (todo.Count == 0) return new BatchResult(null, 0, 0, [], false);
@@ -38,7 +38,7 @@ public sealed class FileOperationService : IFileOperationService
             newOps.Add(new NewJournalOp(item.TrackId, OpRole.Track, item.OldPath, item.NewPath));
             foreach (var sc in item.Sidecars) newOps.Add(new NewJournalOp(item.TrackId, OpRole.Sidecar, sc.OldPath, sc.NewPath));
         }
-        var (batchId, ops) = await _journal.BeginBatchAsync("Rename", template, newOps, CancellationToken.None);
+        var (batchId, ops) = await _journal.BeginBatchAsync(kind, template, newOps, CancellationToken.None);
 
         var failures = new List<FileFailure>();
         int renamed = 0, sidecars = 0, handled = 0;
@@ -80,6 +80,7 @@ public sealed class FileOperationService : IFileOperationService
             }
             handled++;
         }
+        await _journal.RecomputeFolderCountsAsync(batchId, CancellationToken.None);
         progress?.Report(new FileOperationProgress(todo.Count, handled, failures.Count, null));
         _log.LogInformation("Rename batch {Batch}: {Renamed} renamed, {Failed} failed, cancelled={Cancelled}", batchId, renamed, failures.Count, cancelled);
         return new BatchResult(batchId, renamed, sidecars, failures, cancelled);
@@ -111,6 +112,8 @@ public sealed class FileOperationService : IFileOperationService
         await _journal.SetStateAsync(op.Id, forward ? OpState.InProgress : OpState.UndoInProgress, null, null, CancellationToken.None);
         try
         {
+            if (!string.Equals(Path.GetDirectoryName(from), Path.GetDirectoryName(to), StringComparison.OrdinalIgnoreCase))
+                _files.EnsureFolder(Path.GetDirectoryName(to)!);
             _files.Move(from, to);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -140,6 +143,7 @@ public sealed class FileOperationService : IFileOperationService
             var error = await MoveOneAsync(op, forward: false);
             if (error is null) restored++; else refused.Add(new FileFailure(op.NewPath, error));
         }
+        await _journal.RecomputeFolderCountsAsync(batchId, CancellationToken.None);
         return new UndoResult(restored, refused);
     }
 

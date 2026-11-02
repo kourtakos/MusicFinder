@@ -1,4 +1,5 @@
 using Dapper;
+using Microsoft.Data.Sqlite;
 using MusicFinder.Application.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -11,9 +12,11 @@ public sealed class FileOperationJournalRepository : IFileOperationJournal, IRen
     private readonly SqliteConnectionFactory _factory;
     private readonly SqliteWriteQueue _writes;
     private readonly TimeProvider _time;
+    private readonly MusicFinder.Domain.Contracts.IFolderRepository? _folders;
 
-    public FileOperationJournalRepository(SqliteConnectionFactory factory, SqliteWriteQueue writes, TimeProvider? time = null)
+    public FileOperationJournalRepository(SqliteConnectionFactory factory, SqliteWriteQueue writes, MusicFinder.Domain.Contracts.IFolderRepository? folders = null, TimeProvider? time = null)
     {
+        _folders = folders;
         _factory = factory;
         _writes = writes;
         _time = time ?? TimeProvider.System;
@@ -55,12 +58,44 @@ public sealed class FileOperationJournalRepository : IFileOperationJournal, IRen
             var t = conn.QuerySingleOrDefault<(string? Title, string? Artist, string? AlbumArtist, string? Album, string? GenreRaw)>(
                 "SELECT Title, Artist, AlbumArtist, Album, GenreRaw FROM Tracks WHERE Id = @trackId", new { trackId }, tx);
             var fileName = Path.GetFileName(trackPath);
+            var folderId = EnsureFolder(conn, tx, trackId, Path.GetDirectoryName(trackPath)!);
             // Same row, new path: play history, genres, tags, analysis and identification all follow it. The triggers refresh the search indexes.
             conn.Execute(
-                "UPDATE Tracks SET FullPath = @trackPath, FileName = @fileName, NormalizedText = @text WHERE Id = @trackId",
-                new { trackId, trackPath, fileName, text = TextNormalizer.BuildSearchText(fileName, t.Title, t.Artist, t.AlbumArtist, t.Album, t.GenreRaw) }, tx);
+                "UPDATE Tracks SET FullPath = @trackPath, FileName = @fileName, FolderId = @folderId, NormalizedText = @text WHERE Id = @trackId",
+                new { trackId, trackPath, fileName, folderId, text = TextNormalizer.BuildSearchText(fileName, t.Title, t.Artist, t.AlbumArtist, t.Album, t.GenreRaw) }, tx);
             return 1;
         }, ct);
+
+    /// <summary>The id of the folder row for a directory below the track's library folder, creating the missing rows (a scan would find the same ones).</summary>
+    private static long EnsureFolder(SqliteConnection conn, SqliteTransaction tx, long trackId, string directory)
+    {
+        var root = conn.QuerySingle<(long Id, string Path)>(
+            "SELECT r.Id, r.Path FROM Tracks t JOIN Folders f ON f.Id = t.FolderId JOIN LibraryRoots r ON r.Id = f.RootId WHERE t.Id = @trackId", new { trackId }, tx);
+        return Ensure(directory);
+
+        long Ensure(string dir)
+        {
+            var id = conn.ExecuteScalar<long?>("SELECT Id FROM Folders WHERE FullPath = @dir COLLATE NOCASE", new { dir }, tx);
+            if (id is not null) return id.Value;
+            var parent = Path.GetDirectoryName(dir);
+            if (parent is null || !dir.StartsWith(root.Path, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("The folder is outside the library folder.");
+            var parentId = Ensure(parent);
+            conn.Execute("INSERT INTO Folders(RootId, ParentId, FullPath, Name) VALUES (@rootId, @parentId, @dir, @name)",
+                new { rootId = root.Id, parentId, dir, name = Path.GetFileName(dir) }, tx);
+            return conn.ExecuteScalar<long>("SELECT last_insert_rowid()", transaction: tx);
+        }
+    }
+
+    public async Task RecomputeFolderCountsAsync(string batchId, CancellationToken ct)
+    {
+        if (_folders is null) return;
+        using var conn = _factory.Open();
+        var roots = await conn.QueryAsync<long>(new CommandDefinition(
+            "SELECT DISTINCT f.RootId FROM FileOperations o JOIN Tracks t ON t.Id = o.TrackId JOIN Folders f ON f.Id = t.FolderId WHERE o.BatchId = @batchId",
+            new { batchId }, cancellationToken: ct));
+        foreach (var root in roots) await _folders.RecomputeCountsAsync(root, ct);
+    }
 
     private sealed record OpRow(long Id, string BatchId, long TrackId, string Role, string OldPath, string NewPath, string State, string? Error);
 
@@ -118,7 +153,7 @@ public sealed class FileOperationJournalRepository : IFileOperationJournal, IRen
     }
 
     private sealed record SourceRow(long Id, string FullPath, string? Artist, string? Title, string? Album, string? AlbumArtist,
-        long? Year, long? TrackNumber, string? GenreRaw, double? Bpm, string? MusicalKey);
+        long? Year, long? TrackNumber, string? GenreRaw, double? Bpm, string? MusicalKey, string? RootPath);
 
     public async Task<IReadOnlyList<RenameSource>> GetAsync(IReadOnlyCollection<long> trackIds, CancellationToken ct)
     {
@@ -127,8 +162,9 @@ public sealed class FileOperationJournalRepository : IFileOperationJournal, IRen
         var ids = trackIds.ToArray();
         var rows = (await conn.QueryAsync<SourceRow>(new CommandDefinition(
             """
-            SELECT Id, FullPath, Artist, Title, Album, AlbumArtist, Year, TrackNumber, GenreRaw, Bpm, MusicalKey
-            FROM Tracks WHERE Id IN @ids AND Missing = 0
+            SELECT t.Id, t.FullPath, t.Artist, t.Title, t.Album, t.AlbumArtist, t.Year, t.TrackNumber, t.GenreRaw, t.Bpm, t.MusicalKey, r.Path AS RootPath
+            FROM Tracks t JOIN Folders f ON f.Id = t.FolderId JOIN LibraryRoots r ON r.Id = f.RootId
+            WHERE t.Id IN @ids AND t.Missing = 0
             """, new { ids }, cancellationToken: ct))).ToList();
 
         // {Genre} is the taxonomy's top genre; a track without a mapped genre falls back to its raw tag.
@@ -146,6 +182,6 @@ public sealed class FileOperationJournalRepository : IFileOperationJournal, IRen
 
         return rows.Select(r => new RenameSource(
             r.Id, r.FullPath, r.Artist, r.Title, r.Album, r.AlbumArtist, (int?)r.Year, (int?)r.TrackNumber,
-            top.TryGetValue(r.Id, out var g) ? g : r.GenreRaw, r.Bpm, r.MusicalKey)).ToList();
+            top.TryGetValue(r.Id, out var g) ? g : r.GenreRaw, r.Bpm, r.MusicalKey, r.RootPath)).ToList();
     }
 }

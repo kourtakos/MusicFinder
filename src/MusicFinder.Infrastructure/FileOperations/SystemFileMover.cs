@@ -24,6 +24,8 @@ public sealed class SystemFileMover : IFileMover, IFileProbe
     }
 
     public void Move(string from, string to) => File.Move(from, to, overwrite: false);
+
+    public void EnsureFolder(string directory) => Directory.CreateDirectory(directory);
 }
 
 /// <summary>One holder at a time: a scan or a batch of file operations.</summary>

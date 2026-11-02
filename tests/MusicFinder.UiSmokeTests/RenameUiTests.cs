@@ -175,6 +175,44 @@ public class RenameUiTests
     });
 
     [Fact]
+    public Task MovingIntoFolders_ShowsThePathsInThePreview_MovesTheFiles_TheTreeFollows_AndItCanBeUndone() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var before = Snapshot(c.App.MusicDir);
+        var vm = await OpenAsync(c);
+
+        vm.MoveIntoFolders = true;
+        await vm.RefreshPreviewAsync();
+
+        Assert.Equal("{Genre}/{Artist}/{Artist} - {Title}", vm.Template);
+        Assert.Equal("Move 3 files", vm.RenameButtonText);
+        Assert.Contains(vm.Rows, r => r.NewName == Path.Combine("Pop", "Madonna", "Madonna - Frozen.mp3"));
+        Assert.True(File.Exists(Path.Combine(c.App.MusicDir, "a.mp3")));            // still only a preview
+
+        var window = new RenameWindow(vm) { Owner = c.App.Window };
+        window.Show();
+        try
+        {
+            await Task.Delay(300);
+            Assert.Empty(BindingAudit.FindBroken(window));
+        }
+        finally { window.Close(); }
+
+        await vm.RenameCommand.ExecuteAsync(null);
+
+        Assert.Contains("Moved 3 files", vm.StatusText);
+        Assert.True(File.Exists(Path.Combine(c.App.MusicDir, "Pop", "Madonna", "Madonna - Frozen.mp3")));
+        Assert.Equal(before, Snapshot(c.App.MusicDir));
+        Assert.Equal("Organize", vm.Batches[0].Info.Kind);
+
+        await vm.UndoCommand.ExecuteAsync(vm.Batches[0]);
+
+        Assert.True(File.Exists(Path.Combine(c.App.MusicDir, "a.mp3")));
+        Assert.Equal(before, Snapshot(c.App.MusicDir));
+    });
+
+    [Fact]
     public Task WithNothingSelected_NoWindowOpens_AndWhileIndexingItIsRefused() => Ui.RunAsync(async () =>
     {
         var c = await StartAsync();

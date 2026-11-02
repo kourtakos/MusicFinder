@@ -91,11 +91,21 @@ public static class FileOperationPlanner
             var ext = Path.GetExtension(s.FullPath);
             if (!name.EndsWith(ext, StringComparison.OrdinalIgnoreCase)) name += ext;
         }
-        name = PathSanitizer.Segment(name);
-
-        var dir = Path.GetDirectoryName(s.FullPath);
-        if (string.IsNullOrEmpty(dir)) return (null, "The file has no folder.");
-        var full = Path.Combine(dir, name);
+        string full;
+        if (options.MoveIntoFolders)
+        {
+            if (string.IsNullOrEmpty(s.RootPath)) return (null, "The library folder of this file is unknown.");
+            var segments = name.Split(['/', '\\'],StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Select(PathSanitizer.Segment).ToArray();
+            if (segments.Length == 0) return (null, "The template gives no file name.");
+            full = Path.Combine([s.RootPath, .. segments]);
+        }
+        else
+        {
+            var dir = Path.GetDirectoryName(s.FullPath);
+            if (string.IsNullOrEmpty(dir)) return (null, "The file has no folder.");
+            full = Path.Combine(dir, PathSanitizer.Segment(name));
+        }
         if (full.Length > PathSanitizer.MaxPathLength) return (null, $"The new path would be {full.Length} characters long (the limit is {PathSanitizer.MaxPathLength}).");
         return (full, null);
     }

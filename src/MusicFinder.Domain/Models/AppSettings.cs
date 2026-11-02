@@ -78,6 +78,8 @@ public sealed class AppSettings
     public string? RenameTemplate { get; set; }
     /// <summary>Fill missing tags with "Unknown Artist" and the like instead of skipping the file.</summary>
     public bool RenameUsePlaceholders { get; set; }
+    /// <summary>The last template used when moving files into folders.</summary>
+    public string? OrganizeTemplate { get; set; }
     /// <summary>How an estimated key is written into a tag. Camelot ("8A") is the default; Open Key ("1m") and note names ("Am") are the alternatives.</summary>
     public MusicFinder.Domain.Models.KeyNotation AnalysisKeyNotation { get; set; } = MusicFinder.Domain.Models.KeyNotation.Camelot;
     /// <summary>How many tracks are analysed at once (1 or 2; the work is heavy and runs at low priority).</summary>

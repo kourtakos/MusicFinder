@@ -11,6 +11,8 @@ public interface IFileMover
     bool ExistsExact(string path);
     /// <summary>Renames within a volume. Throws if the destination already exists; never overwrites.</summary>
     void Move(string from, string to);
+    /// <summary>Creates the folder (and parents) if missing. Never removes anything.</summary>
+    void EnsureFolder(string directory);
 }
 
 /// <summary>Keeps a scan and a batch of file operations from running together.</summary>
@@ -35,6 +37,8 @@ public interface IFileOperationJournal
     Task<IReadOnlyList<BatchInfo>> GetBatchesAsync(int take, CancellationToken ct);
     /// <summary>The path the library currently has for a track (null when the track is unknown).</summary>
     Task<string?> GetTrackPathAsync(long trackId, CancellationToken ct);
+    /// <summary>Refreshes the folder tree counts of every library folder the batch touched.</summary>
+    Task RecomputeFolderCountsAsync(string batchId, CancellationToken ct);
 }
 
 public interface IRenameSourceReader
@@ -45,7 +49,7 @@ public interface IRenameSourceReader
 public interface IFileOperationService
 {
     /// <summary>Renames the files of a confirmed plan. Journals first, never overwrites, one failure does not stop the batch.</summary>
-    Task<BatchResult> RenameAsync(IReadOnlyList<PlanItem> plan, string template, IProgress<FileOperationProgress>? progress, CancellationToken ct);
+    Task<BatchResult> RenameAsync(IReadOnlyList<PlanItem> plan, string template, IProgress<FileOperationProgress>? progress, CancellationToken ct, string kind = "Rename");
     /// <summary>Restores the old names of a batch, newest first. Anything that no longer fits is refused with a reason, not forced.</summary>
     Task<UndoResult> UndoAsync(string batchId, IProgress<FileOperationProgress>? progress, CancellationToken ct);
     /// <summary>Settles operations a crash left half-done. Run at startup before the first scan.</summary>

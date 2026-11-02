@@ -17,3 +17,10 @@ A tag the template needs is empty (or tick "Use Unknown Artist/Title… when a t
 
 ## Tests
 Unit: template, sanitizer, planner (`tests/MusicFinder.UnitTests/Organize`). Integration on generated files in temp folders: journal order, collisions, locked files, crash before and after the move, ambiguous recovery, undo and its refusals, case-only rename on NTFS, scan lock, cancel, CSV. UI: preview, warning once, rename, undo, CSV, missing tags. No test touches a real music library.
+
+## Move into folders (slice 4)
+Tick **Move into folders below the library folder** in the same window. The template then describes the path below the track's library folder, with `/` between folders, for example `{Genre}/{Artist}/{Artist} - {Title}` or `{Genre}/{Artist}/{Album}/{Track:00} {Title}`. The preview shows each file's old and new path relative to its library folder; the button says "Move N files".
+- Every folder name is sanitized like a file name, so a tag value can never create or escape a folder (`AC/DC` becomes `AC_DC`, `..` becomes `_`). Files stay inside their library folder, on the same volume. Moving to another drive (copy, verify, delete) is not offered.
+- Missing folders are created. The track's database row gets its new folder (rows are created for new folders, the tree counts are refreshed), so a later scan finds nothing new and nothing missing.
+- Same journal, recovery, collision checks, sidecars and undo as a rename. **Undo moves the files back but never removes folders**, so empty folders can be left behind; MusicFinder deletes nothing.
+- Same warning about Traktor and VirtualDJ: moving a file breaks their entries for it just like renaming.

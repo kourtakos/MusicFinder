@@ -25,6 +25,7 @@ public class FileOperationTests
         public Action<string, string>? AfterMove { get; set; }
         public bool Exists(string path) => real.Exists(path);
         public bool ExistsExact(string path) => real.ExistsExact(path);
+        public void EnsureFolder(string directory) => real.EnsureFolder(directory);
         public void Move(string from, string to)
         {
             BeforeMove?.Invoke(from, to);
@@ -49,7 +50,7 @@ public class FileOperationTests
         {
             Music = Path.Combine(Db.Dir, "Μουσική");
             Directory.CreateDirectory(Music);
-            Journal = new FileOperationJournalRepository(Db.Factory, Db.Writes);
+            Journal = new FileOperationJournalRepository(Db.Factory, Db.Writes, Db.Folders);
             Service = NewService();
         }
 

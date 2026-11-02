@@ -20,13 +20,13 @@ public sealed class RenamePreviewRowViewModel
     public bool WillRename { get; }
     public bool IsProblem { get; }
 
-    public RenamePreviewRowViewModel(PlanItem item)
+    public RenamePreviewRowViewModel(PlanItem item, string? relativeTo = null)
     {
-        OldName = Path.GetFileName(item.OldPath);
+        OldName = relativeTo is null ? Path.GetFileName(item.OldPath) : Path.GetRelativePath(relativeTo, item.OldPath);
         FolderText = Path.GetDirectoryName(item.OldPath) ?? "";
         WillRename = item.WillMove;
         IsProblem = item.Status == PlanStatus.Skipped;
-        NewName = item.Status == PlanStatus.Skipped ? "" : Path.GetFileName(item.NewPath);
+        NewName = item.Status == PlanStatus.Skipped ? "" : relativeTo is null ? Path.GetFileName(item.NewPath) : Path.GetRelativePath(relativeTo, item.NewPath);
         var extras = item.Sidecars.Count > 0 ? " + " + string.Join(", ", item.Sidecars.Select(s => Path.GetExtension(s.NewPath))) : "";
         StatusText = item.Status switch
         {
@@ -73,10 +73,10 @@ public sealed partial class RenameViewModel : ObservableObject
 {
     public const string WarningTitle = "Before you rename files";
     public const string DjSoftwareWarning =
-        "Traktor and VirtualDJ remember your files by their path. If you rename a file that is in their library, they will no longer find it: " +
+        "Traktor and VirtualDJ remember your files by their path. If you rename or move a file that is in their library, they will no longer find it: " +
         "cue points, beat grids and playlist entries for it are lost on their side until you relocate the file there.\n\n" +
         "MusicFinder can save a list of old and new paths for every rename, and it can undo a whole rename. It cannot change anything inside those programs.\n\n" +
-        "Rename files now?";
+        "Go ahead?";
 
     private readonly IReadOnlyList<long> _trackIds;
     private readonly IRenameSourceReader _sources;
@@ -91,12 +91,18 @@ public sealed partial class RenameViewModel : ObservableObject
     public static IReadOnlyList<string> Presets { get; } =
         ["{Artist} - {Title}", "{Track:00} {Artist} - {Title}", "{Artist} - {Title} [{Key} {Bpm}]", "{Artist} - {Album} - {Track:00} - {Title}"];
 
+    public static IReadOnlyList<string> OrganizePresets { get; } =
+        ["{Genre}/{Artist}/{Artist} - {Title}", "{Genre}/{Artist}/{Album}/{Track:00} {Title}", "{Artist}/{Artist} - {Title}", "{Artist}/{Album}/{Artist} - {Title}"];
+
+    public IReadOnlyList<string> ActivePresets => MoveIntoFolders ? OrganizePresets : Presets;
+
     public ObservableCollection<RenamePreviewRowViewModel> Rows { get; } = [];
     public ObservableCollection<RenameBatchViewModel> Batches { get; } = [];
 
     [ObservableProperty] private string _template;
     [ObservableProperty] private bool _usePlaceholders;
     [ObservableProperty] private bool _includeSidecars = true;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(ActivePresets), nameof(RenameButtonText), nameof(HeadingText))] private bool _moveIntoFolders;
     [ObservableProperty] private string _templateError = "";
     [ObservableProperty] private string _summaryText = "";
     [ObservableProperty] private string _statusText = "";
@@ -108,7 +114,9 @@ public sealed partial class RenameViewModel : ObservableObject
     [ObservableProperty] private bool _hasTracks;
 
     public bool CanRename => RenameCount > 0 && !IsBusy;
-    public string RenameButtonText => RenameCount switch { 0 => "Rename", 1 => "Rename 1 file", _ => $"Rename {RenameCount:N0} files" };
+    private string Verb => MoveIntoFolders ? "Move" : "Rename";
+    public string HeadingText => MoveIntoFolders ? "Move files into folders" : "Rename files";
+    public string RenameButtonText => RenameCount switch { 0 => Verb, 1 => Verb + " 1 file", _ => $"{Verb} {RenameCount:N0} files" };
     public string ReminderText =>
         "Traktor and VirtualDJ find files by path: a renamed file that is in their library is lost there until you relocate it. " +
         "After renaming you can save the old and new paths as a list, or undo the whole rename here.";
@@ -142,6 +150,14 @@ public sealed partial class RenameViewModel : ObservableObject
     partial void OnTemplateChanged(string value) => _ = RefreshPreviewAsync();
     partial void OnUsePlaceholdersChanged(bool value) => _ = RefreshPreviewAsync();
     partial void OnIncludeSidecarsChanged(bool value) => _ = RefreshPreviewAsync();
+
+    partial void OnMoveIntoFoldersChanged(bool value)
+    {
+        var s = _settings.Load();
+        var next = value ? s.OrganizeTemplate : s.RenameTemplate;
+        Template = string.IsNullOrWhiteSpace(next) || next.Contains('/') != value ? ActivePresets[0] : next!;
+        _ = RefreshPreviewAsync();
+    }
     partial void OnRenameCountChanged(int value) => OnPropertyChanged(nameof(RenameButtonText));
 
     [RelayCommand]
@@ -159,25 +175,27 @@ public sealed partial class RenameViewModel : ObservableObject
 
         var parsed = FileNameTemplate.Parse(Template);
         TemplateError = parsed.Error ?? "";
-        var options = new RenameOptions(Template, UsePlaceholders, IncludeSidecars);
+        var options = new RenameOptions(Template, UsePlaceholders, IncludeSidecars, MoveIntoFolders);
         try
         {
+            var roots = new Dictionary<long, string?>();
             var plan = await Task.Run(async () =>
             {
                 var sources = await _sources.GetAsync(_trackIds, cts.Token);
+                foreach (var s in sources) roots[s.TrackId] = s.RootPath;
                 return FileOperationPlanner.PlanRename(sources, options, _probe);
             }, cts.Token);
             if (cts.IsCancellationRequested) return;
 
             _plan = plan;
             Rows.Clear();
-            foreach (var item in plan.OrderBy(p => p.Status == PlanStatus.Skipped ? 0 : p.WillMove ? 1 : 2)) Rows.Add(new RenamePreviewRowViewModel(item));
+            foreach (var item in plan.OrderBy(p => p.Status == PlanStatus.Skipped ? 0 : p.WillMove ? 1 : 2)) Rows.Add(new RenamePreviewRowViewModel(item, MoveIntoFolders && roots.TryGetValue(item.TrackId, out var root) ? root : null));
             RenameCount = plan.Count(p => p.WillMove);
             var skipped = plan.Count(p => p.Status == PlanStatus.Skipped);
             var same = plan.Count(p => p.Status == PlanStatus.Unchanged);
             SummaryText = parsed.Error is not null
                 ? "Fix the template to see the new names."
-                : $"Will rename {RenameCount:N0} {(RenameCount == 1 ? "file" : "files")}"
+                : $"Will {Verb.ToLowerInvariant()} {RenameCount:N0} {(RenameCount == 1 ? "file" : "files")}"
                   + (same > 0 ? $", {same:N0} already have this name" : "")
                   + (skipped > 0 ? $", {skipped:N0} skipped (see the reasons below)" : "") + ".";
         }
@@ -198,7 +216,7 @@ public sealed partial class RenameViewModel : ObservableObject
             _settings.Save(settings);
         }
         settings = _settings.Load();
-        settings.RenameTemplate = Template;
+        if (MoveIntoFolders) settings.OrganizeTemplate = Template; else settings.RenameTemplate = Template;
         settings.RenameUsePlaceholders = UsePlaceholders;
         _settings.Save(settings);
 
@@ -211,8 +229,8 @@ public sealed partial class RenameViewModel : ObservableObject
         try
         {
             var progress = new Progress<FileOperationProgress>(p => { ProgressValue = p.Done; });
-            var result = await Task.Run(() => _operations.RenameAsync(pending, Template, progress, _runCts.Token));
-            StatusText = Describe(result);
+            var result = await Task.Run(() => _operations.RenameAsync(pending, Template, progress, _runCts.Token, MoveIntoFolders ? "Organize" : "Rename"));
+            StatusText = Describe(result, MoveIntoFolders);
             FilesChanged?.Invoke(this, EventArgs.Empty);
             await ReloadBatchesAsync();
             if (result.Failures.Count > 0)
@@ -229,10 +247,10 @@ public sealed partial class RenameViewModel : ObservableObject
         await RefreshPreviewAsync();
     }
 
-    private static string Describe(BatchResult r)
+    private static string Describe(BatchResult r, bool moved)
     {
         if (r.Refused is not null) return r.Refused;
-        var text = $"Renamed {r.Renamed:N0} {(r.Renamed == 1 ? "file" : "files")}";
+        var text = $"{(moved ? "Moved" : "Renamed")} {r.Renamed:N0} {(r.Renamed == 1 ? "file" : "files")}";
         if (r.SidecarsRenamed > 0) text += $" and {r.SidecarsRenamed:N0} lyrics/cue {(r.SidecarsRenamed == 1 ? "file" : "files")}";
         if (r.Failures.Count > 0) text += $"; {r.Failures.Count:N0} could not be renamed";
         if (r.Cancelled) text += "; stopped before the rest";

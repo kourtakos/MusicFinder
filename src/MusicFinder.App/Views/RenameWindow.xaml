@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel>
-            <TextBlock Text="Rename files" FontSize="20" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding HeadingText}" FontSize="20" FontWeight="SemiBold"/>
             <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
                        Text="{Binding ReminderText}"/>
         </StackPanel>
@@ -29,7 +29,7 @@
             <TextBox x:Name="TemplateBox" Margin="0,4,0,0" Height="32" Text="{Binding Template, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="Tokens: {Artist} {Title} {Album} {AlbumArtist} {Year} {Track:00} {Genre} {Bpm} {Key} {FileName} {Extension}. Add :upper, :lower or :title to change case. The extension is kept automatically."/>
             <TextBlock Text="{Binding TemplateError}" Foreground="{StaticResource MF.Brush.Possible}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-            <ItemsControl ItemsSource="{x:Static vm:RenameViewModel.Presets}" Margin="0,6,0,0" Focusable="False"
+            <ItemsControl ItemsSource="{Binding ActivePresets}" Margin="0,6,0,0" Focusable="False"
                           xmlns:vm="clr-namespace:MusicFinder.App.ViewModels">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
@@ -43,6 +43,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
             <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                <CheckBox Content="Move into folders below the library folder (use / in the name)" IsChecked="{Binding MoveIntoFolders}" Margin="0,0,24,0"/>
                 <CheckBox Content="Rename lyrics (.lrc) and cue sheets (.cue) with the track" IsChecked="{Binding IncludeSidecars}" Margin="0,0,24,0"/>
                 <CheckBox Content="Use “Unknown Artist/Title…” when a tag is missing (otherwise those files are skipped)" IsChecked="{Binding UsePlaceholders}"/>
             </StackPanel>
