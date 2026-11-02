@@ -20,8 +20,14 @@
 
         <StackPanel>
             <TextBlock Text="{Binding HeadingText}" FontSize="20" FontWeight="SemiBold"/>
-            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"
-                       Text="{Binding ReminderText}"/>
+            <Border BorderBrush="{StaticResource MF.Brush.Possible}" BorderThickness="2" CornerRadius="8" Padding="14,10" Margin="0,8,0,0"
+                    Background="{StaticResource MF.Brush.PanelBg}">
+                <StackPanel>
+                    <TextBlock Text="Warning: Traktor, VirtualDJ and other DJ software will lose these files" FontWeight="Bold"
+                               Foreground="{StaticResource MF.Brush.Possible}"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,4,0,0" Text="{Binding ReminderText}"/>
+                </StackPanel>
+            </Border>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Margin="0,12,0,8" Visibility="{Binding HasTracks, Converter={StaticResource BoolToVis}}">

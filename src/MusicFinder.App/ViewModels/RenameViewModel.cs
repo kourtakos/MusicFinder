@@ -118,8 +118,9 @@ public sealed partial class RenameViewModel : ObservableObject
     public string HeadingText => MoveIntoFolders ? "Move files into folders" : "Rename files";
     public string RenameButtonText => RenameCount switch { 0 => Verb, 1 => Verb + " 1 file", _ => $"{Verb} {RenameCount:N0} files" };
     public string ReminderText =>
-        "Traktor and VirtualDJ find files by path: a renamed file that is in their library is lost there until you relocate it. " +
-        "After renaming you can save the old and new paths as a list, or undo the whole rename here.";
+        "Traktor and VirtualDJ find files by their path. A file you rename or move that is in their library, playlists or crates is reported missing there, " +
+        "and its cue points, beat grids and playlist entries are lost until you relocate it inside those programs. MusicFinder cannot change their databases. " +
+        "Save the old and new paths as a list after the rename, and use Undo here to put everything back.";
 
     public event EventHandler? CloseRequested;
     /// <summary>Raised after files were renamed or restored, so the Library can reload what it shows.</summary>
