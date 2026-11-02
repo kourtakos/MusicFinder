@@ -7,6 +7,17 @@ namespace MusicFinder.UiSmokeTests;
 public class ShutdownTests
 {
     [Fact]
+    public Task TheRealAudioDecoder_IsWiredIntoTheApplication_WithoutAnyTestReplacement() => Ui.RunAsync(async () =>
+    {
+        // Every other analysis test swaps the decoder for a fake; this one checks the container builds the real one (it once resolved itself: a circular dependency).
+        var app = await UiTestApp.CreateAsync();
+
+        Assert.IsType<MusicFinder.Infrastructure.Audio.AudioDecoderRouter>(app.Service<IAudioDecoder>());
+        Assert.NotNull(app.Service<IAudioAnalysisService>());
+        await app.DisposeAsync();
+    });
+
+    [Fact]
     public Task TheScanCoordinator_CanBeDisposedMoreThanOnce() => Ui.RunAsync(async () =>
     {
         var app = await UiTestApp.CreateAsync();

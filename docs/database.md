@@ -109,3 +109,10 @@ Query side: `SearchSqlBuilder` returns only `(Id, SortKey)` for the page, then t
 - `MusicBrainzCache(EntityType 'recording'|'release', Mbid, Json, FetchedUtc, ExpiresUtc)`: MusicBrainz records as received, 30 days.
 
 Times are written with `DapperConfig.ToDb` (fixed-width ISO), so "not yet expired" is a plain text comparison. `IdentificationCacheRepository` also counts and clears all three tables ("Forget remembered answers").
+
+## BPM and key analysis (M5b)
+
+`0008_TrackAnalysis.sql` adds `TrackAnalysis(TrackId PK -> Tracks ON DELETE CASCADE, FileSize, ModifiedUtc, AnalyzerVersion, BpmStatus/KeyStatus 'Estimated'|'NoEstimate', BpmEstimate, BpmScore, BpmLevel, BpmFlags, BpmAlternativesJson, KeyEstimate (Camelot),
+KeyScore, KeyLevel, KeyRunner, KeyFlags, TuningCents, AnalyzedSeconds, Decoder, Message, AnalyzedUtc)`. Estimates are kept **apart from `Tracks.Bpm` and `Tracks.MusicalKey`** (the tags): Find Similar and the grid read only
+the tags, so an estimate never looks like a tag value until the user writes it. A row is used only while the file's size and modified time and `AudioAnalyzer.Version` are unchanged; after a tag write the row is moved to
+the file's new size and time (the audio did not change). "No estimate" is stored too (a silent file stays silent); decode failures are not.

@@ -71,8 +71,25 @@ public class SearchServiceTests
         Assert.Equal(["Digital Love"], await Titles(f, new SearchQuery { Text = "decade:00s" }));
         Assert.Equal(["Good Times", "Le Freak"], await Titles(f, new SearchQuery { Text = "year:1978-1979" }));
         Assert.Equal(["Digital Love", "untitled"], await Titles(f, new SearchQuery { Text = "missing:bpm" }));
+        Assert.Equal(["Digital Love", "untitled", "Σ' αγαπώ"], await Titles(f, new SearchQuery { Text = "missing:key" }));
         Assert.Equal(["Le Freak"], await Titles(f, new SearchQuery { Text = "artist:chic genre:funk" }));
         Assert.Empty(await Titles(f, new SearchQuery { Text = "title:chic" })); // scoped: chic is an artist
+    }
+
+    [Fact]
+    public async Task ABpmOfZeroOrABlankKey_CountsAsMissing()
+    {
+        var f = await CreateAsync();
+        await using var _ = f.Db;
+        await f.Db.Writes.EnqueueAsync((c, t) =>
+        {
+            Dapper.SqlMapper.Execute(c, "UPDATE Tracks SET Bpm = 0 WHERE Title = 'Digital Love'", transaction: t);
+            Dapper.SqlMapper.Execute(c, "UPDATE Tracks SET MusicalKey = '   ' WHERE Title = 'Le Freak'", transaction: t);
+        });
+
+        Assert.Equal(["Digital Love", "untitled"], await Titles(f, new SearchQuery { Text = "missing:bpm" }));
+        Assert.Contains("Le Freak", await Titles(f, new SearchQuery { Text = "missing:key" }));
+        Assert.Equal(["Digital Love", "untitled"], await Titles(f, new SearchQuery { Text = "missing:bpm missing:key" }));   // both missing
     }
 
     [Fact]

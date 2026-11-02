@@ -75,6 +75,14 @@ App ──► Application ──► Domain
   Writing goes only through `ITagEditingService`; `TagField.MusicBrainzRecordingId` and a front cover (`TagChangeSet.Cover`, fetched by `CoverArtClient`, checked by `CoverImageReader`) are the new writable things.
 - Tests replace the network (`FakeHttpHandler`), the process (`FakeRunner`) and the whole service (`FakeIdentification`); nothing in the default suite contacts a real service.
 
+## BPM and key analysis
+
+- **Domain**: `Contracts/AudioAnalysis.cs` (`IAudioDecoder`, `IAudioAnalysisService`, `ITrackAnalysisStore`), `Models/AudioAnalysisModels.cs`.
+- **Application/Analysis** (pure, no I/O, tested on float arrays): `Fft`, `SilenceGate`, `OnsetEnvelope` + `TempoEstimator`, `Chromagram` + `KeyEstimator`, `AudioAnalyzer` (version-stamped),
+  `AudioAnalysisService` (decode, analyse, remember), `AnalysisRunner` (dedicated below-normal-priority threads, 1-2 at once), `AnalysisProposalBuilder` (the ticking rules); `CamelotKey` gained the formatters.
+- **Infrastructure**: `Audio/AudioDecoders.cs` (`MediaFoundationAudioDecoder`, `WaveAiffAudioDecoder`, `VorbisAudioDecoder`, `AudioDecoderRouter`), `TrackAnalysisRepository`, migration 0008.
+- **App**: `AnalyzeViewModel` / `AnalyzeWindow`, `AnalysisSettingsViewModel`; entry points in `LibraryViewModel` (`AnalyzeCommand`, `AnalyzeMissingCommand`). Writing goes only through `ITagEditingService`.
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

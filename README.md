@@ -4,7 +4,7 @@ Fast, offline-first Windows DJ music library organizer and finder. Instant searc
 music folders, a folder tree, cover art, genre/tag organisation and a safe tag editor.
 See `CLAUDE.md` for the full implementation contract.
 
-**Status: M1 (search), M2 (covers, genres, tags), M3 (DJ session and drag-out), the Quick Search pop-up, M7 (smart Greek search, Find Similar) and M5 (online identification) are implemented.**
+**Status: M1 (search), M2 (covers, genres, tags), M3 (DJ session and drag-out), the Quick Search pop-up, M7 (smart Greek search, Find Similar), M5 (online identification) and a BPM/key audio analysis are implemented.**
 MusicFinder only changes your music files when you press *Write* in the tag editor, after a preview, and never silently.
 It never renames, moves or deletes files. It makes no network connection unless you turn on **online identification** in Settings, after being shown exactly what is sent (`docs/identification.md`).
 
@@ -46,6 +46,7 @@ Command-line options for the app:
 9. Drag tracks from the grid into VirtualDJ, Traktor or any player that accepts files. The **Session** tab lists what you dragged and what MusicFinder
    infers about it ("exported", "possibly played" after a quiet period, "confirmed" only when you say so). See `docs/dj-session.md`.
 10. **Identify online** (`Ctrl+I`, right-click, or the button in the details panel) looks tracks up on MusicBrainz, optionally by audio fingerprint through AcoustID, and proposes tags (and the release's cover) and shows exactly what Write will change. Many tracks at once get one list with the clear matches ticked. Off until you agree (`docs/identification.md`).
+   **Analyze BPM and key** (`Ctrl+B`) listens to tracks on your computer and estimates their tempo and key, with a confidence, shown apart from your tags; only confident tempos are ticked for you, keys never, and nothing is written until you press Write (`docs/audio-analysis.md`).
 11. Press **Ctrl+Alt+Space** in any program to open a small always-on-top search window; drag results into your player and move the window out of the way.
    Change the shortcut in Settings. See `docs/quick-search.md`.
 
@@ -81,4 +82,5 @@ docs/                           architecture, database, search syntax, Greek sea
 - Favorites (shown in the reference design) need a database migration and are not implemented.
 - Drag-out is verified with Windows Media Player and Winamp only; Traktor and VirtualDJ are untested (checklist in `docs/dj-session.md`).
 - No DJ-history import yet (M4), so nothing is "confirmed" except by you. File organisation, duplicates and Library Health (M6) and backup (M8) are later milestones.
+- BPM and key analysis was measured on 150 files of the author's own library: confident tempos agreed with the tags 92 % of the time, keys only about 6 in 10 even at high confidence (`docs/audio-analysis.md`). Which key notation Traktor and VirtualDJ read from a tag is not verified.
 - Online identification (including covers from the Cover Art Archive) is tested with fake services only; it has not yet been run against the real MusicBrainz and AcoustID with a real key and fpcalc. `fpcalc.exe` is not bundled (its licence is not verified); you supply it. BPM and key are never looked up online (`docs/identification.md`).

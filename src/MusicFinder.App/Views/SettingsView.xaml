@@ -265,6 +265,45 @@
             </Border>
 
             <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel DataContext="{Binding Analysis}">
+                    <TextBlock Text="BPM and key analysis" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"
+                               Text="MusicFinder can listen to your tracks and estimate their tempo and key, all on this computer. The results are estimates and are shown apart from your tags; nothing is written until you press Write. Tracks whose tempo drifts (live or folk recordings) and music that is not in a Western key give weak or wrong answers, and the window says so."/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <TextBlock Text="Write the key as" VerticalAlignment="Center" Width="190"/>
+                        <ComboBox Style="{StaticResource MF.ComboBox}" ItemsSource="{x:Static vm:AnalysisSettingsViewModel.Notations}" SelectedItem="{Binding SelectedNotation, Mode=TwoWay}" Width="300" Height="32">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="190,6,0,0"
+                               Text="Which notation Traktor and VirtualDJ read from a tag is not verified: try one track first. The analysis window shows the exact text that will be written."/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <TextBlock Text="Seconds listened to" VerticalAlignment="Center" Width="190"/>
+                        <Border Style="{StaticResource MF.InputBorder}" Width="90" Height="32">
+                            <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding Seconds, UpdateSourceTrigger=LostFocus}"/>
+                        </Border>
+                        <TextBlock Text="30 – 240, from the middle of each track" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                        <TextBlock Text="Tracks analysed at once" VerticalAlignment="Center" Width="190"/>
+                        <Border Style="{StaticResource MF.InputBorder}" Width="90" Height="32">
+                            <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding Concurrency, UpdateSourceTrigger=LostFocus}"/>
+                        </Border>
+                        <TextBlock Text="1 or 2; the work runs at low priority" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    </StackPanel>
+
+                    <CheckBox Content="Start with “Replace a BPM or key the file already has” ticked" IsChecked="{Binding AllowOverwriteDefault}" Margin="0,14,0,0"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <Button Content="Forget estimates" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0" Command="{Binding ClearEstimatesCommand}"/>
+                        <TextBlock Text="{Binding CacheText}" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
                 <StackPanel>
                     <TextBlock Text="Artwork" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <CheckBox Content="Use cover.jpg / folder.jpg when a file has no embedded cover"

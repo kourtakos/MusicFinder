@@ -22,4 +22,9 @@
     <ProjectReference Include="..\..\src\MusicFinder.Infrastructure\MusicFinder.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The same synthetic rhythms and chords as the unit tests, so the service is tested on music with a known tempo and key. -->
+    <Compile Include="..\MusicFinder.UnitTests\Analysis\SignalFixtures.cs" Link="Analysis\SignalFixtures.cs" />
+  </ItemGroup>
+
 </Project>

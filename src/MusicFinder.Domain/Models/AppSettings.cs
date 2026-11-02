@@ -67,4 +67,13 @@ public sealed class AppSettings
     public bool UseCoverArtArchive { get; set; } = true;
     /// <summary>Tick "Embed this cover" for the user when the file has no cover yet. It is still written only after the user presses Write.</summary>
     public bool EmbedCoverByDefault { get; set; } = true;
+
+    /// <summary>Seconds of a track the BPM and key analysis listens to (the middle of the track). 30 - 240.</summary>
+    public int AnalysisSeconds { get; set; } = 90;
+    /// <summary>How an estimated key is written into a tag. Camelot ("8A") is the default; Open Key ("1m") and note names ("Am") are the alternatives.</summary>
+    public MusicFinder.Domain.Models.KeyNotation AnalysisKeyNotation { get; set; } = MusicFinder.Domain.Models.KeyNotation.Camelot;
+    /// <summary>How many tracks are analysed at once (1 or 2; the work is heavy and runs at low priority).</summary>
+    public int AnalysisConcurrency { get; set; } = 1;
+    /// <summary>Start the analysis window with "replace the BPM and key already in the file" ticked. Off: existing values are kept unless the user ticks it there.</summary>
+    public bool AnalysisAllowOverwriteDefault { get; set; }
 }

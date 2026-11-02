@@ -11,6 +11,8 @@
     <ProjectReference Include="..\..\src\MusicFinder.Application\MusicFinder.Application.csproj" />
     <ProjectReference Include="..\..\src\MusicFinder.Infrastructure\MusicFinder.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\MusicFinder.App\MusicFinder.App.csproj" />
+    <!-- The same synthetic rhythms and chords as the unit tests: music with a known tempo and key. -->
+    <Compile Include="..\MusicFinder.UnitTests\Analysis\SignalFixtures.cs" Link="Analysis\SignalFixtures.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,7 +5,7 @@ Read this first on a fresh machine or in a fresh Claude Code session. `CLAUDE.md
 ## Set up
 
 1. Install Git, the **.NET SDK 9.0.x** (`global.json` pins the band; .NET 10 upgrade = set `NetVersion` in `Directory.Build.props` to `10.0` and bump `Microsoft.*` in `Directory.Packages.props`), and Windows 10/11 x64.
-2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect **1267 green**: 603 unit, 467 integration, 197 UI smoke; UI tests need an interactive desktop session).
+2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect **1487 green**: 746 unit, 522 integration, 219 UI smoke; UI tests need an interactive desktop session).
 3. Run: `src\MusicFinder.App\bin\Debug\net9.0-windows\MusicFinder.exe --portable --software` (`--portable` keeps data in `Data\` beside the exe; `--software` avoids GPU rendering problems).
    Stop a running `MusicFinder.exe` before building (it locks the exe).
 4. Self-contained test package: `dotnet publish src\MusicFinder.App\MusicFinder.App.csproj -c Release -r win-x64 --self-contained true -o dist\MusicFinder-win-x64`, add an empty `portable.flag`, zip.
@@ -13,7 +13,7 @@ Read this first on a fresh machine or in a fresh Claude Code session. `CLAUDE.md
 ## Status
 
 M1 search foundation, M2 metadata/artwork/genres, M3 DJ session + drag-out, Quick Search overlay (global hotkey, configurable), M7 smart Greek search + Find Similar, M5 online identification (fake-service tested; real AcoustID key + fpcalc run still to do, see `docs/external-integrations.md`): **done**.
-Remaining: M6 organize/quality/duplicates/Library Health, M8 backup/release, a BPM/key audio analyzer (requested, not planned yet), and **M4 history importers last**
+Remaining: M6 organize/quality/duplicates/Library Health, M8 backup/release, and **M4 history importers last**. BPM/key audio analysis: done (see `docs/audio-analysis.md`; key accuracy is only fair)
 (needs real Traktor/VirtualDJ installs and real history samples; assume no file formats). Traktor/VirtualDJ drag interop is unverified: see `docs/traktor-test.md`.
 Drag verified by hand only with Windows Media Player and Winamp (`docs/dj-session.md`).
 

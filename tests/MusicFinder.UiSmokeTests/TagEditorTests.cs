@@ -26,6 +26,8 @@ internal sealed class FakeDialogs : IUserDialogs
     public string? FilePicked { get; set; }
     public void ShowIdentificationConsent(IdentificationConsentViewModel viewModel) { Consent = viewModel; OnConsent?.Invoke(viewModel); }
     public void ShowIdentify(IdentifyViewModel viewModel) => Identify = viewModel;
+    public AnalyzeViewModel? Analyze { get; private set; }
+    public void ShowAnalyze(AnalyzeViewModel viewModel) => Analyze = viewModel;
     public string? PickFile(string title, string filter) => FilePicked;
 }
 

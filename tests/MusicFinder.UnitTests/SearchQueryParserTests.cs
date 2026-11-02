@@ -52,6 +52,14 @@ public class SearchQueryParserTests
         Assert.Equal(["title", "bpm"], q.Missing);
     }
 
+    [Fact]
+    public void MissingKey_IsAFilter()
+    {
+        var q = SearchQueryParser.Parse("missing:key");
+        Assert.Equal(["key"], q.Missing);
+        Assert.Empty(q.Warnings);
+    }
+
     [Theory]
     [InlineData("bpm:abc")]
     [InlineData("year:x-y")]

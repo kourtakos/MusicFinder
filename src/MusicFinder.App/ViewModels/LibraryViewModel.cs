@@ -40,11 +40,14 @@ public partial class LibraryViewModel : ObservableObject
     private readonly IdentificationSettingsViewModel _identificationSettings;
     private readonly TimeProvider _time;
     private readonly ICoverArtClient _coverArt;
+    private readonly IAudioAnalysisService _analysis;
+    private readonly MusicFinder.Application.Analysis.AnalysisRunner _analysisRunner;
 
     public LibraryViewModel(FolderTreeViewModel tree, SearchViewModel search, ScanCoordinator scans,
         ILibraryRootRepository roots, ITrackRepository tracks, ISettingsStore settings, GenreMappingJob genreJob,
         ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths,
-        IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time, ICoverArtClient coverArt)
+        IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time, ICoverArtClient coverArt,
+        IAudioAnalysisService analysis, MusicFinder.Application.Analysis.AnalysisRunner analysisRunner)
     {
         Tree = tree;
         Search = search;
@@ -60,6 +63,8 @@ public partial class LibraryViewModel : ObservableObject
         _identificationSettings = identificationSettings;
         _time = time;
         _coverArt = coverArt;
+        _analysis = analysis;
+        _analysisRunner = analysisRunner;
 
         var saved = settings.Load();
         _leftPanelWidth = new GridLength(Math.Clamp(saved.LeftPanelWidth, 180, 420));
@@ -159,6 +164,47 @@ public partial class LibraryViewModel : ObservableObject
         }
 
         _dialogs.ShowIdentify(new IdentifyViewModel(selected, _identification, _tagEditing, _tracks, _coverArt, _settings, _paths));
+    }
+
+    /// <summary>
+    /// Opens the BPM and key analysis for the selected tracks. The window listens to them in the background and shows estimates; nothing is
+    /// written until the user presses Write there. Refused while indexing, like the other commands that can write tags.
+    /// </summary>
+    [RelayCommand]
+    private void Analyze()
+    {
+        var ids = Search.SelectedItems.Select(i => i.Id).ToList();
+        if (ids.Count == 0) return;
+        OpenAnalysis(ids);
+    }
+
+    /// <summary>The tracks of the library (or the folder selected in the tree) that have no BPM or no key.</summary>
+    [RelayCommand]
+    private async Task AnalyzeMissingAsync()
+    {
+        if (_scans.IsScanning)
+        {
+            _dialogs.ShowInfo("Analyze BPM and key", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            return;
+        }
+        var folder = Tree.GlobalSearch ? null : Tree.SelectedFolderId;
+        var ids = await _analysis.FindTracksNeedingAnalysisAsync(new Domain.Models.AnalysisScope(folder, Tree.IncludeSubfolders), default);
+        if (ids.Count == 0)
+        {
+            _dialogs.ShowInfo("Analyze BPM and key", folder is null ? "Every track in the library already has a BPM and a key." : "Every track in this folder already has a BPM and a key.");
+            return;
+        }
+        OpenAnalysis(ids);
+    }
+
+    private void OpenAnalysis(IReadOnlyList<long> ids)
+    {
+        if (_scans.IsScanning)
+        {
+            _dialogs.ShowInfo("Analyze BPM and key", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            return;
+        }
+        _dialogs.ShowAnalyze(new AnalyzeViewModel(ids, _analysis, _analysisRunner, _tagEditing, _tracks, _settings, _paths));
     }
 
     /// <summary>Raised when the view should move keyboard focus to the search box (Ctrl+F / Ctrl+K).</summary>

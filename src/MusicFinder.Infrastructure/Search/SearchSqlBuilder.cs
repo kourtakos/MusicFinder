@@ -195,7 +195,8 @@ public static class SearchSqlBuilder
                 "album" => "(t.Album IS NULL OR TRIM(t.Album) = '')",
                 "genre" => "(t.GenreRaw IS NULL OR TRIM(t.GenreRaw) = '')",
                 "year" => "t.Year IS NULL",
-                "bpm" => "t.Bpm IS NULL",
+                "bpm" => "(t.Bpm IS NULL OR t.Bpm <= 0)",
+                "key" => "(t.MusicalKey IS NULL OR TRIM(t.MusicalKey) = '')",
                 _ => "1 = 1"
             });
         }

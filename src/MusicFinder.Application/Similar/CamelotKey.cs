@@ -62,6 +62,41 @@ public readonly partial record struct CamelotKey(int Number, bool IsMinor)
         return true;
     }
 
+    /// <summary>The key whose tonic is this pitch class (0 = C, 1 = C#, ... 11 = B), major or minor.</summary>
+    public static CamelotKey FromPitchClass(int tonicPitchClass, bool minor)
+    {
+        var pc = ((tonicPitchClass % 12) + 12) % 12;
+        var number = minor ? 8 + 7 * (pc - 9) : 8 + 7 * pc;           // the same circle-of-fifths rule as parsing
+        number = ((number % 12) + 12) % 12;
+        return new CamelotKey(number == 0 ? 12 : number, minor);
+    }
+
+    /// <summary>The pitch class of the tonic (0 = C ... 11 = B). Seven is its own inverse modulo twelve, so the circle of fifths is undone by multiplying by 7.</summary>
+    public int TonicPitchClass
+    {
+        get
+        {
+            var step = (((Number - 8) * 7) % 12 + 12) % 12;
+            return IsMinor ? (step + 9) % 12 : step;
+        }
+    }
+
+    /// <summary>Open Key: the same wheel turned so that 1d is C major and 1m is A minor.</summary>
+    public string ToOpenKey() => $"{((Number + 4) % 12) + 1}{(IsMinor ? 'm' : 'd')}";
+
+    private static readonly string[] MinorNames = ["Abm", "Ebm", "Bbm", "Fm", "Cm", "Gm", "Dm", "Am", "Em", "Bm", "F#m", "Dbm"];
+    private static readonly string[] MajorNames = ["B", "F#", "Db", "Ab", "Eb", "Bb", "F", "C", "G", "D", "A", "E"];
+
+    /// <summary>The key as a note name in the spelling the Camelot wheel uses ("Am", "Dbm", "F#", "Bb").</summary>
+    public string ToNoteName() => (IsMinor ? MinorNames : MajorNames)[Number - 1];
+
+    public string Format(MusicFinder.Domain.Models.KeyNotation notation) => notation switch
+    {
+        MusicFinder.Domain.Models.KeyNotation.OpenKey => ToOpenKey(),
+        MusicFinder.Domain.Models.KeyNotation.NoteName => ToNoteName(),
+        _ => ToString()
+    };
+
     private static int PitchClass(char note) => note switch
     {
         'C' => 0, 'D' => 2, 'E' => 4, 'F' => 5, 'G' => 7, 'A' => 9, _ => 11

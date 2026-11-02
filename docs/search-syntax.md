@@ -23,7 +23,7 @@ Genre / BPM / Decade filters; filters never exclude one another.
 | `bpm:120` / `bpm:115-125` | Exact value or inclusive range. A reversed range is swapped. |
 | `year:1985` / `year:1980-1989` | Year or range. |
 | `decade:80s` / `decade:1980s` | Decade shorthand for a ten-year `year` range (`10s` = 2010–2019, `00s` = 2000–2009). |
-| `missing:title` | Tracks with no value for `title`, `artist`, `album`, `genre`, `year` or `bpm`. |
+| `missing:title` | Tracks with no value for `title`, `artist`, `album`, `genre`, `year`, `bpm` or `key` (a BPM of 0 or a blank key counts as missing). |
 | `played:never` | Never played (no possible or confirmed play). |
 | `played:possible` / `played:confirmed` | At least one possible / confirmed play. |
 | `played:session` | Played (possibly or confirmed) in the live DJ session; matches nothing when no session is running. |

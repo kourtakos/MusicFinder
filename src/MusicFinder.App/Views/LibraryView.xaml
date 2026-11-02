@@ -211,6 +211,9 @@
                             <TextBlock Text="Last Scan" Style="{StaticResource MF.Secondary}"/>
                             <TextBlock Text="{Binding LastScanText}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
                         </Grid>
+                        <Button Content="Analyze missing BPM and key…" Style="{StaticResource MF.PillButton}" Height="32" Padding="12,0" Margin="0,12,0,0"
+                                HorizontalAlignment="Stretch" Command="{Binding AnalyzeMissingCommand}"
+                                ToolTip="Listen to the tracks (in the selected folder, or the whole library) that have no BPM or no key and estimate them. Nothing is written until you confirm."/>
                     </StackPanel>
                 </Border>
             </Grid>
@@ -234,6 +237,8 @@
                                           Command="{Binding PlacementTarget.DataContext.EditTagsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Identify online…  (Ctrl+I)"
                                           Command="{Binding PlacementTarget.DataContext.IdentifyCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Analyze BPM and key…  (Ctrl+B)"
+                                          Command="{Binding PlacementTarget.DataContext.AnalyzeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Find similar"
                                           Command="{Binding PlacementTarget.DataContext.Search.FindSimilarCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <Separator/>
@@ -416,6 +421,9 @@
                             <Button Content="Identify selection online…" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
                                     HorizontalAlignment="Center" Margin="0,8,0,0" Command="{Binding IdentifyCommand}"
                                     ToolTip="Look the selected tracks up on MusicBrainz (Ctrl+I)"/>
+                            <Button Content="Analyze BPM and key of selection…" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Center" Margin="0,8,0,0" Command="{Binding AnalyzeCommand}"
+                                    ToolTip="Listen to the selected tracks and estimate their BPM and key (Ctrl+B)"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -561,6 +569,9 @@
                             <Button Content="Identify online…" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
                                     HorizontalAlignment="Left" Margin="0,8,0,0" ToolTip="Look this track up on MusicBrainz and fill in missing tags (Ctrl+I)"
                                     Command="{Binding DataContext.IdentifyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            <Button Content="Analyze BPM and key…" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Left" Margin="0,8,0,0" ToolTip="Listen to this track and estimate its BPM and key (Ctrl+B)"
+                                    Command="{Binding DataContext.AnalyzeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
                             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                 <Button Content="Open in Explorer" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
                                         Command="{Binding DataContext.Search.RevealInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>

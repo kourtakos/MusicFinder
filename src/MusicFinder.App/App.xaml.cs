@@ -97,6 +97,8 @@ public partial class App : System.Windows.Application
         services.AddSingleton<SearchViewModel>();
         services.AddSingleton<LibraryViewModel>();
         services.AddSingleton<IdentificationSettingsViewModel>();
+        services.AddSingleton<MusicFinder.Application.Analysis.AnalysisRunner>();
+        services.AddSingleton<AnalysisSettingsViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<TagsViewModel>();
         services.AddSingleton<SessionViewModel>();

@@ -32,7 +32,7 @@ public static class SearchQueryParser
     private static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase)
         { "artist", "title", "album", "genre", "ext", "key", "bpm", "year", "decade", "missing", "played" };
     private static readonly HashSet<string> MissingFields = new(StringComparer.OrdinalIgnoreCase)
-        { "title", "artist", "album", "genre", "year", "bpm" };
+        { "title", "artist", "album", "genre", "year", "bpm", "key" };
 
     public static ParsedQuery Parse(string? input)
     {
@@ -121,7 +121,7 @@ public static class SearchQueryParser
                 break;
             case "missing":
                 if (MissingFields.Contains(value)) q.Missing.Add(value.ToLowerInvariant());
-                else q.Warnings.Add($"Unknown missing:{value} (title, artist, album, genre, year, bpm).");
+                else q.Warnings.Add($"Unknown missing:{value} (title, artist, album, genre, year, bpm, key).");
                 break;
             case "played":
                 if (value.All(char.IsLetter) && Enum.TryParse<PlayedFilter>(value, ignoreCase: true, out var played))

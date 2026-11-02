@@ -70,7 +70,17 @@ public static class ServiceCollectionExtensions
             ReaderConcurrency = sp.GetRequiredService<ISettingsStore>().Load().ReaderConcurrency
         });
         AddIdentification(services);
+        AddAnalysis(services);
         return services;
+    }
+
+    /// <summary>BPM and key analysis: estimates from the audio, kept apart from the tags until the user writes them.</summary>
+    private static void AddAnalysis(IServiceCollection services)
+    {
+        // A factory, not the type: the router also has a constructor that takes decoders, which the container would try to fill with itself.
+        services.AddSingleton<IAudioDecoder>(_ => new Audio.AudioDecoderRouter());
+        services.AddSingleton<ITrackAnalysisStore, TrackAnalysisRepository>();
+        services.AddSingleton<IAudioAnalysisService, MusicFinder.Application.Analysis.AudioAnalysisService>();
     }
 
     /// <summary>Online identification (M5). Nothing here touches the network until the user turns it on and accepts the explanation.</summary>

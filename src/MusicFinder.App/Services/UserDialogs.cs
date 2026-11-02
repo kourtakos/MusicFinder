@@ -18,6 +18,8 @@ public interface IUserDialogs
     void ShowIdentificationConsent(ViewModels.IdentificationConsentViewModel viewModel);
     /// <summary>Shows the online identification window as a modal dialog over the main window.</summary>
     void ShowIdentify(ViewModels.IdentifyViewModel viewModel);
+    /// <summary>Shows the BPM and key analysis window as a modal dialog over the main window.</summary>
+    void ShowAnalyze(ViewModels.AnalyzeViewModel viewModel);
     /// <summary>A file picker; <paramref name="filter"/> is in the Windows form "Name|*.ext|Name2|*.ext2". Null when cancelled.</summary>
     string? PickFile(string title, string filter);
 }
@@ -60,6 +62,9 @@ public sealed class UserDialogs : IUserDialogs
 
     public void ShowIdentify(ViewModels.IdentifyViewModel viewModel) =>
         new Views.IdentifyWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public void ShowAnalyze(ViewModels.AnalyzeViewModel viewModel) =>
+        new Views.AnalyzeWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
 
     public string? PickFile(string title, string filter)
     {
