@@ -57,7 +57,12 @@ public partial class FolderTreeViewModel : ObservableObject
         ScopeChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    internal void NodeSelected(FolderNodeViewModel node) => SelectedNode = node;
+    /// <summary>Choosing a different folder means the user wants that folder, so a leftover "Global search" (for example from opening a Library Health finding) is switched off.</summary>
+    internal void NodeSelected(FolderNodeViewModel node)
+    {
+        if (GlobalSearch && node.Id != SelectedNode?.Id) GlobalSearch = false;
+        SelectedNode = node;
+    }
 
     public async Task ReloadAsync()
     {
