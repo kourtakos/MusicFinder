@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!-- Single switch: set to 10.0 once the .NET 10 SDK is installed (and bump Microsoft.* packages in Directory.Packages.props). -->
+    <NetVersion>9.0</NetVersion>
+    <TargetFramework>net$(NetVersion)</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <SatelliteResourceLanguages>en;el</SatelliteResourceLanguages>
+  </PropertyGroup>
+</Project>

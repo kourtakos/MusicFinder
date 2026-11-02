@@ -1,0 +1,120 @@
+<Window x:Class="MusicFinder.App.Views.QuickSearchWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ctl="clr-namespace:MusicFinder.App.Controls"
+        Title="MusicFinder quick search" Width="580" SizeToContent="Height" MaxHeight="640"
+        WindowStyle="None" ResizeMode="NoResize" Topmost="True" ShowInTaskbar="False" ShowActivated="True"
+        WindowStartupLocation="Manual" Background="{StaticResource MF.Brush.PanelBg}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Window.Resources>
+        <!-- Rows highlight like the library grid; the default blue selection would clash with the theme. -->
+        <Style x:Key="QuickItem" TargetType="ListBoxItem">
+            <Setter Property="Focusable" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Padding="12,6" Background="Transparent">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource MF.Brush.RowHover}"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{StaticResource MF.Brush.AccentSoft}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border BorderBrush="{StaticResource MF.Brush.Accent}" BorderThickness="1">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title strip: grab it to move the window out of the way of your player. -->
+            <Border x:Name="TitleStrip" Background="{StaticResource MF.Brush.HeaderBg}" Height="34" Cursor="SizeAll"
+                    MouseLeftButtonDown="TitleStrip_MouseLeftButtonDown">
+                <Grid Margin="12,0,4,0">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE76F;" Margin="0,0,10,0"
+                                   Foreground="{StaticResource MF.Brush.TextMuted}"/>
+                        <TextBlock Text="MusicFinder" FontWeight="SemiBold"/>
+                        <TextBlock Text="  ·  drag this bar to move" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <Button HorizontalAlignment="Right" Style="{StaticResource MF.IconButton}" ToolTip="Close (Esc)"
+                            Command="{Binding CloseCommand}">
+                        <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE711;" FontSize="12"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Border Grid.Row="1" Style="{StaticResource MF.InputBorder}" Height="44" Margin="12,12,12,8">
+                <Grid>
+                    <TextBlock Text="Search artist, title, filename…" IsHitTestVisible="False" Margin="14,0"
+                               Foreground="{StaticResource MF.Brush.TextMuted}" VerticalAlignment="Center"
+                               Visibility="{Binding Query, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                    <TextBox x:Name="SearchBox" Style="{StaticResource MF.PlainTextBox}" FontSize="15" Padding="14,0"
+                             Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}"
+                             PreviewKeyDown="SearchBox_PreviewKeyDown"/>
+                </Grid>
+            </Border>
+
+            <ListBox x:Name="ResultList" Grid.Row="2" ItemsSource="{Binding Results}" SelectionMode="Extended"
+                     ItemContainerStyle="{StaticResource QuickItem}" Background="Transparent" BorderThickness="0"
+                     MaxHeight="440" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"
+                     SelectionChanged="ResultList_SelectionChanged" PreviewKeyDown="ResultList_PreviewKeyDown"
+                     Visibility="{Binding Results.Count, Converter={StaticResource NotNullToVis}}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ToolTip="{Binding FullPath}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ctl:ArtworkThumbnail Width="40" Height="40" PixelSize="64" Margin="0,0,12,0"
+                                AudioPath="{Binding FullPath}" ArtKey="{Binding ArtKey}"
+                                Service="{Binding DataContext.Artwork, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Artist}" Foreground="{StaticResource MF.Brush.TextSecondary}"
+                                           FontSize="12" TextTrimming="CharacterEllipsis"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                                <!-- This track's evidence in the live session (Exported / Possible / Played). -->
+                                <Border x:Name="Badge" Style="{StaticResource MF.Chip}" Margin="0,0,10,0"
+                                        Visibility="{Binding HasSessionBadge, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="{Binding SessionBadge}" FontSize="11" Foreground="White"/>
+                                </Border>
+                                <TextBlock Text="{Binding BpmText}" Foreground="{StaticResource MF.Brush.TextSecondary}" Width="34" TextAlignment="Right"/>
+                                <TextBlock Text="{Binding KeyText}" Foreground="{StaticResource MF.Brush.TextSecondary}" Width="38" TextAlignment="Right"/>
+                            </StackPanel>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsSessionConfirmed}" Value="True">
+                                <Setter TargetName="Badge" Property="Background" Value="{StaticResource MF.Brush.Accent}"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <StackPanel Grid.Row="3" Margin="14,6,14,10">
+                <TextBlock Text="{Binding Warning}" Foreground="{StaticResource MF.Brush.Warning}" FontSize="12" TextWrapping="Wrap"
+                           Visibility="{Binding Warning, Converter={StaticResource NotNullToVis}}" Margin="0,0,0,4"/>
+                <TextBlock Text="{Binding StatusText}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"/>
+                <TextBlock Text="Drag tracks into your player  ·  Enter opens the library  ·  Esc closes" Style="{StaticResource MF.Secondary}"
+                           Foreground="{StaticResource MF.Brush.TextMuted}" Margin="0,2,0,0"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

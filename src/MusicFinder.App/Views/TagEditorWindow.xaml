@@ -1,0 +1,166 @@
+<Window x:Class="MusicFinder.App.Views.TagEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Edit tags" Style="{StaticResource MF.Window}"
+        Width="860" Height="700" MinWidth="680" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+
+    <Grid Margin="22,18,22,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="{Binding Heading}" FontSize="20" FontWeight="SemiBold"/>
+            <TextBlock Text="{Binding SubHeading}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Non-blocking problem or hint -->
+        <Border Grid.Row="1" Margin="0,12,0,0" Padding="12,8" CornerRadius="8" Background="{StaticResource MF.Brush.AccentSoft}"
+                Visibility="{Binding HasMessage, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" Foreground="{StaticResource MF.Brush.Warning}"/>
+        </Border>
+
+        <!-- ===== Step 1: edit ===== -->
+        <ScrollViewer Grid.Row="2" Margin="0,16,0,0" VerticalScrollBarVisibility="Auto"
+                      Visibility="{Binding IsEditStep, Converter={StaticResource BoolToVis}}">
+            <ItemsControl ItemsSource="{Binding Fields}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,0,0,12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="30"/>
+                                <ColumnDefinition Width="110"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="170"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <CheckBox IsChecked="{Binding Apply, Mode=TwoWay}" VerticalAlignment="Center"
+                                      ToolTip="Tick to change this field (typing ticks it for you)"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Label}" VerticalAlignment="Center"/>
+
+                            <Grid Grid.Column="2">
+                                <Border Style="{StaticResource MF.InputBorder}" Height="36">
+                                    <Grid>
+                                        <TextBlock Text="{Binding Placeholder}" IsHitTestVisible="False" Margin="12,0" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MF.Brush.TextMuted}"
+                                                   Visibility="{Binding Text, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                        <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0"
+                                                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </Grid>
+                                </Border>
+                                <!-- Red outline while the value is invalid -->
+                                <Border CornerRadius="8" BorderThickness="1" BorderBrush="{StaticResource MF.Brush.Error}" IsHitTestVisible="False"
+                                        Visibility="{Binding Error, Converter={StaticResource NotNullToVis}}"/>
+                            </Grid>
+
+                            <StackPanel Grid.Column="3" Margin="12,0,0,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding MixedText}" Foreground="{StaticResource MF.Brush.Warning}" FontSize="12"/>
+                                <TextBlock Text="{Binding Hint}" Style="{StaticResource MF.Secondary}"/>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Error}" Foreground="{StaticResource MF.Brush.Error}"
+                                       FontSize="12" Margin="2,4,0,0" TextWrapping="Wrap"
+                                       Visibility="{Binding Error, Converter={StaticResource NotNullToVis}}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ===== Step 2: preview ===== -->
+        <Grid Grid.Row="2" Margin="0,16,0,0" Visibility="{Binding IsPreviewStep, Converter={StaticResource BoolToVis}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding PreviewSummary}" TextWrapping="Wrap" Margin="0,0,0,10"/>
+            <Border Grid.Row="1" Style="{StaticResource MF.Panel}">
+                <DataGrid ItemsSource="{Binding PreviewRows}" Style="{StaticResource MF.TrackGrid}" SelectionMode="Single"
+                          EnableRowVirtualization="True" Margin="4">
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                            <Setter Property="MinHeight" Value="34"/>
+                        </Style>
+                    </DataGrid.RowStyle>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="1.4*"/>
+                        <DataGridTextColumn Header="Field" Binding="{Binding Field}" Width="110"/>
+                        <DataGridTextColumn Header="Before" Binding="{Binding Before, TargetNullValue='(empty)'}" Width="*"/>
+                        <DataGridTextColumn Header="After" Binding="{Binding After, TargetNullValue='(will be cleared)'}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+            <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                <CheckBox Content="Keep a backup copy of each file before changing it" IsChecked="{Binding KeepBackup}"/>
+                <TextBlock Style="{StaticResource MF.Secondary}" Margin="26,4,0,0" TextWrapping="Wrap"
+                           Text="Backups are stored in MusicFinder's data folder, never next to your music. Each file is written through a verified temporary copy, so a failure leaves the original untouched."/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===== Step 3: writing ===== -->
+        <StackPanel Grid.Row="2" Margin="0,60,0,0" VerticalAlignment="Top" MaxWidth="560"
+                    Visibility="{Binding IsWritingStep, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="Writing tags…" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+            <ProgressBar Margin="0,16,0,8" Height="6" Minimum="0" Maximum="{Binding ProgressTotal}" Value="{Binding ProgressDone, Mode=OneWay}"/>
+            <TextBlock Text="{Binding ProgressFile}" Style="{StaticResource MF.Secondary}" HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- ===== Step 4: result ===== -->
+        <ScrollViewer Grid.Row="2" Margin="0,16,0,0" VerticalScrollBarVisibility="Auto"
+                      Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="{Binding ResultSummary}" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                <ItemsControl ItemsSource="{Binding Failures}" Margin="0,16,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="{StaticResource MF.Brush.RowAlt}" CornerRadius="8" Padding="12,8" Margin="0,0,0,8">
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Path}" FontWeight="SemiBold" TextWrapping="Wrap" TextTrimming="None"/>
+                                    <TextBlock Text="{Binding Error}" Foreground="{StaticResource MF.Brush.Error}" TextWrapping="Wrap" TextTrimming="None"
+                                               Visibility="{Binding Error, Converter={StaticResource NotNullToVis}}"/>
+                                    <TextBlock Text="{Binding Warning}" Foreground="{StaticResource MF.Brush.Warning}" TextWrapping="Wrap" TextTrimming="None"
+                                               Visibility="{Binding Warning, Converter={StaticResource NotNullToVis}}"/>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="Open backup folder" Style="{StaticResource MF.PillButton}" Height="34" HorizontalAlignment="Left"
+                        Margin="0,12,0,0" Command="{Binding RevealBackupsCommand}"
+                        Visibility="{Binding KeepBackup, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ===== Buttons ===== -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Cancel" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding CloseCommand}"
+                    Visibility="{Binding IsEditStep, Converter={StaticResource BoolToVis}}"/>
+            <Button Content="Preview changes" Style="{StaticResource MF.AccentButton}" Command="{Binding PreviewCommand}"
+                    Visibility="{Binding IsEditStep, Converter={StaticResource BoolToVis}}"/>
+
+            <Button Content="Back" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding BackCommand}"
+                    Visibility="{Binding IsPreviewStep, Converter={StaticResource BoolToVis}}"/>
+            <Button Content="{Binding WriteButtonText}" Style="{StaticResource MF.AccentButton}" Command="{Binding WriteCommand}"
+                    Visibility="{Binding IsPreviewStep, Converter={StaticResource BoolToVis}}"/>
+
+            <Button Content="Stop after this file" Style="{StaticResource MF.PillButton}" Command="{Binding CancelWritingCommand}"
+                    Visibility="{Binding IsWritingStep, Converter={StaticResource BoolToVis}}"/>
+
+            <Button Content="Close" Style="{StaticResource MF.AccentButton}" Command="{Binding CloseCommand}"
+                    Visibility="{Binding IsDoneStep, Converter={StaticResource BoolToVis}}"/>
+        </StackPanel>
+    </Grid>
+</Window>

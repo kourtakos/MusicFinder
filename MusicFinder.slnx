@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MusicFinder.App/MusicFinder.App.csproj" />
+    <Project Path="src/MusicFinder.Application/MusicFinder.Application.csproj" />
+    <Project Path="src/MusicFinder.Domain/MusicFinder.Domain.csproj" />
+    <Project Path="src/MusicFinder.Infrastructure/MusicFinder.Infrastructure.csproj" />
+    <Project Path="tests/MusicFinder.IntegrationTests/MusicFinder.IntegrationTests.csproj" />
+    <Project Path="tests/MusicFinder.UnitTests/MusicFinder.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MusicFinder.UiSmokeTests/MusicFinder.UiSmokeTests.csproj" />
+  </Folder>
+</Solution>

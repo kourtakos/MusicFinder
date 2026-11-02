@@ -1,0 +1,32 @@
+{
+  "tags": ["Warm Up", "Peak Time", "Closing", "Wedding", "Greek Party"],
+  "genres": [
+    { "name": "Electronic", "children": ["Techno", "Trance", "Drum & Bass", "Dubstep", "EDM", "Electro", "Ambient", "Breakbeat"], "aliases": ["electronica", "dance", "electronic dance"] },
+    { "name": "House", "children": ["Deep House", "Tech House", "Progressive House", "Funky House", "Afro House", "Tribal House", "Melodic House"], "aliases": ["house music"] },
+    { "name": "Disco", "children": ["Nu Disco", "Italo Disco", "Boogie", "Disco House"], "aliases": ["nudisco:Nu Disco", "italo:Italo Disco", "disco funk"] },
+    { "name": "Funk", "children": ["Funk Rock", "P-Funk", "Boogie Funk"], "aliases": ["funky"] },
+    { "name": "Pop", "children": ["Dance Pop", "Synthpop", "Electropop", "Pop Rock", "Europop"], "aliases": ["synth pop:Synthpop", "euro pop:Europop"] },
+    { "name": "Rock", "children": ["Indie Rock", "Alternative Rock", "Classic Rock", "Hard Rock", "Punk", "Metal", "New Wave", "Post-Punk"], "aliases": ["alternative:Alternative Rock", "alt rock:Alternative Rock", "indie:Indie Rock", "heavy metal:Metal", "punk rock:Punk"] },
+    { "name": "Hip-Hop", "children": ["Rap", "Trap", "Old School Hip-Hop"], "aliases": ["hiphop", "hip hop rap"] },
+    { "name": "R&B", "children": ["Contemporary R&B", "New Jack Swing"], "aliases": ["rnb", "r n b", "r and b", "rhythm and blues"] },
+    { "name": "Soul", "children": ["Neo Soul", "Northern Soul", "Motown"], "aliases": [] },
+    { "name": "Jazz", "children": ["Acid Jazz", "Jazz Funk", "Smooth Jazz", "Swing", "Bossa Nova"], "aliases": [] },
+    { "name": "Latin", "children": ["Salsa", "Bachata", "Reggaeton", "Merengue", "Cumbia", "Latin Pop", "Latin House"], "aliases": ["latino", "reggaetón:Reggaeton"] },
+    { "name": "Reggae", "children": ["Dancehall", "Dub", "Ska"], "aliases": [] },
+    { "name": "Classical", "children": ["Opera", "Baroque", "Soundtrack"], "aliases": ["classic", "ost:Soundtrack", "film score:Soundtrack"] },
+    {
+      "name": "Greek",
+      "children": ["Laiko", "Entexno", "Rebetiko", "Nisiotika", "Greek Pop", "Greek Hip-Hop", "Skyladiko", "Dimotiko", "Greek Remix"],
+      "aliases": [
+        "ελληνικά", "ελληνικό", "ellinika", "greek music",
+        "λαϊκά:Laiko", "λαϊκό:Laiko", "laika:Laiko",
+        "έντεχνο:Entexno", "entehno:Entexno",
+        "ρεμπέτικα:Rebetiko", "rempetiko:Rebetiko",
+        "νησιώτικα:Nisiotika", "δημοτικά:Dimotiko", "σκυλάδικα:Skyladiko",
+        "ελληνικό ποπ:Greek Pop", "greek remixes:Greek Remix"
+      ]
+    },
+    { "name": "Folk", "children": ["Singer-Songwriter", "Country", "Bluegrass"], "aliases": ["folk rock"] },
+    { "name": "World", "children": ["Balkan", "Arabic", "Turkish", "African", "Afrobeats"], "aliases": ["worldbeat", "afrobeat:Afrobeats", "balkan beats:Balkan"] }
+  ]
+}

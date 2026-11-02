@@ -1,0 +1,57 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Color tokens sampled from the reference mockup. Dark is the default theme. -->
+    <Color x:Key="MF.Color.WindowBg">#0D0D11</Color>
+    <Color x:Key="MF.Color.HeaderBg">#121217</Color>
+    <Color x:Key="MF.Color.PanelBg">#17171D</Color>
+    <Color x:Key="MF.Color.InputBg">#15151A</Color>
+    <Color x:Key="MF.Color.RowAlt">#1A1A21</Color>
+    <Color x:Key="MF.Color.RowHover">#22222B</Color>
+    <Color x:Key="MF.Color.PanelBorder">#2A2A33</Color>
+    <Color x:Key="MF.Color.InputBorder">#3A3A46</Color>
+    <Color x:Key="MF.Color.TextPrimary">#F2F2F5</Color>
+    <Color x:Key="MF.Color.TextSecondary">#A3A3AD</Color>
+    <Color x:Key="MF.Color.TextMuted">#7B7B88</Color>
+    <Color x:Key="MF.Color.Accent">#8B5CF6</Color>
+    <Color x:Key="MF.Color.AccentHover">#A78BFA</Color>
+    <Color x:Key="MF.Color.AccentSoft">#2A2140</Color>
+    <Color x:Key="MF.Color.SelectionRow">#3D2B7A</Color>
+    <Color x:Key="MF.Color.SelectionTree">#2D2454</Color>
+    <Color x:Key="MF.Color.ChipGenre">#6A47C9</Color>
+    <Color x:Key="MF.Color.ChipGenreAlt">#4A3F3A</Color>
+    <Color x:Key="MF.Color.Confirmed">#22C55E</Color>
+    <Color x:Key="MF.Color.Possible">#EAB308</Color>
+    <Color x:Key="MF.Color.Warning">#F59E0B</Color>
+    <Color x:Key="MF.Color.Favorite">#EC4899</Color>
+    <Color x:Key="MF.Color.Error">#EF4444</Color>
+
+    <SolidColorBrush x:Key="MF.Brush.WindowBg" Color="{StaticResource MF.Color.WindowBg}"/>
+    <SolidColorBrush x:Key="MF.Brush.HeaderBg" Color="{StaticResource MF.Color.HeaderBg}"/>
+    <SolidColorBrush x:Key="MF.Brush.PanelBg" Color="{StaticResource MF.Color.PanelBg}"/>
+    <SolidColorBrush x:Key="MF.Brush.InputBg" Color="{StaticResource MF.Color.InputBg}"/>
+    <SolidColorBrush x:Key="MF.Brush.RowAlt" Color="{StaticResource MF.Color.RowAlt}"/>
+    <SolidColorBrush x:Key="MF.Brush.RowHover" Color="{StaticResource MF.Color.RowHover}"/>
+    <SolidColorBrush x:Key="MF.Brush.PanelBorder" Color="{StaticResource MF.Color.PanelBorder}"/>
+    <SolidColorBrush x:Key="MF.Brush.InputBorder" Color="{StaticResource MF.Color.InputBorder}"/>
+    <SolidColorBrush x:Key="MF.Brush.TextPrimary" Color="{StaticResource MF.Color.TextPrimary}"/>
+    <SolidColorBrush x:Key="MF.Brush.TextSecondary" Color="{StaticResource MF.Color.TextSecondary}"/>
+    <SolidColorBrush x:Key="MF.Brush.TextMuted" Color="{StaticResource MF.Color.TextMuted}"/>
+    <SolidColorBrush x:Key="MF.Brush.Accent" Color="{StaticResource MF.Color.Accent}"/>
+    <SolidColorBrush x:Key="MF.Brush.AccentHover" Color="{StaticResource MF.Color.AccentHover}"/>
+    <SolidColorBrush x:Key="MF.Brush.AccentSoft" Color="{StaticResource MF.Color.AccentSoft}"/>
+    <SolidColorBrush x:Key="MF.Brush.SelectionRow" Color="{StaticResource MF.Color.SelectionRow}"/>
+    <SolidColorBrush x:Key="MF.Brush.SelectionTree" Color="{StaticResource MF.Color.SelectionTree}"/>
+    <SolidColorBrush x:Key="MF.Brush.ChipGenre" Color="{StaticResource MF.Color.ChipGenre}"/>
+    <SolidColorBrush x:Key="MF.Brush.ChipGenreAlt" Color="{StaticResource MF.Color.ChipGenreAlt}"/>
+    <SolidColorBrush x:Key="MF.Brush.Confirmed" Color="{StaticResource MF.Color.Confirmed}"/>
+    <SolidColorBrush x:Key="MF.Brush.Possible" Color="{StaticResource MF.Color.Possible}"/>
+    <SolidColorBrush x:Key="MF.Brush.Warning" Color="{StaticResource MF.Color.Warning}"/>
+    <SolidColorBrush x:Key="MF.Brush.Favorite" Color="{StaticResource MF.Color.Favorite}"/>
+    <SolidColorBrush x:Key="MF.Brush.Error" Color="{StaticResource MF.Color.Error}"/>
+
+    <LinearGradientBrush x:Key="MF.Brush.Logo" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#A78BFA" Offset="0"/>
+        <GradientStop Color="#6D28D9" Offset="1"/>
+    </LinearGradientBrush>
+</ResourceDictionary>

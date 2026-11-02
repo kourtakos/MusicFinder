@@ -1,0 +1,232 @@
+<UserControl x:Class="MusicFinder.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
+        <StackPanel MaxWidth="900" HorizontalAlignment="Left">
+
+            <TextBlock Text="Settings" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,14"/>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <Grid>
+                        <TextBlock Text="Indexed folders" FontSize="16" FontWeight="SemiBold"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="Rescan all" Style="{StaticResource MF.PillButton}" Height="34"
+                                    Command="{Binding RescanAllCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Add folder…" Style="{StaticResource MF.AccentButton}" Height="34"
+                                    Command="{Binding AddRootCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,6,0,12"
+                               Text="MusicFinder only reads your music files. Removing a folder here stops indexing it; the files are never touched."/>
+
+                    <TextBlock Text="No folders yet. Add the folders that contain your music." Style="{StaticResource MF.Secondary}"
+                               Visibility="{Binding Roots.Count, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+
+                    <ItemsControl ItemsSource="{Binding Roots}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource MF.Brush.RowAlt}" CornerRadius="8" Padding="12,10" Margin="0,0,0,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <CheckBox IsChecked="{Binding Enabled, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,12,0"
+                                                  ToolTip="Include this folder in the index"/>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding Path}" FontWeight="SemiBold"/>
+                                            <TextBlock Style="{StaticResource MF.Secondary}">
+                                                <Run Text="{Binding StatusText, Mode=OneWay}"/>
+                                                <Run Text=" · last scan "/>
+                                                <Run Text="{Binding LastScanText, Mode=OneWay}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <Button Style="{StaticResource MF.IconButton}" ToolTip="Rescan"
+                                                    Command="{Binding DataContext.RescanRootCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE72C;"/>
+                                            </Button>
+                                            <Button Style="{StaticResource MF.IconButton}" ToolTip="Open in Explorer"
+                                                    Command="{Binding DataContext.OpenFolderCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding Path}">
+                                                <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8B7;"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Indexing" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Parallel disk readers" VerticalAlignment="Center" Width="170"/>
+                        <Border Style="{StaticResource MF.InputBorder}" Width="70" Height="32">
+                            <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="10,0"
+                                     Text="{Binding ReaderConcurrency, UpdateSourceTrigger=LostFocus}"/>
+                        </Border>
+                        <TextBlock Text="1–8 · applies after restart" Style="{StaticResource MF.Secondary}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="DJ session" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Quiet period after a drag" VerticalAlignment="Center" Width="170"/>
+                        <Border Style="{StaticResource MF.InputBorder}" Width="70" Height="32">
+                            <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="10,0"
+                                     Text="{Binding SessionHeuristicSeconds, UpdateSourceTrigger=LostFocus}"/>
+                        </Border>
+                        <TextBlock Text="15–20 seconds" Style="{StaticResource MF.Secondary}" Margin="12,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <CheckBox Content="Start a session automatically on the first drag" Margin="0,10,0,0"
+                              IsChecked="{Binding AutoStartSessionOnDrag}"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,10,0,0"
+                               Text="After you drag a track out, MusicFinder waits this long. If you did not search, filter or change folder in the meantime, it is marked 'possibly played'. That is weak evidence, not proof. Only you (or, later, your DJ software's own history) can confirm a play. A new search leaves the track as 'exported', never as 'not played'."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Search" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <CheckBox Content="Smart Greek search: find Greek names by typing Greeklish, and the reverse"
+                              IsChecked="{Binding SmartGreekSearch}"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="26,4,0,10"
+                               Text="Also finds text typed with the wrong keyboard layout, and ignores accents, case and final sigma. This is automatic; there is no mode to switch while typing. Matching between Greek and Greeklish is a best guess, so exact matches are always listed first."/>
+                    <CheckBox Content="Suggest the closest word when nothing matches (typos)" IsChecked="{Binding FuzzySearch}"/>
+
+                    <TextBlock Text="Your own aliases" FontWeight="SemiBold" Margin="0,16,0,2"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,0,0,8"
+                               Text="For names the automatic rules cannot connect, for example Daft Punk and ντάφτ πανκ. Searching either spelling then finds the tracks tagged with the first one."/>
+                    <ItemsControl ItemsSource="{Binding SearchAliases}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource MF.Brush.RowAlt}" CornerRadius="8" Padding="12,6" Margin="0,0,0,4">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Source}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Grid.Column="1" Text="  =  " Style="{StaticResource MF.Secondary}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Alias}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        <Button Grid.Column="3" Style="{StaticResource MF.IconButton}" ToolTip="Remove this alias"
+                                                Command="{Binding DataContext.RemoveSearchAliasCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                CommandParameter="{Binding}">
+                                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE711;" FontSize="12"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <Border Style="{StaticResource MF.InputBorder}" Width="220" Height="34" Margin="0,0,8,0">
+                            <Grid>
+                                <TextBlock Text="Name as tagged" IsHitTestVisible="False" Margin="12,0" VerticalAlignment="Center"
+                                           Foreground="{StaticResource MF.Brush.TextMuted}"
+                                           Visibility="{Binding NewAliasSource, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding NewAliasSource, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource MF.InputBorder}" Width="220" Height="34" Margin="0,0,8,0">
+                            <Grid>
+                                <TextBlock Text="Also search as" IsHitTestVisible="False" Margin="12,0" VerticalAlignment="Center"
+                                           Foreground="{StaticResource MF.Brush.TextMuted}"
+                                           Visibility="{Binding NewAliasAlias, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding NewAliasAlias, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                        </Border>
+                        <Button Content="Add" Style="{StaticResource MF.AccentButton}" Height="34" Padding="18,0" Command="{Binding AddSearchAliasCommand}"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding AliasError}" Foreground="{StaticResource MF.Brush.Warning}" TextWrapping="Wrap" Margin="0,6,0,0"
+                               Visibility="{Binding AliasError, Converter={StaticResource NotNullToVis}}"/>
+
+                    <Expander Header="Explain a search" Margin="0,16,0,0" Foreground="{StaticResource MF.Brush.TextPrimary}">
+                        <StackPanel Margin="0,10,0,0">
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,0,0,8"
+                                       Text="Type a search to see how it is read (every spelling it is looked up under) and why each result matched. Handy when a name is not found."/>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Style="{StaticResource MF.InputBorder}" Width="360" Height="34" Margin="0,0,8,0">
+                                    <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding ExplainQuery, UpdateSourceTrigger=PropertyChanged}"/>
+                                </Border>
+                                <Button Content="Explain" Style="{StaticResource MF.PillButton}" Height="34" Padding="16,0" Command="{Binding ExplainSearchCommand}"/>
+                            </StackPanel>
+                            <TextBox Text="{Binding ExplainOutput, Mode=OneWay}" IsReadOnly="True" TextWrapping="NoWrap" FontFamily="Consolas" FontSize="12"
+                                     Style="{StaticResource MF.PlainTextBox}" Margin="0,8,0,0" MaxHeight="320" MinHeight="60"
+                                     VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" AcceptsReturn="True"/>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Quick search" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <CheckBox Content="Open a small search window over any program with a keyboard shortcut"
+                              IsChecked="{Binding QuickSearchEnabled}"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <TextBlock Text="Shortcut" VerticalAlignment="Center" Width="170"/>
+                        <Border Style="{StaticResource MF.InputBorder}" Width="240" Height="34">
+                            <TextBox x:Name="HotkeyBox" Style="{StaticResource MF.PlainTextBox}" Padding="12,0" IsReadOnly="True" IsReadOnlyCaretVisible="False"
+                                     Cursor="Hand" ToolTip="Click here, then press the keys you want to use"
+                                     Text="{Binding QuickSearchHotkey, Mode=OneWay}"
+                                     PreviewKeyDown="HotkeyBox_PreviewKeyDown"/>
+                        </Border>
+                        <Button Content="Use default" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0" Margin="10,0,0,0"
+                                Command="{Binding ResetHotkeyCommand}"/>
+                    </StackPanel>
+                    <TextBlock x:Name="HotkeyStatusText" Text="{Binding HotkeyStatus}" TextWrapping="Wrap" Margin="0,10,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{StaticResource MF.Brush.TextSecondary}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HotkeyStatusIsError}" Value="True">
+                                        <Setter Property="Foreground" Value="{StaticResource MF.Brush.Warning}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,8,0,0"
+                               Text="Click the shortcut box and press the keys you want, for example Ctrl+Alt+Space. The shortcut must include Ctrl, Alt or Win, and some combinations belong to Windows or to other programs. The pop-up window can be dragged anywhere on screen and remembers its position. The shortcut works while MusicFinder is running (also when its window is minimized)."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
+                    <TextBlock Text="Artwork" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <CheckBox Content="Use cover.jpg / folder.jpg when a file has no embedded cover"
+                              IsChecked="{Binding UseFolderArtwork}"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="26,6,0,0"
+                               Text="Covers are read from your files and cached as small thumbnails; nothing is downloaded and your files are never modified."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18">
+                <StackPanel>
+                    <TextBlock Text="Data locations" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Text="Library database" Style="{StaticResource MF.Secondary}"/>
+                    <TextBox Text="{Binding DatabasePath, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource MF.PlainTextBox}" Margin="0,2,0,10"/>
+                    <TextBlock Text="Settings file" Style="{StaticResource MF.Secondary}"/>
+                    <TextBox Text="{Binding SettingsPath, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource MF.PlainTextBox}" Margin="0,2,0,10"/>
+                    <TextBlock Text="Logs" Style="{StaticResource MF.Secondary}"/>
+                    <TextBox Text="{Binding LogDirectory, Mode=OneWay}" IsReadOnly="True" Style="{StaticResource MF.PlainTextBox}" Margin="0,2,0,10"/>
+                    <TextBlock TextWrapping="Wrap" Style="{StaticResource MF.Secondary}"
+                               Text="Everything is stored locally. MusicFinder makes no network connections in this version and sends no telemetry."/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

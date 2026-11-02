@@ -1,0 +1,130 @@
+﻿<Window x:Class="MusicFinder.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:MusicFinder.App.ViewModels"
+        xmlns:views="clr-namespace:MusicFinder.App.Views"
+        Title="MusicFinder" Style="{StaticResource MF.Window}"
+        MinWidth="1000" MinHeight="650" Width="1440" Height="860"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.InputBindings>
+        <KeyBinding Key="F" Modifiers="Ctrl" Command="{Binding FocusSearchCommand}"/>
+        <KeyBinding Key="K" Modifiers="Ctrl" Command="{Binding FocusSearchCommand}"/>
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:LibraryViewModel}"><views:LibraryView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><views:SettingsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TagsViewModel}"><views:TagsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:PlaceholderViewModel}"><views:PlaceholderView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SessionViewModel}"><views:SessionView/></DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="68"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== Header: logo + navigation ===== -->
+        <Border Background="{StaticResource MF.Brush.HeaderBg}" BorderBrush="{StaticResource MF.Brush.PanelBorder}" BorderThickness="0,0,0,1">
+            <Grid Margin="20,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <Grid Width="42" Height="42" Margin="0,0,12,0">
+                        <Ellipse Fill="{StaticResource MF.Brush.Logo}"/>
+                        <Ellipse Width="14" Height="14" Fill="{StaticResource MF.Brush.HeaderBg}"/>
+                        <Ellipse Width="5" Height="5" Fill="{StaticResource MF.Brush.AccentHover}"/>
+                    </Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="MusicFinder" FontSize="{StaticResource MF.Size.Logo}" FontWeight="Bold" LineHeight="24"/>
+                        <TextBlock Text="DJ Music Organizer" Style="{StaticResource MF.Secondary}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Live session badge: click to open the Session tab -->
+                <Button HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0"
+                        Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:AppTab.Session}"
+                        ToolTip="A DJ session is running. Click to see what was dragged out."
+                        Visibility="{Binding Session.IsLive, Converter={StaticResource BoolToVis}}">
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Width="9" Height="9" Fill="#E5484D" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Session.LiveBadgeText}" FontWeight="SemiBold"/>
+                    </StackPanel>
+                </Button>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"
+                                 IsChecked="{Binding SelectedTab, Mode=TwoWay, Converter={StaticResource EqualsConv}, ConverterParameter=Library}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8F1;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
+                            <TextBlock Text="Library" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"
+                                 IsChecked="{Binding SelectedTab, Mode=TwoWay, Converter={StaticResource EqualsConv}, ConverterParameter=Tags}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8EC;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
+                            <TextBlock Text="Tags" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"
+                                 IsChecked="{Binding SelectedTab, Mode=TwoWay, Converter={StaticResource EqualsConv}, ConverterParameter=History}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE81C;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
+                            <TextBlock Text="History" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"
+                                 IsChecked="{Binding SelectedTab, Mode=TwoWay, Converter={StaticResource EqualsConv}, ConverterParameter=Session}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE916;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
+                            <TextBlock Text="Session" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"
+                                 IsChecked="{Binding SelectedTab, Mode=TwoWay, Converter={StaticResource EqualsConv}, ConverterParameter=Settings}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE713;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
+                            <TextBlock Text="Settings" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                        </StackPanel>
+                    </RadioButton>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== Current tab ===== -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentView}" Focusable="False"/>
+
+        <!-- ===== Status bar ===== -->
+        <Border Grid.Row="2" Background="{StaticResource MF.Brush.HeaderBg}" BorderBrush="{StaticResource MF.Brush.PanelBorder}" BorderThickness="0,1,0,0">
+            <Grid Margin="22,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Library.Search.ResultsText}"/>
+                    <Rectangle Width="1" Height="14" Fill="{StaticResource MF.Brush.InputBorder}" Margin="14,0"/>
+                    <TextBlock Text="{Binding Library.Search.SelectedText}" Foreground="{StaticResource MF.Brush.TextSecondary}"/>
+                    <Rectangle Width="1" Height="14" Fill="{StaticResource MF.Brush.InputBorder}" Margin="14,0"/>
+                    <TextBlock Text="{Binding Session.StatusBarText}" Foreground="{StaticResource MF.Brush.TextSecondary}"/>
+                    <TextBlock Text="{Binding IndexStatusText}" Foreground="{StaticResource MF.Brush.TextMuted}" Margin="14,0,0,0"
+                               Visibility="{Binding HasIndexStatus, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            Visibility="{Binding Library.IsScanning, Converter={StaticResource BoolToVis}}">
+                    <ProgressBar IsIndeterminate="True" Width="140" Margin="0,0,12,0"/>
+                    <TextBlock Text="{Binding Library.ScanText}" Foreground="{StaticResource MF.Brush.TextSecondary}" MaxWidth="560"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE839;" FontSize="13" Margin="0,0,8,0"/>
+                    <TextBlock Text="Offline · local library" Foreground="{StaticResource MF.Brush.TextSecondary}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

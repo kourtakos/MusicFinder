@@ -1,0 +1,13 @@
+<UserControl x:Class="MusicFinder.App.Controls.ArtworkThumbnail"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border x:Name="Frame" CornerRadius="6" ClipToBounds="True"
+            Background="{StaticResource MF.Brush.RowAlt}" BorderBrush="{StaticResource MF.Brush.PanelBorder}" BorderThickness="1">
+        <Grid>
+            <!-- Neutral fallback: shown until a cover arrives, and for tracks without one. Never blocks scrolling. -->
+            <TextBlock x:Name="Placeholder" Style="{StaticResource MF.Icon}" Text="&#xE8D6;" HorizontalAlignment="Center"
+                       Foreground="{StaticResource MF.Brush.TextMuted}"/>
+            <Image x:Name="Picture" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Grid>
+    </Border>
+</UserControl>

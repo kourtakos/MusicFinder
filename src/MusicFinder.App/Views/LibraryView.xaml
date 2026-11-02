@@ -1,0 +1,568 @@
+<UserControl x:Class="MusicFinder.App.Views.LibraryView" x:Name="Root"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MusicFinder.App.ViewModels"
+             xmlns:ctl="clr-namespace:MusicFinder.App.Controls">
+    <UserControl.Resources>
+        <!-- Small label used in the details panel rows. -->
+        <Style x:Key="DetailLabel" TargetType="TextBlock" BasedOn="{StaticResource MF.Secondary}">
+            <Setter Property="Width" Value="84"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="16,4,16,8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== Search + filter bar ===== -->
+        <Grid Grid.Row="0" Margin="0,8,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Style="{StaticResource MF.InputBorder}" Height="44" Margin="0,0,12,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE721;" FontSize="16" Margin="14,0,10,0"/>
+                    <TextBlock Grid.Column="1" Text="Search artist, title, filename…   (Ctrl+F)" IsHitTestVisible="False"
+                               Foreground="{StaticResource MF.Brush.TextMuted}" VerticalAlignment="Center"
+                               Visibility="{Binding Search.QueryText, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                    <TextBox x:Name="SearchBox" Grid.Column="1" Style="{StaticResource MF.PlainTextBox}" FontSize="15"
+                             Text="{Binding Search.QueryText, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Button Grid.Column="2" Style="{StaticResource MF.IconButton}" Margin="0,0,6,0" ToolTip="Clear (Esc)"
+                            Command="{Binding Search.ClearQueryCommand}"
+                            Visibility="{Binding Search.QueryText, Converter={StaticResource NotNullToVis}}">
+                        <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE711;" FontSize="12"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <ctl:FilterDropDown Grid.Column="1" Header="Genre" Options="{Binding Search.GenreOptions}" Margin="0,0,10,0"/>
+            <ctl:FilterDropDown Grid.Column="2" Header="BPM" Options="{Binding Search.BpmOptions}" Margin="0,0,10,0"/>
+            <ctl:FilterDropDown Grid.Column="3" Header="Decade" Options="{Binding Search.DecadeOptions}" Margin="0,0,10,0"/>
+            <ctl:FilterDropDown Grid.Column="4" Header="Tags" Options="{Binding Search.TagOptions}" Margin="0,0,10,0"/>
+            <ctl:FilterDropDown Grid.Column="5" Header="Played" Options="{Binding Search.PlayedOptions}" Margin="0,0,10,0"/>
+            <Button Grid.Column="6" Content="Reset" Style="{StaticResource MF.PillButton}" Command="{Binding Search.ResetCommand}"/>
+        </Grid>
+
+        <StackPanel Grid.Row="1">
+            <!-- Non-blocking query validation message -->
+            <TextBlock Text="{Binding Search.Warning}" Foreground="{StaticResource MF.Brush.Warning}"
+                       FontSize="12" Margin="4,0,0,8"
+                       Visibility="{Binding Search.Warning, Converter={StaticResource NotNullToVis}}"/>
+
+            <!-- Find similar: what the list is, how it is matched, and a way back. -->
+            <Border Style="{StaticResource MF.Panel}" Padding="14,10" Margin="0,0,0,10"
+                    Visibility="{Binding Search.IsSimilarMode, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock>
+                            <Run Text="Similar to " Foreground="{StaticResource MF.Brush.TextSecondary}"/><Run Text="{Binding Search.SimilarTitle, Mode=OneWay}" FontWeight="SemiBold"/>
+                        </TextBlock>
+                        <TextBlock Text="{Binding Search.SimilarMessage}" Foreground="{StaticResource MF.Brush.Warning}" FontSize="12" TextWrapping="Wrap"
+                                   Visibility="{Binding Search.SimilarMessage, Converter={StaticResource NotNullToVis}}"/>
+                        <TextBlock Style="{StaticResource MF.Secondary}" FontSize="12" TextWrapping="Wrap"
+                                   Text="A match of genre, BPM, key and DJ tags. It says nothing about how the music sounds."
+                                   Visibility="{Binding Search.SimilarMessage, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0">
+                        <TextBlock Text="BPM ±" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <ComboBox Style="{StaticResource MF.ComboBox}" Width="68" Height="30" ItemsSource="{Binding Search.SimilarWindowChoices}"
+                                  SelectedItem="{Binding Search.SimilarBpmWindow, Mode=TwoWay}" ToolTip="How far apart in BPM still counts as a match"/>
+                        <CheckBox Content="Half/double tempo" Margin="14,0,0,0" VerticalAlignment="Center" IsChecked="{Binding Search.SimilarHalfDouble}"
+                                  ToolTip="Also match double and half the tempo (70 and 140 mix well). These matches are labelled."/>
+                        <CheckBox Content="Hide played in last 24 h" Margin="14,0,0,0" VerticalAlignment="Center" IsChecked="{Binding Search.SimilarHideRecentlyPlayed}"/>
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="Close" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0"
+                            Command="{Binding Search.CloseSimilarCommand}" ToolTip="Back to your search"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- ===== Body: folders | results | details ===== -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="LeftColumn" Width="{Binding DataContext.LeftPanelWidth, ElementName=Root, Mode=TwoWay}" MinWidth="180" MaxWidth="420"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*" MinWidth="460"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition x:Name="RightColumn" Width="{Binding DataContext.RightPanelWidth, ElementName=Root, Mode=TwoWay}" MinWidth="260" MaxWidth="520"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: folders + library stats -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Border Style="{StaticResource MF.Panel}" Padding="10,10,6,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Grid Margin="2,0,4,6">
+                            <TextBlock Text="Folders" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource MF.IconButton}" ToolTip="Add folder…" Command="{Binding Tree.AddRootCommand}">
+                                    <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE710;"/>
+                                </Button>
+                                <Button Style="{StaticResource MF.IconButton}" ToolTip="Rescan" Command="{Binding Tree.RescanNodeCommand}">
+                                    <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE72C;"/>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel Grid.Row="1" Margin="4,0,4,8">
+                            <CheckBox Content="Include subfolders" IsChecked="{Binding Tree.IncludeSubfolders}" FontSize="12" Margin="0,0,0,5"
+                                      IsEnabled="{Binding Tree.GlobalSearch, Converter={StaticResource InvBool}}"/>
+                            <CheckBox Content="Global search (ignore folder)" IsChecked="{Binding Tree.GlobalSearch}" FontSize="12"/>
+                        </StackPanel>
+
+                        <TreeView Grid.Row="2" ItemsSource="{Binding Tree.Roots}">
+                            <TreeView.ItemContainerStyle>
+                                <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                                    <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                    <Setter Property="ContextMenu">
+                                        <Setter.Value>
+                                            <ContextMenu>
+                                                <MenuItem Header="Rescan"
+                                                          Command="{Binding PlacementTarget.Tag.Tree.RescanNodeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <MenuItem Header="Open in Explorer"
+                                                          Command="{Binding PlacementTarget.Tag.Tree.OpenNodeInExplorerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                                <MenuItem Header="Exclude from index…"
+                                                          Command="{Binding PlacementTarget.Tag.Tree.ExcludeRootCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                          CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                            </ContextMenu>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TreeView.ItemContainerStyle>
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type vm:FolderNodeViewModel}" ItemsSource="{Binding Children}">
+                                    <Grid x:Name="Row" Height="22">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8B7;" Foreground="#E0A93B" FontSize="15" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" ToolTip="{Binding FullPath}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding CountText}" Style="{StaticResource MF.Secondary}"
+                                                   Margin="6,0,0,0" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsPlaceholder}" Value="True">
+                                            <Setter TargetName="Row" Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </HierarchicalDataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
+
+                        <TextBlock Grid.Row="2" Text="Add a folder with the + button to start indexing your music."
+                                   Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="6,8"
+                                   VerticalAlignment="Top"
+                                   Visibility="{Binding Tree.Roots.Count, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="1" Style="{StaticResource MF.Panel}" Padding="14,12" Margin="0,10,0,0">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8F1;" Margin="0,0,8,0"/>
+                            <TextBlock Text="Library" FontSize="15" FontWeight="SemiBold"/>
+                        </StackPanel>
+                        <Grid Margin="0,2">
+                            <TextBlock Text="Total Tracks" Style="{StaticResource MF.Secondary}"/>
+                            <TextBlock Text="{Binding TotalTracks, StringFormat=N0}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                        <Grid Margin="0,2">
+                            <TextBlock Text="Indexed Folders" Style="{StaticResource MF.Secondary}"/>
+                            <TextBlock Text="{Binding IndexedFolders}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                        <Grid Margin="0,2">
+                            <TextBlock Text="Last Scan" Style="{StaticResource MF.Secondary}"/>
+                            <TextBlock Text="{Binding LastScanText}" HorizontalAlignment="Right" FontWeight="SemiBold"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns"
+                          ResizeBehavior="PreviousAndNext" Width="8" Margin="0"/>
+
+            <!-- Center: results grid -->
+            <Border Grid.Column="2" Style="{StaticResource MF.Panel}" Padding="6,2,2,6">
+                <Grid>
+                    <DataGrid x:Name="TrackGrid" Style="{StaticResource MF.TrackGrid}"
+                              ItemsSource="{Binding Search.Results}"
+                              ClipboardCopyMode="None"
+                              SelectionChanged="TrackGrid_SelectionChanged"
+                              Sorting="TrackGrid_Sorting"
+                              ScrollViewer.ScrollChanged="TrackGrid_ScrollChanged"
+                              PreviewKeyDown="TrackGrid_PreviewKeyDown">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Edit tags…  (F2)"
+                                          Command="{Binding PlacementTarget.DataContext.EditTagsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Find similar"
+                                          Command="{Binding PlacementTarget.DataContext.Search.FindSimilarCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <Separator/>
+                                <MenuItem Header="Mark as played"
+                                          Command="{Binding PlacementTarget.DataContext.Search.MarkPlayedCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Mark as not played"
+                                          Command="{Binding PlacementTarget.DataContext.Search.MarkNotPlayedCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Undo last play change"
+                                          Command="{Binding PlacementTarget.DataContext.Search.UndoPlayCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <Separator/>
+                                <MenuItem Header="Open in Explorer  (Ctrl+O)"
+                                          Command="{Binding PlacementTarget.DataContext.Search.RevealInExplorerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Copy path  (Ctrl+C)"
+                                          Command="{Binding PlacementTarget.DataContext.Search.CopyPathsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="" Width="64" CanUserSort="False" CanUserResize="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ctl:ArtworkThumbnail Width="44" Height="44" PixelSize="64"
+                                            AudioPath="{Binding FullPath}" ArtKey="{Binding ArtKey}"
+                                            Service="{Binding DataContext.Search.Artwork, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <!-- Shown only while the list is "similar to ..." (visibility is set in the code-behind: grid columns are not in the visual tree, so they cannot bind). -->
+                            <DataGridTemplateColumn x:Name="MatchColumn" Header="Match" Width="64" CanUserSort="False" Visibility="Collapsed">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding MatchText}" FontWeight="SemiBold" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MF.Brush.AccentHover}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Title" Width="2.2*" MinWidth="120" SortMemberPath="Title">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel VerticalAlignment="Center" ToolTip="{Binding FullPath}">
+                                            <TextBlock Text="{Binding Title}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="File not found" FontSize="11" Foreground="{StaticResource MF.Brush.Warning}"
+                                                       Visibility="{Binding IsMissing, Converter={StaticResource BoolToVis}}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Artist" Width="1.6*" MinWidth="90" SortMemberPath="Artist">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Artist}" Foreground="{StaticResource MF.Brush.TextSecondary}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Genre" Width="1.5*" MinWidth="90" CanUserSort="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ItemsControl ItemsSource="{Binding GenreChips}" AlternationCount="2" ClipToBounds="True" Focusable="False">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border x:Name="Chip" Style="{StaticResource MF.Chip}">
+                                                        <TextBlock Text="{Binding Text}" FontSize="11" Foreground="White" TextTrimming="None"/>
+                                                    </Border>
+                                                    <DataTemplate.Triggers>
+                                                        <DataTrigger Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource TemplatedParent}}" Value="1">
+                                                            <Setter TargetName="Chip" Property="Background" Value="{StaticResource MF.Brush.ChipGenreAlt}"/>
+                                                        </DataTrigger>
+                                                        <!-- Raw (unmapped) genre text: muted, so gaps in the taxonomy are visible. -->
+                                                        <DataTrigger Binding="{Binding IsMapped}" Value="False">
+                                                            <Setter TargetName="Chip" Property="Background" Value="{StaticResource MF.Brush.ChipGenreAlt}"/>
+                                                        </DataTrigger>
+                                                    </DataTemplate.Triggers>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="BPM" Width="64" SortMemberPath="Bpm">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding BpmText}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Key" Width="60" SortMemberPath="Key">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding KeyText}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Time" Width="64" SortMemberPath="Duration">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding DurationText}" Foreground="{StaticResource MF.Brush.TextSecondary}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Last Played" Width="170" SortMemberPath="LastPlayed">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="{Binding PlayDetailText}">
+                                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE823;" FontSize="14" Margin="0,0,8,0"
+                                                       Foreground="{StaticResource MF.Brush.TextMuted}"/>
+                                            <TextBlock Text="{Binding LastPlayedText}" Foreground="{StaticResource MF.Brush.TextSecondary}"/>
+                                            <!-- This track's evidence in the live session. "Exported" and "Possible" are not proof of playback. -->
+                                            <Border x:Name="Badge" Style="{StaticResource MF.Chip}" Margin="8,0,0,0"
+                                                    Visibility="{Binding HasSessionBadge, Converter={StaticResource BoolToVis}}">
+                                                <TextBlock Text="{Binding SessionBadge}" FontSize="11" Foreground="White"/>
+                                            </Border>
+                                        </StackPanel>
+                                        <DataTemplate.Triggers>
+                                            <DataTrigger Binding="{Binding IsSessionConfirmed}" Value="True">
+                                                <Setter TargetName="Badge" Property="Background" Value="{StaticResource MF.Brush.Accent}"/>
+                                            </DataTrigger>
+                                        </DataTemplate.Triggers>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn x:Name="WhyColumn" Header="Why" Width="2*" MinWidth="140" CanUserSort="False" Visibility="Collapsed">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding WhyText}" TextWrapping="Wrap" FontSize="12" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MF.Brush.TextSecondary}" ToolTip="{Binding WhyText}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Plays" Width="60" SortMemberPath="PlayCount">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate><TextBlock Text="{Binding Plays}" ToolTip="{Binding PlayDetailText}" Foreground="{StaticResource MF.Brush.TextSecondary}"/></DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Empty state -->
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                                Visibility="{Binding Search.Results.Count, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}">
+                        <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE721;" FontSize="34" HorizontalAlignment="Center"
+                                   Foreground="{StaticResource MF.Brush.TextMuted}"/>
+                        <TextBlock Text="No tracks to show" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,10,0,2"/>
+                        <TextBlock Style="{StaticResource MF.Secondary}" HorizontalAlignment="Center"
+                                   Text="Add a folder, or change the search and filters."/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns"
+                          ResizeBehavior="PreviousAndNext" Width="8"/>
+
+            <!-- Right: details -->
+            <Border Grid.Column="4" Style="{StaticResource MF.Panel}">
+                <Grid>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24"
+                                Visibility="{Binding Search.SelectedTrack, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}">
+                        <TextBlock Text="{Binding Search.SelectionHint}" Style="{StaticResource MF.Secondary}" FontSize="13"
+                                   TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center"/>
+
+                        <!-- Bulk assignment for several selected tracks. A dash means only some of them have it. -->
+                        <StackPanel Margin="0,18,0,0" HorizontalAlignment="Center"
+                                    Visibility="{Binding Search.IsMultiSelection, Converter={StaticResource BoolToVis}}">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <TextBlock Text="DJ tags" Width="84" VerticalAlignment="Center" Style="{StaticResource MF.Secondary}"/>
+                                <ctl:AssignmentPicker Tip="Assign DJ tags to all selected tracks" Picker="{Binding Search.TagPicker}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Your genres" Width="84" VerticalAlignment="Center" Style="{StaticResource MF.Secondary}"/>
+                                <ctl:AssignmentPicker Tip="Assign genres to all selected tracks" Picker="{Binding Search.GenrePicker}"/>
+                            </StackPanel>
+                            <Button Content="Edit tags of selection…" Style="{StaticResource MF.AccentButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Center" Margin="0,16,0,0" Command="{Binding EditTagsCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  Visibility="{Binding Search.SelectedTrack, Converter={StaticResource NotNullToVis}}">
+                        <StackPanel DataContext="{Binding Search.SelectedTrack}" Margin="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <ctl:ArtworkThumbnail Width="112" Height="112" PixelSize="224"
+                                    AudioPath="{Binding FullPath}" ArtKey="{Binding ArtKey}"
+                                    Service="{Binding DataContext.Search.Artwork, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                <StackPanel Grid.Column="1" Margin="14,4,0,0" VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding Title}" FontSize="19" FontWeight="SemiBold" TextWrapping="Wrap"
+                                               TextTrimming="None"/>
+                                    <TextBlock Text="{Binding Artist}" Foreground="{StaticResource MF.Brush.TextSecondary}" FontSize="14"
+                                               Margin="0,3,0,0" TextWrapping="Wrap" TextTrimming="None"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{StaticResource MF.Brush.PanelBorder}" Margin="0,16"/>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Genre" Style="{StaticResource DetailLabel}" VerticalAlignment="Top" Margin="0,4,0,0"/>
+                                <WrapPanel Grid.Column="1">
+                                    <ItemsControl ItemsSource="{Binding GenreChips}" AlternationCount="2">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border x:Name="Chip" Style="{StaticResource MF.Chip}" Margin="0,0,5,4">
+                                                    <TextBlock Text="{Binding Text}" FontSize="12" Foreground="White" TextTrimming="None"/>
+                                                </Border>
+                                                <DataTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding (ItemsControl.AlternationIndex), RelativeSource={RelativeSource TemplatedParent}}" Value="1">
+                                                        <Setter TargetName="Chip" Property="Background" Value="{StaticResource MF.Brush.ChipGenreAlt}"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsMapped}" Value="False">
+                                                        <Setter TargetName="Chip" Property="Background" Value="{StaticResource MF.Brush.ChipGenreAlt}"/>
+                                                    </DataTrigger>
+                                                </DataTemplate.Triggers>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ctl:AssignmentPicker Tip="Assign your own genres" Margin="0,0,0,4"
+                                        Picker="{Binding DataContext.Search.GenrePicker, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                </WrapPanel>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="BPM" Style="{StaticResource DetailLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding BpmText}"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Key" Style="{StaticResource DetailLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding KeyText}"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Decade" Style="{StaticResource DetailLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding DecadeText}"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Tags" Style="{StaticResource DetailLabel}" VerticalAlignment="Top" Margin="0,4,0,0"/>
+                                <WrapPanel Grid.Column="1">
+                                    <ItemsControl ItemsSource="{Binding DjTags}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Style="{StaticResource MF.Chip}" Margin="0,0,5,4"
+                                                        Background="{StaticResource MF.Brush.AccentSoft}"
+                                                        BorderBrush="{StaticResource MF.Brush.Accent}" BorderThickness="1">
+                                                    <TextBlock Text="{Binding}" FontSize="12" Foreground="{StaticResource MF.Brush.AccentHover}" TextTrimming="None"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ctl:AssignmentPicker Tip="Assign DJ tags" Margin="0,0,0,4"
+                                        Picker="{Binding DataContext.Search.TagPicker, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                </WrapPanel>
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{StaticResource MF.Brush.PanelBorder}" Margin="0,6,0,14"/>
+
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="File" Style="{StaticResource DetailLabel}" VerticalAlignment="Top"/>
+                                <TextBox Grid.Column="1" Text="{Binding FullPath, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
+                                         Style="{StaticResource MF.PlainTextBox}" VerticalAlignment="Top"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Size" Style="{StaticResource DetailLabel}"/>
+                                <TextBlock Grid.Column="1" TextTrimming="None">
+                                    <Run Text="{Binding SizeText, Mode=OneWay}"/><Run Text="  |  "/><Run Text="{Binding FormatText, Mode=OneWay}"/>
+                                </TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Duration" Style="{StaticResource DetailLabel}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding DurationText}"/>
+                            </Grid>
+
+                            <Rectangle Height="1" Fill="{StaticResource MF.Brush.PanelBorder}" Margin="0,6,0,14"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE81C;" Margin="0,0,8,0"/>
+                                <TextBlock Text="Play History" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" TextTrimming="None"
+                                       Text="{Binding PlayDetailText}" Margin="0,0,0,6"/>
+                            <ItemsControl ItemsSource="{Binding DataContext.Search.SelectedPlays, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,0,0,8">
+                                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextTrimming="None"/>
+                                            <TextBlock Text="{Binding When}" Style="{StaticResource MF.Secondary}" FontSize="12" TextWrapping="Wrap" TextTrimming="None"/>
+                                            <TextBlock Text="{Binding Session}" Style="{StaticResource MF.Secondary}" FontSize="12" TextWrapping="Wrap" TextTrimming="None"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <Button Content="Find similar" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Left" Margin="0,18,0,0" ToolTip="List tracks that fit well next to this one (by genre, BPM, key and DJ tags)"
+                                    Command="{Binding DataContext.Search.FindSimilarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            <Button Content="Edit tags…" Style="{StaticResource MF.AccentButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Left" Margin="0,8,0,0" ToolTip="Edit tags of the selected track (F2)"
+                                    Command="{Binding DataContext.EditTagsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Open in Explorer" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                        Command="{Binding DataContext.Search.RevealInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                <Button Content="Copy path" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0" Margin="8,0,0,0"
+                                        Command="{Binding DataContext.Search.CopyPathsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>

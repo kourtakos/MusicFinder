@@ -1,0 +1,12 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <FontFamily x:Key="MF.Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="MF.Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+    <system:Double xmlns:system="clr-namespace:System;assembly=mscorlib" x:Key="MF.Size.Logo">22</system:Double>
+    <system:Double xmlns:system="clr-namespace:System;assembly=mscorlib" x:Key="MF.Size.Nav">15</system:Double>
+    <system:Double xmlns:system="clr-namespace:System;assembly=mscorlib" x:Key="MF.Size.Body">14</system:Double>
+    <system:Double xmlns:system="clr-namespace:System;assembly=mscorlib" x:Key="MF.Size.Small">12</system:Double>
+    <system:Double xmlns:system="clr-namespace:System;assembly=mscorlib" x:Key="MF.Size.Chip">11</system:Double>
+</ResourceDictionary>

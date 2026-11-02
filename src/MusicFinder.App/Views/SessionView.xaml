@@ -1,0 +1,122 @@
+<UserControl x:Class="MusicFinder.App.Views.SessionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Margin="16,8,16,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== Session header ===== -->
+        <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Subtitle}" Style="{StaticResource MF.Secondary}" Margin="0,3,0,0" TextWrapping="Wrap"/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Border Style="{StaticResource MF.InputBorder}" Width="240" Height="34" Margin="0,0,10,0">
+                            <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="10,0" ToolTip="Session name"
+                                     Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Border>
+                        <ComboBox Style="{StaticResource MF.ComboBox}" Width="150" Height="34" ItemsSource="{x:Static vmns:SessionViewModel.SoftwareChoices}"
+                                  SelectedItem="{Binding EditSoftware, Mode=TwoWay}" ToolTip="Your DJ software (for your own records)"
+                                  xmlns:vmns="clr-namespace:MusicFinder.App.ViewModels"/>
+                        <Button Content="Save" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0" Margin="10,0,0,0"
+                                Command="{Binding SaveDetailsCommand}" IsEnabled="{Binding IsLive}"/>
+                    </StackPanel>
+
+                    <TextBlock Margin="0,12,0,0" Style="{StaticResource MF.Secondary}">
+                        <Run Text="{Binding ExportedCount, Mode=OneWay}"/><Run Text=" exported  ·  "/>
+                        <Run Text="{Binding PossibleCount, Mode=OneWay}"/><Run Text=" possibly played  ·  "/>
+                        <Run Text="{Binding ConfirmedCount, Mode=OneWay}"/><Run Text=" confirmed"/>
+                    </TextBlock>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top">
+                    <Button Content="Undo" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0" Margin="0,0,8,0"
+                            ToolTip="Undo the last manual play change" Command="{Binding UndoCommand}" IsEnabled="{Binding CanUndo}"/>
+                    <Button Content="Start session" Style="{StaticResource MF.AccentButton}" Height="34" Padding="16,0"
+                            Command="{Binding StartCommand}"
+                            Visibility="{Binding IsLive, Converter={StaticResource InvBoolToVis}}"/>
+                    <Button Content="Stop session" Style="{StaticResource MF.PillButton}" Height="34" Padding="16,0"
+                            Command="{Binding StopCommand}"
+                            Visibility="{Binding IsLive, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== What was dragged out, newest first ===== -->
+        <Border Grid.Row="1" Style="{StaticResource MF.Panel}" Padding="18,14">
+            <Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Entries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource MF.Brush.RowAlt}" CornerRadius="8" Padding="12,10" Margin="0,0,0,6">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding TimeText}" Style="{StaticResource MF.Secondary}" VerticalAlignment="Top" Margin="0,3,0,0"/>
+
+                                        <StackPanel Grid.Column="1">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" MaxWidth="420"/>
+                                                <TextBlock Text="{Binding Artist, StringFormat=' — {0}'}" Foreground="{StaticResource MF.Brush.TextSecondary}"
+                                                           TextTrimming="CharacterEllipsis" MaxWidth="260"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="0,4,0,2">
+                                                <Border x:Name="Badge" Style="{StaticResource MF.Chip}" Margin="0,0,8,0">
+                                                    <TextBlock Text="{Binding StatusText}" FontSize="11" Foreground="White"/>
+                                                </Border>
+                                                <TextBlock Text="{Binding TargetText}" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding Evidence}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" TextTrimming="None"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                                            <Button Content="Played" Style="{StaticResource MF.PillButton}" Height="30" Padding="12,0" Margin="0,0,6,0"
+                                                    ToolTip="Mark this one as played (confirmed by you)"
+                                                    Command="{Binding DataContext.MarkPlayedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                            <Button Content="Not played" Style="{StaticResource MF.PillButton}" Height="30" Padding="12,0"
+                                                    ToolTip="Mark this one as not played"
+                                                    Command="{Binding DataContext.MarkNotPlayedCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                                    CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Status}" Value="Confirmed">
+                                        <Setter TargetName="Badge" Property="Background" Value="{StaticResource MF.Brush.Accent}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Status}" Value="Exported">
+                                        <Setter TargetName="Badge" Property="Background" Value="{StaticResource MF.Brush.ChipGenreAlt}"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520"
+                            Visibility="{Binding HasEntries, Converter={StaticResource InvBoolToVis}}">
+                    <TextBlock Text="Nothing dragged out yet" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"
+                               Text="Drag tracks from the Library into your DJ software. Each drop is listed here. If you do not search or change anything for the quiet period, it is marked 'possibly played'. That is weak evidence, never proof; you decide what really played."/>
+                </StackPanel>
+
+                <TextBlock Text="{Binding Error}" Foreground="{StaticResource MF.Brush.Warning}" VerticalAlignment="Bottom" FontSize="12"
+                           Visibility="{Binding Error, Converter={StaticResource NotNullToVis}}"/>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

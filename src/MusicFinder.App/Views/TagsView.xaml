@@ -1,0 +1,323 @@
+<UserControl x:Class="MusicFinder.App.Views.TagsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:MusicFinder.App.ViewModels">
+    <UserControl.Resources>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource MF.Secondary}">
+            <Setter Property="Margin" Value="0,14,0,6"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="16,8,16,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Result of the last action; red for problems -->
+        <Border Margin="0,0,0,10" Padding="14,9" CornerRadius="8" Background="{StaticResource MF.Brush.AccentSoft}"
+                Visibility="{Binding HasMessage, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="{Binding Message}" TextWrapping="Wrap" TextTrimming="None">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                        <Setter Property="Foreground" Value="{StaticResource MF.Brush.Confirmed}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding MessageIsError}" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource MF.Brush.Error}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="*" MinWidth="260"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="380"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ===== Left: DJ tags + unmapped values ===== -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Style="{StaticResource MF.Panel}" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="DJ tags" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,12"
+                                   Text="Your own labels, like Warm Up or Wedding. Edit a name and press Enter to rename."/>
+                        <ItemsControl ItemsSource="{Binding DjTags}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource MF.InputBorder}" Height="34">
+                                            <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="10,0"
+                                                     Text="{Binding Name, UpdateSourceTrigger=LostFocus}"
+                                                     PreviewKeyDown="CommitOnEnter"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding CountText}" Style="{StaticResource MF.Secondary}"
+                                                   Margin="10,0" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="2" Style="{StaticResource MF.IconButton}" ToolTip="Delete this tag"
+                                                Command="{Binding DataContext.DeleteTagCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}">
+                                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE74D;" FontSize="13"/>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Style="{StaticResource MF.InputBorder}" Height="34">
+                                <Grid>
+                                    <TextBlock Text="New tag…" IsHitTestVisible="False" Margin="10,0" VerticalAlignment="Center"
+                                               Foreground="{StaticResource MF.Brush.TextMuted}"
+                                               Visibility="{Binding NewTagName, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                    <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="10,0"
+                                             Text="{Binding NewTagName, UpdateSourceTrigger=PropertyChanged}">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding AddTagCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                </Grid>
+                            </Border>
+                            <Button Grid.Column="1" Content="Add" Style="{StaticResource MF.AccentButton}" Height="34" Padding="14,0"
+                                    Margin="8,0,0,0" Command="{Binding AddTagCommand}"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Style="{StaticResource MF.Panel}" Padding="16">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="Genres not in the taxonomy" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,10"
+                                       Text="Genre text found in your files that matches no genre or alias. Pick one, then map it to a genre or create a new genre."/>
+                        </StackPanel>
+                        <ListBox Grid.Row="1" Style="{StaticResource MF.SelectableListBox}" ItemsSource="{Binding Unmapped}"
+                                 SelectedItem="{Binding SelectedUnmapped, Mode=TwoWay}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <TextBlock Text="{Binding Value}" Margin="0,0,56,0"/>
+                                        <TextBlock Text="{Binding TrackCount}" HorizontalAlignment="Right"
+                                                   Foreground="{StaticResource MF.Brush.TextSecondary}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Grid.Row="1" Text="Every genre value in your files maps to the taxonomy." Style="{StaticResource MF.Secondary}"
+                                   TextWrapping="Wrap" Margin="4,6"
+                                   Visibility="{Binding HasUnmapped, Converter={StaticResource InvBoolToVis}}"/>
+                        <StackPanel Grid.Row="2" Margin="0,10,0,0">
+                            <Button Content="Map to the selected genre" Style="{StaticResource MF.AccentButton}" Height="34"
+                                    Command="{Binding MapUnmappedCommand}" IsEnabled="{Binding CanMap}"
+                                    ToolTip="Select a value here and a genre in the taxonomy"/>
+                            <Button Content="Create it as a new genre" Style="{StaticResource MF.PillButton}" Height="34" Margin="0,8,0,0"
+                                    Command="{Binding CreateGenreFromUnmappedCommand}" IsEnabled="{Binding CanCreateFromUnmapped}"
+                                    ToolTip="Created under the selected genre, or at the top level when none is selected"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ===== Middle: taxonomy ===== -->
+            <Border Grid.Column="2" Style="{StaticResource MF.Panel}" Padding="16,16,10,16">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="0,0,6,0">
+                        <TextBlock Text="Genre taxonomy" Style="{StaticResource SectionTitle}"/>
+                        <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,4,0,10"
+                                   Text="How your genres are grouped. Counts are tracks in the genre or any sub-genre."/>
+                    </StackPanel>
+                    <TreeView Grid.Row="1" ItemsSource="{Binding Taxonomy}">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type vm:GenreNodeItem}" ItemsSource="{Binding Children}">
+                                <Grid Height="24">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding CountText}" Style="{StaticResource MF.Secondary}"
+                                               Margin="10,0,8,0" VerticalAlignment="Center"/>
+                                </Grid>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                    <Grid Grid.Row="2" Margin="0,10,6,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource MF.InputBorder}" Height="34">
+                            <Grid>
+                                <TextBlock Text="New top-level genre…" IsHitTestVisible="False" Margin="10,0" VerticalAlignment="Center"
+                                           Foreground="{StaticResource MF.Brush.TextMuted}"
+                                           Visibility="{Binding NewTopGenre, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="10,0"
+                                         Text="{Binding NewTopGenre, UpdateSourceTrigger=PropertyChanged}">
+                                    <TextBox.InputBindings>
+                                        <KeyBinding Key="Return" Command="{Binding AddTopGenreCommand}"/>
+                                    </TextBox.InputBindings>
+                                </TextBox>
+                            </Grid>
+                        </Border>
+                        <Button Grid.Column="1" Content="Add genre" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                Margin="8,0,0,0" Command="{Binding AddTopGenreCommand}"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- ===== Right: the selected genre ===== -->
+            <Border Grid.Column="4" Style="{StaticResource MF.Panel}">
+                <Grid>
+                    <TextBlock Text="Select a genre in the taxonomy to rename it, move it, or manage its aliases and sub-genres."
+                               Style="{StaticResource MF.Secondary}" FontSize="13" TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Margin="28"
+                               Visibility="{Binding HasSelection, Converter={StaticResource InvBoolToVis}}"/>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}">
+                        <StackPanel Margin="18">
+                            <TextBlock Text="{Binding SelectedGenreTitle}" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            <TextBlock Text="{Binding SelectedGenreSubtitle}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,2,0,0"/>
+
+                            <TextBlock Text="Name" Style="{StaticResource FieldLabel}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource MF.InputBorder}" Height="36">
+                                    <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0"
+                                             Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}">
+                                        <TextBox.InputBindings>
+                                            <KeyBinding Key="Return" Command="{Binding RenameGenreCommand}"/>
+                                        </TextBox.InputBindings>
+                                    </TextBox>
+                                </Border>
+                                <Button Grid.Column="1" Content="Rename" Style="{StaticResource MF.PillButton}" Height="36" Padding="14,0"
+                                        Margin="8,0,0,0" Command="{Binding RenameGenreCommand}"/>
+                            </Grid>
+
+                            <TextBlock Text="Move under" Style="{StaticResource FieldLabel}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox x:Name="ParentBox" Style="{StaticResource MF.ComboBox}" ItemsSource="{Binding ParentChoices}"
+                                          SelectedItem="{Binding SelectedParent, Mode=TwoWay}" DisplayMemberPath="Display"/>
+                                <Button Grid.Column="1" Content="Move" Style="{StaticResource MF.PillButton}" Height="36" Padding="14,0"
+                                        Margin="8,0,0,0" Command="{Binding MoveGenreCommand}"/>
+                            </Grid>
+
+                            <TextBlock Text="Aliases" Style="{StaticResource FieldLabel}"/>
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,-2,0,8"
+                                       Text="Other spellings in your files that mean this genre, like Nu-Disco or λαϊκά."/>
+                            <ItemsControl ItemsSource="{Binding Aliases}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,0,0,4">
+                                            <Border Background="{StaticResource MF.Brush.RowAlt}" CornerRadius="6" Padding="10,6" Margin="0,0,34,0">
+                                                <TextBlock Text="{Binding Alias}"/>
+                                            </Border>
+                                            <Button Style="{StaticResource MF.IconButton}" HorizontalAlignment="Right" Width="28" Height="28"
+                                                    ToolTip="Remove this alias"
+                                                    Command="{Binding DataContext.RemoveAliasCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}">
+                                                <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE711;" FontSize="11"/>
+                                            </Button>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource MF.InputBorder}" Height="34">
+                                    <Grid>
+                                        <TextBlock Text="New alias…" IsHitTestVisible="False" Margin="12,0" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MF.Brush.TextMuted}"
+                                                   Visibility="{Binding NewAlias, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                        <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0"
+                                                 Text="{Binding NewAlias, UpdateSourceTrigger=PropertyChanged}">
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Return" Command="{Binding AddAliasCommand}"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+                                    </Grid>
+                                </Border>
+                                <Button Grid.Column="1" Content="Add" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                        Margin="8,0,0,0" Command="{Binding AddAliasCommand}"/>
+                            </Grid>
+
+                            <TextBlock Text="Sub-genres" Style="{StaticResource FieldLabel}"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource MF.InputBorder}" Height="34">
+                                    <Grid>
+                                        <TextBlock Text="New sub-genre…" IsHitTestVisible="False" Margin="12,0" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource MF.Brush.TextMuted}"
+                                                   Visibility="{Binding NewSubGenre, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                                        <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0"
+                                                 Text="{Binding NewSubGenre, UpdateSourceTrigger=PropertyChanged}">
+                                            <TextBox.InputBindings>
+                                                <KeyBinding Key="Return" Command="{Binding AddSubGenreCommand}"/>
+                                            </TextBox.InputBindings>
+                                        </TextBox>
+                                    </Grid>
+                                </Border>
+                                <Button Grid.Column="1" Content="Add" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                        Margin="8,0,0,0" Command="{Binding AddSubGenreCommand}"/>
+                            </Grid>
+
+                            <Button Content="Delete genre…" Style="{StaticResource MF.PillButton}" Height="36" Margin="0,26,0,0"
+                                    HorizontalAlignment="Left" Padding="16,0" Foreground="{StaticResource MF.Brush.Error}"
+                                    Command="{Binding DeleteGenreCommand}"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</UserControl>
