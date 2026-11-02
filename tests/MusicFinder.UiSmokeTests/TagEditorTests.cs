@@ -34,6 +34,8 @@ internal sealed class FakeDialogs : IUserDialogs
     public void ShowDuplicates(DuplicatesViewModel viewModel) => Duplicates = viewModel;
     public ProbableDuplicatesViewModel? Probable { get; private set; }
     public void ShowProbableDuplicates(ProbableDuplicatesViewModel viewModel) => Probable = viewModel;
+    public RestoreViewModel? Restore { get; private set; }
+    public void ShowRestore(RestoreViewModel viewModel) => Restore = viewModel;
     public RenameViewModel? Rename { get; private set; }
     public void ShowRename(RenameViewModel viewModel) => Rename = viewModel;
     public string? SavePicked { get; set; }

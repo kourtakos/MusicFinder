@@ -1,0 +1,79 @@
+<Window x:Class="MusicFinder.App.Views.RestoreWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Restore a backup" Style="{StaticResource MF.Window}"
+        Width="920" Height="740" MinWidth="720" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+
+    <Grid Margin="22,18,22,18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock Text="{Binding Heading}" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding CreatedText}" Style="{StaticResource MF.Secondary}" Margin="0,2,0,8"/>
+            <Border BorderBrush="{StaticResource MF.Brush.Possible}" BorderThickness="2" CornerRadius="8" Padding="14,10" Background="{StaticResource MF.Brush.PanelBg}">
+                <TextBlock TextWrapping="Wrap" FontWeight="SemiBold" Text="A backup holds your index, tags, genres, history and settings. It does not contain your music files."/>
+            </Border>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False" Margin="0,12,0,0">
+            <StackPanel>
+                <TextBlock Text="{Binding SchemaText}" Foreground="{StaticResource MF.Brush.Possible}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+
+                <TextBlock Text="What is in the backup" FontSize="16" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding CountLines}" Margin="0,4,0,12" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate><TextBlock Text="{Binding}"/></DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="Where are your music folders now?" FontSize="16" FontWeight="SemiBold"/>
+                <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,2,0,6"
+                           Text="If a folder is on another drive or share on this PC, choose its new location. Tracks keep their history; only their paths change."/>
+                <ItemsControl ItemsSource="{Binding Mappings}" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource MF.Panel}" Padding="12,8" Margin="0,0,0,6">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding OldPath}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Text="{Binding TracksText}" Style="{StaticResource MF.Secondary}"/>
+                                        <TextBox Text="{Binding NewPath, UpdateSourceTrigger=PropertyChanged}" Height="30" Margin="0,6,0,0"/>
+                                        <TextBlock Text="{Binding FoundText}" Style="{StaticResource MF.Secondary}" Margin="0,2,0,0"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Browse…" Style="{StaticResource MF.PillButton}" Height="30" Padding="14,0" Margin="8,0,0,0" VerticalAlignment="Center"
+                                            Command="{Binding BrowseCommand}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{Binding ImpactText}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Margin="0,12,0,0">
+            <CheckBox Content="I understand that this replaces my current library with the one in this backup" IsChecked="{Binding Confirmed}"/>
+            <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                <Button Content="Restore" Style="{StaticResource MF.AccentButton}" Height="34" Padding="18,0" Command="{Binding RestoreCommand}"/>
+                <Button Content="Restart now" Style="{StaticResource MF.AccentButton}" Height="34" Padding="18,0" Margin="8,0,0,0"
+                        Command="{Binding RestartNowCommand}" Visibility="{Binding IsStaged, Converter={StaticResource BoolToVis}}"/>
+                <Button Content="Close" Style="{StaticResource MF.PillButton}" Height="34" Padding="18,0" Margin="8,0,0,0" Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

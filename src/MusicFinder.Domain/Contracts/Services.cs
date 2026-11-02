@@ -240,3 +240,29 @@ public interface IProbableDuplicateService
     Task<ProbableDuplicateResult> FindAsync(CancellationToken ct);
     Task DismissAsync(string key, CancellationToken ct);
 }
+
+public interface ILibraryBackupService
+{
+    /// <summary>
+    /// Writes a consistent snapshot of the library (index, tags, genres, history, settings) to a verified .musicfinder-backup.zip.
+    /// It never contains the music files. The live database is only read, through SQLite's online backup.
+    /// </summary>
+    Task<BackupResult> BackupAsync(BackupRequest request, CancellationToken ct);
+    /// <summary>Reads an archive and verifies its manifest and every payload hash. Throws <see cref="BackupFormatException"/> with the reason when it cannot be trusted.</summary>
+    Task<BackupManifest> InspectAsync(string archivePath, CancellationToken ct);
+}
+
+public interface ILibraryRestoreService
+{
+    /// <summary>Verifies the archive and shows what restoring it would replace. Changes nothing.</summary>
+    Task<RestorePreview> PreviewAsync(string archivePath, CancellationToken ct);
+    /// <summary>
+    /// Makes a verified safety backup of the current library, then prepares the archive in a staging folder (checked, upgraded, paths remapped).
+    /// The live database is not touched: the swap happens when MusicFinder starts next. Throws <see cref="RestoreRefusedException"/> when it cannot be done safely.
+    /// </summary>
+    Task<StagedRestore> StageAsync(RestoreRequest request, CancellationToken ct);
+    /// <summary>The restore waiting for the next start, if any.</summary>
+    bool HasPendingRestore { get; }
+    /// <summary>Forgets a staged restore that has not been applied yet.</summary>
+    void CancelPendingRestore();
+}

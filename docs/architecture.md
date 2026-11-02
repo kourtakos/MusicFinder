@@ -111,6 +111,13 @@ App ──► Application ──► Domain
 - **Infrastructure**: `SongCandidateRepository`, migration 0012.
 - **App**: `ProbableDuplicatesViewModel` / window, opened from the Health tab; no delete, move or rename command.
 
+## Backup and restore (M8)
+
+- **Domain**: `Contracts/Services.cs` (`ILibraryBackupService`, `ILibraryRestoreService`), `Models/BackupModels.cs`, `Models/RestoreModels.cs`.
+- **Application/Backup**: `PathRemapper`, `SettingsRedactor`.
+- **Infrastructure/Backup**: `LibraryBackupService` (online backup, zip, manifest, verification), `RestoreService` (safety backup, staging, schema upgrade, remap), `RestoreFinalizer` (the phased swap at startup, before any connection exists).
+- **App**: `BackupSettingsViewModel` (Settings section), `RestoreViewModel` / `RestoreWindow`, `IAppRestarter`; `App.OnStartup` runs the finalizer first.
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

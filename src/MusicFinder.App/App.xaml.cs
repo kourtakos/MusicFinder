@@ -41,6 +41,19 @@ public partial class App : System.Windows.Application
             args.Handled = true;
         };
 
+        // A restore prepared in the last session is swapped in now, before anything has the database open.
+        string? restoreMessage = null;
+        try
+        {
+            var restore = MusicFinder.Infrastructure.Backup.RestoreFinalizer.TryApply(paths);
+            if (restore is not null) { Log.Information("Restore: {Message}", restore.Message); restoreMessage = restore.Message; }
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Applying the pending restore failed");
+            restoreMessage = "The pending restore could not be applied: " + ex.Message;
+        }
+
         try
         {
             var builder = Host.CreateApplicationBuilder(e.Args);
@@ -60,6 +73,7 @@ public partial class App : System.Windows.Application
 
             var window = _host.Services.GetRequiredService<MainWindow>();
             window.Show();
+            if (restoreMessage is not null) MessageBox.Show(window, restoreMessage, "Restore", MessageBoxButton.OK, MessageBoxImage.Information);
             _host.Services.GetRequiredService<Services.Hotkeys.QuickSearchService>().Start(); // global shortcut for the quick-search window
             _host.Services.GetRequiredService<SearchIndexCoordinator>().Start();            // smart Greek search index, built in the background
 
@@ -99,6 +113,8 @@ public partial class App : System.Windows.Application
         services.AddSingleton<IdentificationSettingsViewModel>();
         services.AddSingleton<MusicFinder.Application.Analysis.AnalysisRunner>();
         services.AddSingleton<AnalysisSettingsViewModel>();
+        services.AddSingleton<IAppRestarter, AppRestarter>();
+        services.AddSingleton<BackupSettingsViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<TagsViewModel>();
         services.AddSingleton<HealthViewModel>();

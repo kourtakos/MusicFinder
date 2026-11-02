@@ -24,6 +24,8 @@ public interface IUserDialogs
     void ShowDuplicates(ViewModels.DuplicatesViewModel viewModel);
     /// <summary>Shows the probable duplicates and other versions review as a modal dialog over the main window.</summary>
     void ShowProbableDuplicates(ViewModels.ProbableDuplicatesViewModel viewModel);
+    /// <summary>Shows the restore window (preview, folder mapping, confirmation) as a modal dialog over the main window.</summary>
+    void ShowRestore(ViewModels.RestoreViewModel viewModel);
     /// <summary>Shows the batch rename window as a modal dialog over the main window.</summary>
     void ShowRename(ViewModels.RenameViewModel viewModel);
     /// <summary>A save-as picker; null when cancelled.</summary>
@@ -79,6 +81,9 @@ public sealed class UserDialogs : IUserDialogs
 
     public void ShowProbableDuplicates(ViewModels.ProbableDuplicatesViewModel viewModel) =>
         new Views.ProbableDuplicatesWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public void ShowRestore(ViewModels.RestoreViewModel viewModel) =>
+        new Views.RestoreWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
 
     public void ShowRename(ViewModels.RenameViewModel viewModel) =>
         new Views.RenameWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
