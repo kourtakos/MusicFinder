@@ -61,4 +61,6 @@ public sealed class AppSettings
     public int FingerprintLengthSeconds { get; set; } = 120;
     /// <summary>Offer MusicBrainz community genres as an (unticked) suggestion.</summary>
     public bool SuggestGenresFromMusicBrainz { get; set; } = true;
+    /// <summary>Offer the Cover Art Archive front cover of the chosen release in the identify window. Fetched only on request, embedded only if the user ticks it.</summary>
+    public bool UseCoverArtArchive { get; set; } = true;
 }

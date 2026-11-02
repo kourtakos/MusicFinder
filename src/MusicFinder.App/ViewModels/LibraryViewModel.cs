@@ -39,11 +39,12 @@ public partial class LibraryViewModel : ObservableObject
     private readonly IIdentificationService _identification;
     private readonly IdentificationSettingsViewModel _identificationSettings;
     private readonly TimeProvider _time;
+    private readonly ICoverArtClient _coverArt;
 
     public LibraryViewModel(FolderTreeViewModel tree, SearchViewModel search, ScanCoordinator scans,
         ILibraryRootRepository roots, ITrackRepository tracks, ISettingsStore settings, GenreMappingJob genreJob,
         ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths,
-        IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time)
+        IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time, ICoverArtClient coverArt)
     {
         Tree = tree;
         Search = search;
@@ -58,6 +59,7 @@ public partial class LibraryViewModel : ObservableObject
         _identification = identification;
         _identificationSettings = identificationSettings;
         _time = time;
+        _coverArt = coverArt;
 
         var saved = settings.Load();
         _leftPanelWidth = new GridLength(Math.Clamp(saved.LeftPanelWidth, 180, 420));
@@ -156,7 +158,7 @@ public partial class LibraryViewModel : ObservableObject
             if (!consent.Accepted) return;
         }
 
-        _dialogs.ShowIdentify(new IdentifyViewModel(selected, _identification, _tagEditing, _tracks, _settings, _paths));
+        _dialogs.ShowIdentify(new IdentifyViewModel(selected, _identification, _tagEditing, _tracks, _coverArt, _settings, _paths));
     }
 
     /// <summary>Raised when the view should move keyboard focus to the search box (Ctrl+F / Ctrl+K).</summary>

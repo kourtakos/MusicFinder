@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicFinder.App.Services;
@@ -101,6 +103,8 @@ public sealed partial class IdentifyViewModel : ObservableObject
     private readonly IIdentificationService _service;
     private readonly ITagEditingService _editing;
     private readonly ITrackRepository _tracks;
+    private readonly ICoverArtClient _coverArt;
+    private readonly Dictionary<string, CoverImage?> _covers = new(StringComparer.OrdinalIgnoreCase);
     private readonly ISettingsStore _settings;
     private readonly string _backupDirectory;
     private CancellationTokenSource? _lookupCts;
@@ -135,6 +139,14 @@ public sealed partial class IdentifyViewModel : ObservableObject
     [ObservableProperty] private bool _keepBackup;
     [ObservableProperty] private string _methodNote = "";
 
+    // The cover of the chosen release (from the Cover Art Archive). Fetched on request, never stored in the database.
+    [ObservableProperty] private CoverImage? _cover;
+    [ObservableProperty] private ImageSource? _coverPicture;
+    [ObservableProperty] private string _coverStatus = "";
+    [ObservableProperty] private bool _useCover;
+    [ObservableProperty] private bool _replaceCover;
+    [ObservableProperty] private bool _trackHasCover;
+
     public string Heading { get; }
     public bool IsChooseStep => Step == IdentifyStep.Choose;
     public bool IsPreviewStep => Step == IdentifyStep.Preview;
@@ -143,17 +155,21 @@ public sealed partial class IdentifyViewModel : ObservableObject
     public bool HasMessage => !string.IsNullOrEmpty(Message);
     public bool HasQueue => Queue.Count > 1;
     public bool HasCandidates => Candidates.Count > 0;
+    public bool HasCover => Cover is not null;
+    /// <summary>Whether the cover section is offered at all: identification is on and covers are allowed in Settings.</summary>
+    public bool CoverEnabled => _settings.Load().UseCoverArtArchive && _service.GetReadiness().CanTagSearch;
     public bool HasNext => Queue.Any(q => !q.Resolved && q != Current);
     public string WriteButtonText => "Write 1 file";
     public Task WhenIdle => _pending;
     public event EventHandler? CloseRequested;
 
     public IdentifyViewModel(IReadOnlyList<TrackRowViewModel> tracks, IIdentificationService service, ITagEditingService editing,
-        ITrackRepository trackRepository, ISettingsStore settings, AppPaths paths)
+        ITrackRepository trackRepository, ICoverArtClient coverArt, ISettingsStore settings, AppPaths paths)
     {
         _service = service;
         _editing = editing;
         _tracks = trackRepository;
+        _coverArt = coverArt;
         _settings = settings;
         _backupDirectory = Path.Combine(paths.DataDir, "TagBackups");
         _keepBackup = settings.Load().KeepTagBackups;
@@ -340,6 +356,67 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var proposals = IdentificationProposalBuilder.Build(track, candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
         Proposals.Clear();
         foreach (var p in proposals) Proposals.Add(new ProposalRow(p));
+        TrackHasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
+
+        await LoadCoverAsync(choice, version);
+    }
+
+    /// <summary>Looks for the chosen release's front cover. It is only offered: nothing is embedded unless the user ticks it.</summary>
+    private async Task LoadCoverAsync(ReleaseChoice choice, int version)
+    {
+        SetCover(null, "");
+        UseCover = false;
+        ReplaceCover = false;
+        OnPropertyChanged(nameof(CoverEnabled));
+        if (choice.Release is null || !CoverEnabled) return;
+
+        var id = choice.Release.ReleaseId;
+        CoverImage? cover;
+        if (!_covers.TryGetValue(id, out cover))
+        {
+            CoverStatus = "Looking for the cover…";
+            try { cover = await _coverArt.GetFrontAsync(id, default); }
+            catch (IdentificationHttpException)
+            {
+                if (version == _showVersion) CoverStatus = "Could not reach the Cover Art Archive.";
+                return;
+            }
+            _covers[id] = cover;
+        }
+        if (version != _showVersion) return;
+        if (cover is null) { SetCover(null, "No cover is on file for this release."); return; }
+
+        var picture = Decode(cover.Data);
+        if (picture is null) { SetCover(null, "The cover could not be displayed, so it is not offered."); return; }
+        SetCover(cover, cover.Description, picture);
+    }
+
+    private void SetCover(CoverImage? cover, string status, ImageSource? picture = null)
+    {
+        Cover = cover;
+        CoverPicture = picture;
+        CoverStatus = status;
+        OnPropertyChanged(nameof(HasCover));
+    }
+
+    private static ImageSource? Decode(byte[] data)
+    {
+        try
+        {
+            var image = new BitmapImage();
+            using var stream = new MemoryStream(data);
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.DecodePixelWidth = 168;
+            image.StreamSource = stream;
+            image.EndInit();
+            image.Freeze();
+            return image;
+        }
+        catch (Exception ex) when (ex is NotSupportedException or InvalidOperationException or IOException or FileFormatException)
+        {
+            return null;
+        }
     }
 
     // ===== skipping, previewing, writing =====
@@ -360,14 +437,18 @@ public sealed partial class IdentifyViewModel : ObservableObject
         OnPropertyChanged(nameof(HasNext));
     }
 
-    private TagChangeSet BuildChanges() => IdentificationProposalBuilder.ToChangeSet(Proposals.Select(p => p.ToProposal()));
+    private TagChangeSet BuildChanges()
+    {
+        var text = IdentificationProposalBuilder.ToChangeSet(Proposals.Select(p => p.ToProposal()));
+        return UseCover && Cover is not null ? text with { Cover = Cover, ReplaceExistingCover = ReplaceCover } : text;
+    }
 
     [RelayCommand]
     private async Task PreviewAsync()
     {
         Message = null;
         if (Current is null) return;
-        if (!Proposals.Any(p => p.Selected))
+        if (!Proposals.Any(p => p.Selected) && !(UseCover && Cover is not null))
         {
             Message = "Tick at least one field to apply.";
             return;
@@ -380,7 +461,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
         }
         if (plan.Changes.Count == 0)
         {
-            Message = "The file already has these values, so nothing would change.";
+            Message = UseCover && TrackHasCover && !ReplaceCover
+                ? "The file already has a cover and these values, so nothing would change. Tick \"Replace the cover the file has\" to swap the cover."
+                : "The file already has these values, so nothing would change.";
             return;
         }
         PreviewRows.Clear();

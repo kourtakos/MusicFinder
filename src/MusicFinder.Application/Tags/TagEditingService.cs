@@ -46,10 +46,13 @@ public sealed class TagEditingService : ITagEditingService
         foreach (var track in (await _tracks.GetManyAsync(trackIds, ct)).OrderBy(t => t.FullPath, StringComparer.OrdinalIgnoreCase))
         {
             var effective = EffectiveChanges(track, changes);
-            if (effective.Count == 0) { unchanged++; continue; }
+            var cover = EffectiveCover(track, changes);
+            if (effective.Count == 0 && cover is null) { unchanged++; continue; }
             changed++;
             foreach (var (field, after) in effective)
                 rows.Add(new TagDiffRow(track.Id, track.FileName, field, CurrentValue(track, field), after));
+            if (cover is not null)
+                rows.Add(new TagDiffRow(track.Id, track.FileName, TagField.Cover, string.IsNullOrEmpty(track.ArtworkCacheKey) ? null : "embedded cover", cover.Description));
         }
         return new TagEditPlan([], rows, changed, unchanged);
     }
@@ -72,7 +75,8 @@ public sealed class TagEditingService : ITagEditingService
             progress?.Report(new TagEditProgress(i, tracks.Count, track.FileName));
 
             var effective = EffectiveChanges(track, changes);
-            if (effective.Count == 0)
+            var cover = EffectiveCover(track, changes);
+            if (effective.Count == 0 && cover is null)
             {
                 results.Add(new TagEditFileResult(track.Id, track.FullPath, TagEditOutcome.Unchanged)); // never touch a file that already matches
                 continue;
@@ -81,7 +85,7 @@ public sealed class TagEditingService : ITagEditingService
             TagWriteResult result;
             try
             {
-                result = await _writer.WriteAsync(track.FullPath, new TagChangeSet(effective.ToDictionary(e => e.Key, e => e.Value)), options, ct);
+                result = await _writer.WriteAsync(track.FullPath, new TagChangeSet(effective.ToDictionary(e => e.Key, e => e.Value), cover, changes.ReplaceExistingCover), options, ct);
             }
             catch (OperationCanceledException)
             {
@@ -134,6 +138,19 @@ public sealed class TagEditingService : ITagEditingService
             if (!string.Equals(before, after, StringComparison.Ordinal)) result[field] = after;
         }
         return result;
+    }
+
+    /// <summary>
+    /// The cover to write, or null when there is nothing to do: the file already has a cover and replacing was not asked for,
+    /// or it already holds exactly this image.
+    /// </summary>
+    private static CoverImage? EffectiveCover(Track track, TagChangeSet changes)
+    {
+        if (changes.Cover is not { } cover) return null;
+        var has = !string.IsNullOrEmpty(track.ArtworkCacheKey);
+        if (has && !changes.ReplaceExistingCover) return null;
+        if (has && string.Equals(track.ArtworkCacheKey, cover.Hash, StringComparison.OrdinalIgnoreCase)) return null;
+        return cover;
     }
 
     private static string? Canonical(TagField field, string? current) =>

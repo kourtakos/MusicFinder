@@ -78,3 +78,24 @@ public sealed record FieldProposal(TagField Field, string? Current, string? Prop
 public sealed record CachedFingerprint(string Fingerprint, int DurationSeconds, int Algorithm, int LengthSeconds, DateTime ComputedUtc);
 
 public sealed record CachedLookup(string RequestKey, IdentificationMethod Method, LookupOutcome Outcome, string ResultJson, DateTime CheckedUtc);
+
+/// <summary>
+/// A front cover ready to embed: the image bytes exactly as received, its type and (when it could be read) size in pixels.
+/// <see cref="Hash"/> is the same SHA-1 the library uses as an artwork key, so a written cover can be recognized on read-back.
+/// </summary>
+public sealed record CoverImage(byte[] Data, string MimeType, int? Width, int? Height)
+{
+    private string? _hash;
+    public string Hash => _hash ??= Convert.ToHexString(System.Security.Cryptography.SHA1.HashData(Data)).ToLowerInvariant();
+
+    /// <summary>"500×500 JPEG, 84 KB".</summary>
+    public string Description
+    {
+        get
+        {
+            var kind = MimeType.EndsWith("png", StringComparison.OrdinalIgnoreCase) ? "PNG" : "JPEG";
+            var size = Data.Length < 1024 * 1024 ? $"{Math.Max(1, Data.Length / 1024)} KB" : (Data.Length / 1024.0 / 1024.0).ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + " MB";
+            return Width is { } w && Height is { } h ? $"{w}×{h} {kind}, {size}" : $"{kind}, {size}";
+        }
+    }
+}

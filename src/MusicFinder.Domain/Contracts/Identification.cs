@@ -67,3 +67,12 @@ public interface IIdentificationCache
     Task<int> CountAsync(CancellationToken ct);
     Task ClearAsync(CancellationToken ct);
 }
+
+/// <summary>
+/// Fetches the front cover of a MusicBrainz release from the Cover Art Archive. Only on request, never stored in the
+/// database; returns null when the release has no cover, the service is off, or the image is not a usable JPEG or PNG.
+/// </summary>
+public interface ICoverArtClient
+{
+    Task<CoverImage?> GetFrontAsync(string releaseId, CancellationToken ct);
+}

@@ -13,6 +13,7 @@ it is sent in the `User-Agent` header and nowhere else. You may also enter your 
 
 - **AcoustID** (only for audio fingerprints): an acoustic fingerprint of the first 120 seconds (a short code, not audio), the file's length in seconds, and your application key. The request body is gzip-compressed; the key never appears in a URL or a log.
 - **MusicBrainz**: MusicBrainz ids already stored in your files, or the title, artist and album text of your tags (the file name when there is no title) for a search, and the `User-Agent` with your contact.
+- **Cover Art Archive** (only when you look at a release and covers are allowed in Settings): the MusicBrainz id of that release, to ask for its front cover. The archive hands the picture over from archive.org.
 - Nothing else: no file names or folder paths (except a file name used as the search text when a file has no title tag, and only if you ask for a tags search), no play history, no statistics.
 - Answers are remembered on your computer (Settings → *Forget remembered answers* clears them), so the same question is not asked twice: found answers for 30 days, "no match" for 7.
 
@@ -38,6 +39,16 @@ releases of one recording have different albums, years and track numbers, so **y
 Title, artist, album, album artist, year, track number, MusicBrainz recording id and (optionally) genres. A field that is **empty in your file starts ticked**; a field that **already holds a different value starts unticked**, so
 nothing you wrote is replaced unless you tick it. The recording id starts ticked (it only links the file). MusicBrainz community genres are only ever a suggestion and never start ticked. Then *Preview changes* shows
 before and after, and *Write* uses the same safe path as the tag editor: a verified temporary copy replaces the original, a failure leaves the file untouched, the library and search follow, the cover is kept.
+
+## Covers
+
+When you choose a release, MusicFinder asks the **Cover Art Archive** for its front cover and shows a small preview next to the release. It is **only offered**: *Embed this cover* starts unticked, and the cover is written only after you preview and confirm, through the same safe path as the tags (a verified temporary copy replaces the original; a failure leaves the file untouched).
+
+- A file that **already has a cover is left alone**. Tick *Replace the cover the file has* to swap the front cover; your other pictures (back cover, booklet) are kept.
+- What arrives is accepted only if its first bytes say JPEG or PNG and it is under 8 MB; the server's word is not trusted. The 500-pixel version is used (the original if that size does not exist).
+- The picture is kept in memory while the window is open and is never stored in the database.
+- Covers are other people's work: the Cover Art Archive hosts what the community uploaded. Embedding is your decision, for your own library. Turn the feature off in Settings if you prefer.
+- A release without a cover says so; MusicFinder never guesses or substitutes another release's cover.
 
 ## fpcalc and the AcoustID key
 

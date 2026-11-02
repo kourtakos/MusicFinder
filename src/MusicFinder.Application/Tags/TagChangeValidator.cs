@@ -23,6 +23,8 @@ public static class TagChangeValidator
         foreach (var (field, raw) in changes.Changes)
             if (Canonicalize(field, raw, out var error) is null && error is not null)
                 errors.Add(error);
+        if (changes.Cover is { } cover && !CoverImageReader.IsValid(cover))
+            errors.Add("The cover is not a usable JPEG or PNG image, so it was not used.");
         return errors;
     }
 

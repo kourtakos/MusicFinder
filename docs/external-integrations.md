@@ -28,6 +28,13 @@ What MusicFinder talks to, what was verified against official sources (and when)
 - **Licence of the exact binary: not verified** (the README read did not state it; FFmpeg and optionally FFTW are involved). It is therefore **not bundled** and not redistributed by this project; the user supplies it.
 - To verify with a real binary: Greek characters and spaces in the path (the code passes it as a single argument without a shell), that `duration` is the whole file when `-length` is smaller, behaviour on network drives.
 
+## Cover Art Archive (covers)
+
+- `https://coverartarchive.org/release/<mbid>/front-500` (also `front-250`, `front-1200`, `front`). A successful request answers **307** with the image on archive.org (the HTTP client follows it); **404** means no front cover was chosen for that release (a thumbnail size can also 404). (Verified against the Cover Art Archive API page, 2026-11-02.)
+- The page says there are no rate-limiting rules but lists 503 for users who exceed one, and states no User-Agent rule. MusicFinder sends only its own name and version, and never more than one request at a time to the host.
+- The release lookup JSON of MusicBrainz carries `cover-art-archive` (`front`, `back`, `count`), which shows whether a cover exists.
+- **Not yet run against the real service**: the redirect to archive.org, and the formats and sizes of real covers. Tested with fake responses only.
+
 ## Windows
 
 - Global hotkey (`RegisterHotKey`), OLE drag-and-drop with `FileDrop`, and window-under-cursor detection: see `docs/quick-search.md` and `docs/dj-session.md`.

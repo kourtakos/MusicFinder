@@ -89,6 +89,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IFingerprintService, Identification.ChromaprintFingerprintService>();
         services.AddSingleton<IMusicBrainzClient, Identification.MusicBrainzClient>();
         services.AddSingleton<IAcoustIdClient, Identification.AcoustIdClient>();
+        services.AddSingleton<ICoverArtClient, Identification.CoverArtClient>();
         services.AddSingleton<IIdentificationService, MusicFinder.Application.Identification.IdentificationService>();
     }
 }

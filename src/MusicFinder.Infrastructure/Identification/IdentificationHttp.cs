@@ -14,15 +14,18 @@ public sealed class IdentificationHttp : IDisposable
 {
     public const string MusicBrainzHost = "musicbrainz.org";
     public const string AcoustIdHost = "api.acoustid.org";
+    public const string CoverArtHost = "coverartarchive.org";
 
     public HttpClient MusicBrainz { get; }
     public HttpClient AcoustId { get; }
+    public HttpClient CoverArt { get; }
 
     public IdentificationHttp(IRateLimiter limiter, TimeProvider time, Func<HttpMessageHandler>? innerFactory = null, ILogger<IdentificationHttp>? log = null)
     {
         MusicBrainz = Create(limiter, time, innerFactory, log, "https://musicbrainz.org/ws/2/");
         MusicBrainz.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         AcoustId = Create(limiter, time, innerFactory, log, "https://api.acoustid.org/v2/");
+        CoverArt = Create(limiter, time, innerFactory, log, "https://coverartarchive.org/");
     }
 
     private static HttpClient Create(IRateLimiter limiter, TimeProvider time, Func<HttpMessageHandler>? innerFactory, ILogger? log, string baseAddress)
@@ -41,6 +44,7 @@ public sealed class IdentificationHttp : IDisposable
     {
         MusicBrainz.Dispose();
         AcoustId.Dispose();
+        CoverArt.Dispose();
     }
 }
 

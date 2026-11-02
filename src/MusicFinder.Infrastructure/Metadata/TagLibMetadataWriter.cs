@@ -122,6 +122,15 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
                 case TagField.MusicBrainzRecordingId: tag.MusicBrainzTrackId = value; break;
             }
         }
+        if (changes.Cover is { } cover)
+        {
+            // Replace the front cover (or the first picture when none is marked front) and keep every other picture.
+            var existing = tag.Pictures.ToList();
+            var old = existing.FirstOrDefault(p => p.Type == TagLib.PictureType.FrontCover) ?? existing.FirstOrDefault();
+            if (old is not null) existing.Remove(old);
+            var picture = new TagLib.Picture(new TagLib.ByteVector(cover.Data)) { Type = TagLib.PictureType.FrontCover, MimeType = cover.MimeType, Description = "" };
+            tag.Pictures = [picture, .. existing];
+        }
         f.Save();
     }
 
@@ -147,6 +156,14 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
             };
             if (!string.Equals(expected, actual, StringComparison.Ordinal))
                 return $"Verification failed for {field}: expected '{expected}', found '{actual}'. The original file was not changed.";
+        }
+
+        if (changes.Cover is { } cover)
+        {
+            // A cover was requested: the picture read back must be exactly the bytes that were given.
+            if (!string.Equals(after.ArtworkHash, cover.Hash, StringComparison.OrdinalIgnoreCase))
+                return "Verification failed: the new cover was not stored as expected. The original file was not changed.";
+            return null;
         }
 
         // Editing text must never cost the embedded cover.

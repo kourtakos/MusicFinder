@@ -27,6 +27,12 @@ public sealed class FakeHttpHandler : HttpMessageHandler
         return this;
     }
 
+    public FakeHttpHandler ThenResponse(Func<HttpResponseMessage> make)
+    {
+        _script.Enqueue(_ => make());
+        return this;
+    }
+
     public FakeHttpHandler ThenThrow(Exception ex)
     {
         _script.Enqueue(_ => throw ex);
@@ -64,4 +70,16 @@ public sealed class FakeHttpHandler : HttpMessageHandler
         }
         return next(request);
     }
+}
+
+public static class FakeHttpHandlerExtensions
+{
+    /// <summary>Queues a 200 answer carrying image bytes.</summary>
+    public static FakeHttpHandler ThenImage(this FakeHttpHandler handler, byte[] bytes, string contentType = "image/png") =>
+        handler.ThenResponse(() =>
+        {
+            var r = new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK) { Content = new System.Net.Http.ByteArrayContent(bytes) };
+            r.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+            return r;
+        });
 }

@@ -71,6 +71,20 @@ internal sealed class FakeIdentification : IIdentificationService
     }
 }
 
+/// <summary>The Cover Art Archive, replaced: a cover for one release, none for another.</summary>
+internal sealed class FakeCoverArt : ICoverArtClient
+{
+    public List<string> Requests { get; } = [];
+    public static CoverImage Image() => MusicFinder.Application.Tags.CoverImageReader.TryRead(Convert.FromBase64String(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="))!;
+
+    public Task<CoverImage?> GetFrontAsync(string releaseId, CancellationToken ct)
+    {
+        Requests.Add(releaseId);
+        return Task.FromResult<CoverImage?>(releaseId == "rel-1" ? Image() : null);
+    }
+}
+
 public class IdentifyUiTests
 {
     private static readonly (string, string, string, string)[] Files =
@@ -80,7 +94,7 @@ public class IdentifyUiTests
         ("c.mp3", "Charlie", "Artist Two", "Disco"),
     ];
 
-    private sealed record Ctx(UiTestApp App, FakeDialogs Dialogs, FakeIdentification Service)
+    private sealed record Ctx(UiTestApp App, FakeDialogs Dialogs, FakeIdentification Service, FakeCoverArt Covers)
     {
         public SearchViewModel Search => App.Main.Library.Search;
         public AppSettings Saved => App.Settings.Load();
@@ -90,10 +104,12 @@ public class IdentifyUiTests
     {
         var dialogs = new FakeDialogs();
         FakeIdentification? fake = null;
+        var covers = new FakeCoverArt();
         var app = await UiTestApp.CreateWithFilesAsync(s =>
         {
             s.AddSingleton<IUserDialogs>(dialogs);
             s.AddSingleton<IIdentificationService>(sp => fake = new FakeIdentification(sp.GetRequiredService<ISettingsStore>()));
+            s.AddSingleton<ICoverArtClient>(covers);
         }, Files);
         app.Window.Show();
         await app.Main.InitializeAsync();
@@ -108,8 +124,12 @@ public class IdentifyUiTests
             s.AcoustIdApiKey = "KEY123";
             app.Settings.Save(s);
         }
-        return new Ctx(app, dialogs, fake!);
+        return new Ctx(app, dialogs, fake!, covers);
     }
+
+    private static IdentifyViewModel NewVm(Ctx c, IReadOnlyList<TrackRowViewModel> rows) =>
+        new(rows, c.Service, c.App.Service<ITagEditingService>(), c.App.Service<ITrackRepository>(), c.Covers, c.App.Settings,
+            c.App.Service<MusicFinder.Infrastructure.AppPaths>());
 
     private static TrackRowViewModel Row(Ctx c, string title) => c.Search.Results.Single(r => r.Title == title);
 
@@ -198,8 +218,7 @@ public class IdentifyUiTests
     {
         var c = await StartAsync();
         await using var _ = c.App;
-        var vm = new IdentifyViewModel([Row(c, "unknown track")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track")]);
 
         await vm.StartAsync();
         await vm.WhenIdle;
@@ -234,8 +253,7 @@ public class IdentifyUiTests
         var c = await StartAsync();
         await using var _ = c.App;
         var path = Path.Combine(c.App.MusicDir, "a.mp3");
-        var vm = new IdentifyViewModel([Row(c, "unknown track")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track")]);
         await vm.StartAsync();
         await vm.WhenIdle;
         await vm.WhenIdle;
@@ -269,8 +287,7 @@ public class IdentifyUiTests
     {
         var c = await StartAsync();
         await using var _ = c.App;
-        var vm = new IdentifyViewModel([Row(c, "unknown track")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track")]);
         await vm.StartAsync();
         await vm.WhenIdle;
         await vm.WhenIdle;
@@ -289,8 +306,7 @@ public class IdentifyUiTests
         var c = await StartAsync();
         await using var _ = c.App;
         c.Service.Delay = TimeSpan.FromMilliseconds(150);
-        var vm = new IdentifyViewModel([Row(c, "unknown track"), Row(c, "Bravo"), Row(c, "Charlie")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo"), Row(c, "Charlie")]);
         Assert.True(vm.HasQueue);
 
         var run = vm.StartAsync();
@@ -310,8 +326,7 @@ public class IdentifyUiTests
     {
         var c = await StartAsync();
         await using var _ = c.App;
-        var vm = new IdentifyViewModel([Row(c, "unknown track"), Row(c, "Bravo")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
         await vm.StartAsync();
         await vm.WhenIdle;
 
@@ -333,8 +348,7 @@ public class IdentifyUiTests
         var c = await StartAsync();
         await using var _ = c.App;
         c.Service.Respond = r => IdentificationResult.Failed(r.TrackId, r.Method, outcome, text + " … details.");
-        var vm = new IdentifyViewModel([Row(c, "unknown track")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track")]);
 
         await vm.StartAsync();
         await vm.WhenIdle;
@@ -349,8 +363,7 @@ public class IdentifyUiTests
     {
         var c = await StartAsync(agreed: false);
         await using var _ = c.App;
-        var vm = new IdentifyViewModel([Row(c, "unknown track")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track")]);
 
         await vm.StartAsync();
 
@@ -363,8 +376,7 @@ public class IdentifyUiTests
     {
         var c = await StartAsync();
         await using var _ = c.App;
-        var vm = new IdentifyViewModel([Row(c, "unknown track")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track")]);
         await vm.StartAsync();
         await vm.WhenIdle;
 
@@ -382,8 +394,7 @@ public class IdentifyUiTests
     {
         var c = await StartAsync();
         await using var _ = c.App;
-        var vm = new IdentifyViewModel([Row(c, "unknown track"), Row(c, "Bravo")], c.Service, c.App.Service<ITagEditingService>(),
-            c.App.Service<ITrackRepository>(), c.App.Settings, c.App.Service<MusicFinder.Infrastructure.AppPaths>());
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
         var window = new IdentifyWindow(vm);
         window.Show();
         try
@@ -512,6 +523,180 @@ public class IdentifyUiTests
 
         Assert.Null(c.Dialogs.Identify);
         Assert.Empty(c.Dialogs.Infos);
+    });
+
+    // ===== covers =====
+
+    [Fact]
+    public Task TheChosenReleasesCover_IsOffered_NeverTickedForTheUser_AndNotWrittenUnlessTicked() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        Assert.True(vm.CoverEnabled);
+        Assert.True(vm.HasCover);
+        Assert.NotNull(vm.CoverPicture);
+        Assert.Contains("PNG", vm.CoverStatus);
+        Assert.False(vm.UseCover);                                       // offered, never ticked for the user
+        Assert.False(vm.TrackHasCover);
+        Assert.Equal(["rel-1"], c.Covers.Requests);
+
+        vm.Proposals.Single(p => p.Field == TagField.MusicBrainzRecordingId).Selected = true;
+        vm.PreviewCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
+        Assert.DoesNotContain(vm.PreviewRows, r => r.Field == TagField.Cover);
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+
+        using var f = TagLib.File.Create(path);
+        Assert.Empty(f.Tag.Pictures);                                    // text was written, no cover was
+    });
+
+    [Fact]
+    public Task TickingTheCover_ShowsItInThePreview_AndEmbedsItAfterConfirmation() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+        foreach (var p in vm.Proposals) p.Selected = false;               // cover only
+        vm.UseCover = true;
+
+        vm.PreviewCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
+
+        var row = Assert.Single(vm.PreviewRows);
+        Assert.Equal(("Cover", (string?)null), (row.FieldLabel, row.Before));
+        Assert.Contains("PNG", row.After);
+        using (var untouched = TagLib.File.Create(path)) Assert.Empty(untouched.Tag.Pictures);       // the preview wrote nothing
+
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+
+        using (var f = TagLib.File.Create(path))
+        {
+            var picture = Assert.Single(f.Tag.Pictures);
+            Assert.Equal(FakeCoverArt.Image().Data, picture.Data.Data);
+            Assert.Equal(TagLib.PictureType.FrontCover, picture.Type);
+        }
+        await Ui.WaitUntilAsync(() => c.Search.Results.Single(r => r.Title == "unknown track").ArtKey == FakeCoverArt.Image().Hash, what: "grid shows the cover");
+    });
+
+    [Fact]
+    public Task AReleaseWithoutACover_SaysSo_AndOffersNothing() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+        vm.UseCover = true;
+
+        vm.SelectedRelease = vm.Releases.Single(r => r.Release?.ReleaseId == "rel-compilation");
+        await vm.WhenIdle;
+
+        Assert.False(vm.HasCover);
+        Assert.Null(vm.CoverPicture);
+        Assert.False(vm.UseCover);                                       // reset with the release
+        Assert.Contains("No cover is on file", vm.CoverStatus);
+        vm.SelectedRelease = vm.Releases[0];                             // "No release": nothing to look up
+        await vm.WhenIdle;
+        Assert.Equal("", vm.CoverStatus);
+    });
+
+    [Fact]
+    public Task AFileThatHasACover_KeepsIt_UnlessTheUserAsksToReplaceIt() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        // Give the file a different cover first, through the same safe path.
+        var other = FakeCoverArt.Image() with { Data = [.. FakeCoverArt.Image().Data, 0, 0] };
+        var seed = await c.App.Service<ITagEditingService>().ApplyAsync([Row(c, "unknown track").Id],
+            new TagChangeSet(new Dictionary<TagField, string?>(), other), new TagWriteOptions(), null, default);
+        Assert.Equal(1, seed.Written);
+
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+        Assert.True(vm.TrackHasCover);
+        foreach (var p in vm.Proposals) p.Selected = false;
+        vm.UseCover = true;
+
+        vm.PreviewCommand.Execute(null);
+        await Task.Delay(150);
+        Assert.Equal(IdentifyStep.Choose, vm.Step);
+        Assert.Contains("Replace the cover the file has", vm.Message);       // told how, not silently skipped
+        using (var f = TagLib.File.Create(path)) Assert.Equal(other.Data, f.Tag.Pictures.Single().Data.Data);
+
+        vm.ReplaceCover = true;
+        vm.PreviewCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Preview, what: "preview");
+        Assert.Equal("embedded cover", vm.PreviewRows.Single().Before);
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+
+        using var after = TagLib.File.Create(path);
+        Assert.Equal(FakeCoverArt.Image().Data, after.Tag.Pictures.Single().Data.Data);
+    });
+
+    [Fact]
+    public Task WithCoversSwitchedOff_NoCoverIsLookedFor_AndNothingIsShown() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var s = c.Saved;
+        s.UseCoverArtArchive = false;
+        c.App.Settings.Save(s);
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        Assert.False(vm.CoverEnabled);
+        Assert.Empty(c.Covers.Requests);
+        Assert.False(vm.HasCover);
+    });
+
+    [Fact]
+    public Task TheSettingForCovers_IsSavedAtOnce() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        Assert.True(c.App.Main.Settings.Identification.UseCoverArt);
+
+        c.App.Main.Settings.Identification.UseCoverArt = false;
+
+        Assert.False(c.Saved.UseCoverArtArchive);
+    });
+
+    [Fact]
+    public Task TheCoverSection_HasNoBrokenBindings() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        var window = new IdentifyWindow(vm);
+        window.Show();
+        try
+        {
+            await Ui.WaitUntilAsync(() => vm.HasCover, what: "cover loaded");
+            await Task.Delay(300);
+            Assert.NotNull(Descendants<Image>(window).FirstOrDefault(i => i.Name == "CoverImageBox")?.Source);
+            Assert.Empty(BindingAudit.FindBroken(window));
+        }
+        finally { window.Close(); }
     });
 
     private static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject

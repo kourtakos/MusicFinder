@@ -72,7 +72,7 @@ App ──► Application ──► Domain
 - **Infrastructure** (`Identification`): `IdentificationHttp` (retry -> rate limit -> network pipeline, hand-built, no extra package), `MusicBrainzClient` + `MusicBrainzJson`, `AcoustIdClient` (gzip POST),
   `ChromaprintFingerprintService` + `FpcalcLocator` + `WindowsProcessRunner` (no shell, `ArgumentList`, killed on cancel or timeout), `IdentificationCacheRepository`.
 - **App**: `IdentificationConsentViewModel` / window (what is sent, contact, key), `IdentificationSettingsViewModel` (Settings section), `IdentifyViewModel` / `IdentifyWindow` (queue, candidates, release, proposals, preview, write).
-  Writing goes only through `ITagEditingService`; `TagField.MusicBrainzRecordingId` is the one new writable field.
+  Writing goes only through `ITagEditingService`; `TagField.MusicBrainzRecordingId` and a front cover (`TagChangeSet.Cover`, fetched by `CoverArtClient`, checked by `CoverImageReader`) are the new writable things.
 - Tests replace the network (`FakeHttpHandler`), the process (`FakeRunner`) and the whole service (`FakeIdentification`); nothing in the default suite contacts a real service.
 
 ## Threading and data rules
