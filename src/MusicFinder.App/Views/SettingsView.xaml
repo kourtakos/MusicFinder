@@ -242,7 +242,7 @@
                     </StackPanel>
                     <TextBlock Text="{Binding FingerprinterStatus}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="170,6,0,0"/>
 
-                    <CheckBox Content="Offer MusicBrainz community genres as a suggestion (never ticked for you)" IsChecked="{Binding SuggestGenres}" Margin="0,14,0,0"/>
+                    <CheckBox Content="Offer MusicBrainz community genres (ticked only when the file has no genre)" IsChecked="{Binding SuggestGenres}" Margin="0,14,0,0"/>
                     <CheckBox Content="Offer the release's front cover from the Cover Art Archive (only embedded if you tick it)" IsChecked="{Binding UseCoverArt}" Margin="0,8,0,0"/>
                     <CheckBox Content="Tick the cover for me when the file has none (it is still written only when you press Write)" IsChecked="{Binding EmbedCoverByDefault}" IsEnabled="{Binding UseCoverArt}" Margin="26,6,0,0"/>
 

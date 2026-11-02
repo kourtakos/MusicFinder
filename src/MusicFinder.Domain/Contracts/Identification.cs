@@ -14,6 +14,11 @@ public interface IIdentificationService
     Task<IdentificationResult> IdentifyAsync(IdentificationRequest request, CancellationToken ct);
     /// <summary>One release with its track positions (one MusicBrainz lookup, cached). Null when it cannot be fetched.</summary>
     Task<ReleaseDetails?> GetReleaseDetailsAsync(string releaseId, CancellationToken ct);
+    /// <summary>
+    /// Fills in what a search hit does not carry (community genres, ISRCs) from the recording's own MusicBrainz record, which is
+    /// cached. Returns the candidate unchanged when it already has genres, when nothing is known, or when the service cannot be reached.
+    /// </summary>
+    Task<IdentificationCandidate> EnrichAsync(IdentificationCandidate candidate, CancellationToken ct);
     IdentificationReadiness GetReadiness();
     Task ClearCacheAsync(CancellationToken ct);
 }
@@ -43,7 +48,7 @@ public interface IMusicBrainzClient
 
 public sealed record MbRecording(
     string Id, string Title, string ArtistCredit, long? DurationMs,
-    IReadOnlyList<ReleaseSummary> Releases, IReadOnlyList<string> Genres, IReadOnlyList<string> Isrcs);
+    IReadOnlyList<ReleaseSummary> Releases, IReadOnlyList<string> Genres, IReadOnlyList<string> Isrcs, string? GenreLevel = null);
 
 public sealed record MbRelease(
     string Id, string Title, string? Date, string? Country, string AlbumArtistCredit,

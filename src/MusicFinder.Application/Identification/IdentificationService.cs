@@ -112,6 +112,29 @@ public sealed class IdentificationService : IIdentificationService
             : new ReleaseDetails(release.Id, release.Title, release.Date, release.Country, release.AlbumArtistCredit, release.Labels, release.Tracks);
     }
 
+    public async Task<IdentificationCandidate> EnrichAsync(IdentificationCandidate candidate, CancellationToken ct)
+    {
+        var s = _settings.Load();
+        if (candidate.GenreSuggestions.Count > 0 || !s.IdentificationEnabled || s.IdentificationConsentUtc is null || string.IsNullOrWhiteSpace(s.MusicBrainzContact))
+            return candidate;
+        try
+        {
+            var full = await _musicBrainz.GetRecordingAsync(candidate.RecordingId, ct);
+            if (full is null || full.Genres.Count == 0) return candidate;
+            return candidate with
+            {
+                GenreSuggestions = full.Genres,
+                GenreLevel = full.GenreLevel,
+                Isrcs = candidate.Isrcs.Count > 0 ? candidate.Isrcs : full.Isrcs,
+                Releases = candidate.Releases.Count > 0 ? candidate.Releases : full.Releases
+            };
+        }
+        catch (IdentificationHttpException)
+        {
+            return candidate;      // genres are a nicety: never fail the lookup over them
+        }
+    }
+
     public Task ClearCacheAsync(CancellationToken ct) => _cache.ClearAsync(ct);
 
     // ===== methods =====
@@ -235,7 +258,7 @@ public sealed class IdentificationService : IIdentificationService
     private IdentificationCandidate ToCandidate(Track track, MbRecording recording, IdentificationMethod method, double? acoustIdScore, int? searchScore,
         TagSearchTerms? terms = null) =>
         new(recording.Id, recording.Title, recording.ArtistCredit, recording.DurationMs, method, acoustIdScore, searchScore,
-            CandidateEvidence.Compute(track, recording, terms), recording.Releases, recording.Genres, recording.Isrcs);
+            CandidateEvidence.Compute(track, recording, terms), recording.Releases, recording.Genres, recording.Isrcs, recording.GenreLevel);
 
     private static IdentificationResult Done(IdentificationRequest request, IdentificationMethod method, IReadOnlyList<IdentificationCandidate> candidates,
         bool fromCache, DateTime checkedUtc, string noMatchMessage) =>

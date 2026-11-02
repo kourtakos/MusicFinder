@@ -14,7 +14,9 @@ public static class IdentificationProposalBuilder
 {
     public const string FromRecording = "MusicBrainz recording";
     public const string FromRelease = "MusicBrainz release";
-    public const string FromCommunityTags = "MusicBrainz community tags";
+    public const string FromCommunityTags = "MusicBrainz community genres";
+    public const string FromArtistTags = "MusicBrainz genres of the artist";
+    public const int MaxGenres = 3;
 
     public static IReadOnlyList<FieldProposal> Build(
         Track track, IdentificationCandidate recording, ReleaseDetails? release, bool suggestGenres = true)
@@ -37,9 +39,11 @@ public static class IdentificationProposalBuilder
 
         if (suggestGenres && recording.GenreSuggestions.Count > 0)
         {
-            var proposed = string.Join("; ", recording.GenreSuggestions);
+            var proposed = string.Join("; ", recording.GenreSuggestions.Take(MaxGenres).Select(TitleCase));
+            // Community genres are rough: they fill a file that has no genre, but never replace one the user chose.
             if (!Same(track.GenreRaw, proposed))
-                list.Add(new FieldProposal(TagField.Genre, track.GenreRaw, proposed, Selected: false, FromCommunityTags));
+                list.Add(new FieldProposal(TagField.Genre, track.GenreRaw, proposed, Selected: string.IsNullOrWhiteSpace(track.GenreRaw),
+                    recording.GenreLevel == "artist" ? FromArtistTags : FromCommunityTags));
         }
 
         // Linking the file to its recording is useful and harmless, so it starts ticked unless it is already there.
@@ -48,6 +52,10 @@ public static class IdentificationProposalBuilder
 
         return list;
     }
+
+    /// <summary>"classic rock" -> "Classic Rock": MusicBrainz writes genres in lower case.</summary>
+    private static string TitleCase(string genre) =>
+        System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(genre.Trim().ToLowerInvariant());
 
     public static TagChangeSet ToChangeSet(IEnumerable<FieldProposal> proposals) =>
         new(proposals.Where(p => p.Selected).ToDictionary(p => p.Field, p => p.Proposed));

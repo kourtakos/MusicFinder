@@ -60,17 +60,40 @@ public class IdentificationProposalBuilderTests
     }
 
     [Fact]
-    public void Genres_AreASuggestion_AlwaysUnticked_AndCanBeTurnedOff()
+    public void Genres_FillAFileThatHasNone_AreTitleCased_LimitedToThree_AndCanBeTurnedOff()
     {
-        var on = IdentificationProposalBuilder.Build(new Track(), Candidate(["Disco", "Funk"]), null);
+        var on = IdentificationProposalBuilder.Build(new Track(), Candidate(["classic rock", "art rock", "glam rock", "pop"]), null);
         var off = IdentificationProposalBuilder.Build(new Track(), Candidate(["Disco", "Funk"]), null, suggestGenres: false);
 
         var genre = Get(on, TagField.Genre);
-        Assert.Equal("Disco; Funk", genre.Proposed);
-        Assert.False(genre.Selected);
+        Assert.Equal("Classic Rock; Art Rock; Glam Rock", genre.Proposed);       // the three most voted, readable
+        Assert.True(genre.Selected);                                           // the file has no genre: ticked like any empty field
         Assert.Equal(IdentificationProposalBuilder.FromCommunityTags, genre.Source);
         Assert.DoesNotContain(off, x => x.Field == TagField.Genre);
     }
+
+    [Fact]
+    public void AGenreTheUserAlreadyHas_IsNeverReplacedUnlessTicked()
+    {
+        var p = IdentificationProposalBuilder.Build(new Track { GenreRaw = "Laiko" }, Candidate(["disco"]), null);
+
+        var genre = Get(p, TagField.Genre);
+        Assert.False(genre.Selected);
+        Assert.Equal(("Laiko", "Disco"), (genre.Current, genre.Proposed));
+        Assert.DoesNotContain(IdentificationProposalBuilder.ToChangeSet(p).Changes.Keys, k => k == TagField.Genre);
+    }
+
+    [Fact]
+    public void GenresOfTheArtist_AreLabelledAsSuch_SoTheyAreNotTakenForTheRecordings()
+    {
+        var candidate = Candidate(["rock"]) with { GenreLevel = "artist" };
+
+        Assert.Equal(IdentificationProposalBuilder.FromArtistTags, Get(IdentificationProposalBuilder.Build(new Track(), candidate, null), TagField.Genre).Source);
+    }
+
+    [Fact]
+    public void ASameGenreInAnotherCase_NeedsNoChange() =>
+        Assert.DoesNotContain(IdentificationProposalBuilder.Build(new Track { GenreRaw = "disco" }, Candidate(["Disco"]), null), p => p.Field == TagField.Genre);
 
     [Fact]
     public void TheRecordingId_IsTicked_UnlessTheFileAlreadyHasIt()

@@ -57,14 +57,18 @@ public static class MusicBrainzJson
                     group is { } gs ? Strings(gs, "secondary-types") : []));
             }
 
-        // Genres are community tags; the most voted come first.
-        var genres = new List<(string Name, int Count)>();
-        if (e.TryGetProperty("genres", out var gen) && gen.ValueKind == JsonValueKind.Array)
-            foreach (var x in gen.EnumerateArray())
-                if (Str(x, "name") is { } name) genres.Add((name, Int(x, "count") ?? 0));
+        // Genres are community tags; the most voted come first. A recording often has none of its own, so the artist's are the next best
+        // thing (they describe the artist, not this recording, and the user is told which it is).
+        var genres = ReadGenres(e);
+        var level = genres.Count > 0 ? "recording" : null;
+        if (genres.Count == 0)
+        {
+            genres = ArtistGenres(e);
+            if (genres.Count > 0) level = "artist";
+        }
 
         return new MbRecording(id.ToLowerInvariant(), Str(e, "title") ?? "(untitled)", Credit(e), Long(e, "length"),
-            releases, genres.OrderByDescending(x => x.Count).Select(x => x.Name).ToList(), Strings(e, "isrcs"));
+            releases, genres.OrderByDescending(x => x.Count).Select(x => x.Name).ToList(), Strings(e, "isrcs"), level);
     }
 
     private static MbRelease? ReadRelease(JsonElement e)
@@ -95,6 +99,27 @@ public static class MusicBrainzJson
             }
 
         return new MbRelease(id.ToLowerInvariant(), Str(e, "title") ?? "(untitled)", Str(e, "date"), Str(e, "country"), Credit(e), labels, tracks);
+    }
+
+    private static List<(string Name, int Count)> ReadGenres(JsonElement e)
+    {
+        var genres = new List<(string Name, int Count)>();
+        if (e.ValueKind == JsonValueKind.Object && e.TryGetProperty("genres", out var gen) && gen.ValueKind == JsonValueKind.Array)
+            foreach (var x in gen.EnumerateArray())
+                if (Str(x, "name") is { } name) genres.Add((name, Int(x, "count") ?? 0));
+        return genres;
+    }
+
+    /// <summary>The genres of the credited artists (the most voted name wins when two artists share one).</summary>
+    private static List<(string Name, int Count)> ArtistGenres(JsonElement e)
+    {
+        var merged = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        if (e.ValueKind == JsonValueKind.Object && e.TryGetProperty("artist-credit", out var credit) && credit.ValueKind == JsonValueKind.Array)
+            foreach (var c in credit.EnumerateArray())
+                if (c.ValueKind == JsonValueKind.Object && c.TryGetProperty("artist", out var artist))
+                    foreach (var (name, count) in ReadGenres(artist))
+                        merged[name] = Math.Max(merged.GetValueOrDefault(name), count);
+        return merged.Select(p => (p.Key, p.Value)).ToList();
     }
 
     /// <summary>"Artist A feat. Artist B": each credited name followed by its join phrase, as MusicBrainz displays it.</summary>

@@ -504,4 +504,73 @@ public class IdentificationServiceTests
 
         Assert.Equal(0, await rig.Db.Identification.CountAsync(default));
     }
+
+    // ===== genres for hits that came from a search =====
+
+    [Fact]
+    public async Task ASearchHit_GetsItsGenres_FromTheRecordingsOwnRecord_OnRequest_AndOnlyOnce()
+    {
+        await using var rig = new Rig(s => s.AcoustIdApiKey = null);
+        var id = await rig.AddTrackAsync();
+        rig.Mb.SearchHits = [new MbSearchHit(RecA, 94, rig.Mb.Recordings[RecA] with { Genres = [], GenreLevel = null })];   // as a real search answer: no genres
+        var hit = (await rig.Service.IdentifyAsync(new IdentificationRequest(id), default)).Candidates[0];
+        Assert.Empty(hit.GenreSuggestions);                                       // a search answer carries none
+        rig.Mb.Recordings[RecA] = rig.Mb.Recordings[RecA] with { Genres = ["laiko", "pop"], GenreLevel = "artist", Isrcs = ["GRA018500123"] };
+        var before = rig.Mb.RecordingCalls.Count;
+
+        var enriched = await rig.Service.EnrichAsync(hit, default);
+
+        Assert.Equal(["laiko", "pop"], enriched.GenreSuggestions);
+        Assert.Equal("artist", enriched.GenreLevel);
+        Assert.Equal(["GRA018500123"], enriched.Isrcs);
+        Assert.Equal(hit.Releases, enriched.Releases);                            // what the hit already had is kept
+        Assert.Equal(before + 1, rig.Mb.RecordingCalls.Count);
+    }
+
+    [Fact]
+    public async Task ACandidateThatAlreadyHasGenres_IsNotLookedUpAgain()
+    {
+        await using var rig = new Rig();
+        var candidate = new IdentificationCandidate(RecA, "T", "A", null, IdentificationMethod.AcoustIdFingerprint, 0.9, null, [], [], ["disco"], []);
+
+        var result = await rig.Service.EnrichAsync(candidate, default);
+
+        Assert.Same(candidate, result);
+        Assert.Empty(rig.Mb.RecordingCalls);
+    }
+
+    [Fact]
+    public async Task WithoutAgreement_NothingIsLookedUpForGenres()
+    {
+        await using var rig = new Rig(s => s.IdentificationEnabled = false);
+        var candidate = new IdentificationCandidate(RecA, "T", "A", null, IdentificationMethod.MusicBrainzTagSearch, null, 90, [], [], [], []);
+
+        var result = await rig.Service.EnrichAsync(candidate, default);
+
+        Assert.Same(candidate, result);
+        Assert.Empty(rig.Mb.RecordingCalls);
+    }
+
+    [Fact]
+    public async Task WhenGenresCannotBeFetched_TheCandidateIsReturnedAsItWas()
+    {
+        await using var rig = new Rig();
+        rig.Mb.Fails = new IdentificationHttpException(IdentificationFailure.Offline, null, "offline");
+        var candidate = new IdentificationCandidate(RecB, "T", "A", null, IdentificationMethod.MusicBrainzTagSearch, null, 90, [], [], [], []);
+
+        var result = await rig.Service.EnrichAsync(candidate, default);
+
+        Assert.Same(candidate, result);
+    }
+
+    [Fact]
+    public async Task ARecordingWithNoGenresAtAll_StaysWithout()
+    {
+        await using var rig = new Rig();
+        var candidate = new IdentificationCandidate(RecB, "Other Song", "Someone", null, IdentificationMethod.MusicBrainzTagSearch, null, 90, [], [], [], []);
+
+        var result = await rig.Service.EnrichAsync(candidate, default);
+
+        Assert.Empty(result.GenreSuggestions);
+    }
 }

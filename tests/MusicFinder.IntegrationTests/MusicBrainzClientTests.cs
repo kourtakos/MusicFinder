@@ -103,6 +103,39 @@ public class MusicBrainzJsonTests
     }
 
     [Fact]
+    public void ARecordingWithoutGenresOfItsOwn_FallsBackToTheArtistsGenres_AndSaysSo()
+    {
+        var rec = MusicBrainzJson.ParseRecording("""
+            {"id":"5f2c9a0e-7b1d-4c3a-9e84-0d6b2a1f7c33","title":"T","genres":[],
+             "artist-credit":[{"name":"Queen","joinphrase":"","artist":{"name":"Queen","genres":[{"name":"rock","count":45},{"name":"glam rock","count":26},{"name":"afro house","count":1}]}}]}
+            """)!;
+
+        Assert.Equal(["rock", "glam rock", "afro house"], rec.Genres);          // most voted first
+        Assert.Equal("artist", rec.GenreLevel);
+    }
+
+    [Fact]
+    public void TheRecordingsOwnGenres_WinOverTheArtists()
+    {
+        var rec = MusicBrainzJson.ParseRecording("""
+            {"id":"5f2c9a0e-7b1d-4c3a-9e84-0d6b2a1f7c33","title":"T","genres":[{"name":"disco","count":3}],
+             "artist-credit":[{"name":"Queen","artist":{"genres":[{"name":"rock","count":45}]}}]}
+            """)!;
+
+        Assert.Equal(["disco"], rec.Genres);
+        Assert.Equal("recording", rec.GenreLevel);
+    }
+
+    [Fact]
+    public void NoGenresAnywhere_LeavesTheLevelEmpty()
+    {
+        var rec = MusicBrainzJson.ParseRecording("""{"id":"5f2c9a0e-7b1d-4c3a-9e84-0d6b2a1f7c33","title":"T","genres":[],"artist-credit":[{"name":"X","artist":{"genres":[]}}]}""")!;
+
+        Assert.Empty(rec.Genres);
+        Assert.Null(rec.GenreLevel);
+    }
+
+    [Fact]
     public void OddlyShapedFields_AreIgnored_NotFatal()
     {
         var rec = MusicBrainzJson.ParseRecording("""

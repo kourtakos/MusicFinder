@@ -371,7 +371,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         if (track is null) { item.Attention = "the track is no longer in the library"; return; }
 
         var decision = AutoChoice.Decide(track, result.Candidates);
-        var candidate = decision.Candidate ?? result.Candidates[0];
+        var candidate = await _service.EnrichAsync(decision.Candidate ?? result.Candidates[0], ct);   // genres, for hits that came from a search
         var release = AutoChoice.PickRelease(track, candidate);
         var details = release is null ? null : await LoadDetailsAsync(release.ReleaseId, ct);
         var proposals = IdentificationProposalBuilder.Build(track, candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
@@ -582,7 +582,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var track = await _tracks.GetAsync(item.TrackId);
         if (track is null || version != _showVersion) return;
 
-        var proposals = IdentificationProposalBuilder.Build(track, candidate.Candidate, details, _settings.Load().SuggestGenresFromMusicBrainz);
+        var enriched = await _service.EnrichAsync(candidate.Candidate, default);
+        if (version != _showVersion) return;
+        var proposals = IdentificationProposalBuilder.Build(track, enriched, details, _settings.Load().SuggestGenresFromMusicBrainz);
         var rows = proposals.Select(p => new ProposalRow(p)).ToList();
         var hasCover = !string.IsNullOrEmpty(track.ArtworkCacheKey);
 
@@ -602,7 +604,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
 
         var plan = new ItemPlan
         {
-            Candidate = candidate,
+            Candidate = ReferenceEquals(enriched, candidate.Candidate) ? candidate : new CandidateItem(enriched),
             Release = choice.Release,
             Proposals = rows,
             TrackHasCover = hasCover,

@@ -32,7 +32,8 @@ public sealed record IdentificationCandidate(
     IReadOnlyList<string> Evidence,
     IReadOnlyList<ReleaseSummary> Releases,
     IReadOnlyList<string> GenreSuggestions,
-    IReadOnlyList<string> Isrcs)
+    IReadOnlyList<string> Isrcs,
+    string? GenreLevel = null)
 {
     /// <summary>"AcoustID score 0.97", "MusicBrainz search score 87 of 100", or the id-only note.</summary>
     public string ScoreText =>

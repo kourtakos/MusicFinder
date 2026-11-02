@@ -64,6 +64,15 @@ internal sealed class FakeIdentification : IIdentificationService
                 [new ReleaseTrack(RecordingId, 1, 12, 20, "Ξανά στη ζωή μου", "Χάρις Αλεξίου")]));
     }
 
+    public List<string> Enriched { get; } = [];
+    public Func<IdentificationCandidate, IdentificationCandidate>? Enrich { get; set; }
+
+    public Task<IdentificationCandidate> EnrichAsync(IdentificationCandidate candidate, CancellationToken ct)
+    {
+        Enriched.Add(candidate.RecordingId);
+        return Task.FromResult(Enrich?.Invoke(candidate) ?? candidate);
+    }
+
     public Task ClearCacheAsync(CancellationToken ct)
     {
         CacheCleared++;
@@ -920,6 +929,100 @@ public class IdentifyUiTests
             Assert.Contains("1 problem", vm.ResultSummary);
         }
         finally { File.SetAttributes(readOnly, FileAttributes.Normal); }
+    });
+
+    // ===== genres =====
+
+    private static async Task ClearGenreAsync(Ctx c, string title)
+    {
+        var summary = await c.App.Service<ITagEditingService>().ApplyAsync([Row(c, title).Id],
+            new TagChangeSet(new Dictionary<TagField, string?> { [TagField.Genre] = "" }), new TagWriteOptions(), null, default);
+        Assert.Equal(1, summary.Written);
+    }
+
+    [Fact]
+    public Task AFileWithoutAGenre_GetsTheCommunityGenres_Ticked_AndTheyAreWritten() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        await ClearGenreAsync(c, "unknown track");
+        // A search hit has no genres: the window asks for them (from the recording's own record) when it shows the track.
+        c.Service.Enrich = cand => cand with { GenreSuggestions = ["classic rock", "art rock", "glam rock", "pop"], GenreLevel = "artist" };
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        var genre = vm.Proposals.Single(p => p.Field == TagField.Genre);
+        Assert.Equal("Classic Rock; Art Rock; Glam Rock", genre.Proposed);
+        Assert.Equal("MusicBrainz genres of the artist", genre.Source);          // said plainly: these describe the artist
+        Assert.True(genre.Selected);                                             // the file has none, so it is filled like any empty field
+        Assert.Contains("Genre", vm.ChangeSummary);
+        Assert.NotEmpty(c.Service.Enriched);
+
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+
+        using var f = TagLib.File.Create(path);
+        Assert.Equal(["Classic Rock", "Art Rock", "Glam Rock"], f.Tag.Genres);
+    });
+
+    [Fact]
+    public Task AGenreTheFileAlreadyHas_IsShownBesideTheProposal_ButNotTicked() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        c.Service.Enrich = cand => cand with { GenreSuggestions = ["rock"], GenreLevel = "recording" };
+        var path = Path.Combine(c.App.MusicDir, "a.mp3");
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        var genre = vm.Proposals.Single(p => p.Field == TagField.Genre);
+        Assert.Equal(("Disco", "Rock"), (genre.Current, genre.Proposed));
+        Assert.False(genre.Selected);
+
+        vm.WriteCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => vm.Step == IdentifyStep.Done, what: "written");
+        using var f = TagLib.File.Create(path);
+        Assert.Equal(["Disco"], f.Tag.Genres);                                   // the user's genre is untouched
+    });
+
+    [Fact]
+    public Task InAList_TheGenreIsPartOfWhatWillChange_ForFilesWithoutOne() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        await ClearGenreAsync(c, "unknown track");
+        c.Service.Enrich = cand => cand with { GenreSuggestions = ["disco"], GenreLevel = "recording" };
+        var vm = NewVm(c, [Row(c, "unknown track"), Row(c, "Bravo")]);
+
+        await vm.StartAsync();
+
+        Assert.Contains("Genre", vm.Queue[0].ChangesText);                       // no genre in the file: filled
+        Assert.DoesNotContain("Genre", vm.Queue[1].ChangesText);                 // Funk is kept
+    });
+
+    [Fact]
+    public Task TurningGenresOff_RemovesThemFromTheProposals() => Ui.RunAsync(async () =>
+    {
+        var c = await StartAsync();
+        await using var _ = c.App;
+        await ClearGenreAsync(c, "unknown track");
+        c.Service.Enrich = cand => cand with { GenreSuggestions = ["disco"], GenreLevel = "recording" };
+        var s = c.Saved;
+        s.SuggestGenresFromMusicBrainz = false;
+        c.App.Settings.Save(s);
+        var vm = NewVm(c, [Row(c, "unknown track")]);
+
+        await vm.StartAsync();
+        await vm.WhenIdle;
+        await vm.WhenIdle;
+
+        Assert.DoesNotContain(vm.Proposals, p => p.Field == TagField.Genre);
     });
 
     private static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject
