@@ -97,3 +97,15 @@ trick on `Missing` in page queries and a row-value keyset comparison (ascending)
 
 Query side: `SearchSqlBuilder` returns only `(Id, SortKey)` for the page, then the full rows of those ids are read (late materialization). Relevance sort key =
 `printf('%d', tier * 2 + notPrimary) || char(31) || title`, still one non-null text key, so keyset cursors work as for the other text sorts.
+
+## Online identification (M5)
+
+`0007_Identification.sql` drops and recreates `IdentificationCache` (the 0001 table was never written by any version, so it is empty everywhere) and adds two tables:
+
+- `IdentificationCache(TrackId PK -> Tracks ON DELETE CASCADE, FileSize, ModifiedUtc, Fingerprint, DurationSeconds, Algorithm, LengthSeconds, ComputedUtc)`: one audio fingerprint per file. It is used only while the file's size and
+  modified time are unchanged, and only for the same fingerprint length.
+- `IdentificationLookups(RequestKey PK, TrackId -> Tracks ON DELETE SET NULL, Method, Outcome 'Found'|'NoMatch', ResultJson, CheckedUtc, ExpiresUtc)`: one row per question asked of an online service, keyed by the question
+  (SHA-1 of "acoustid|fingerprint|duration" or "mbsearch|query"), so two copies of one song share it. Found answers last 30 days, "no match" 7 days; errors are never stored.
+- `MusicBrainzCache(EntityType 'recording'|'release', Mbid, Json, FetchedUtc, ExpiresUtc)`: MusicBrainz records as received, 30 days.
+
+Times are written with `DapperConfig.ToDb` (fixed-width ISO), so "not yet expired" is a plain text comparison. `IdentificationCacheRepository` also counts and clears all three tables ("Forget remembered answers").

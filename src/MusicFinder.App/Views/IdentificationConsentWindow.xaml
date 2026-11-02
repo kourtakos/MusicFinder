@@ -1,0 +1,43 @@
+<Window x:Class="MusicFinder.App.Views.IdentificationConsentWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Online identification" Style="{StaticResource MF.Window}"
+        Width="640" SizeToContent="Height" MinHeight="420" MaxHeight="820" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding DeclineCommand}"/>
+    </Window.InputBindings>
+
+    <StackPanel Margin="24,20,24,20">
+        <TextBlock Text="{Binding Heading}" FontSize="20" FontWeight="SemiBold"/>
+        <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,6,0,0"
+                   Text="MusicFinder can look tracks up online to fill in missing tags. It is off until you agree, and your library and search never depend on it."/>
+
+        <TextBlock Text="What is sent" FontWeight="SemiBold" Margin="0,16,0,4"/>
+        <TextBlock Text="{Binding WhatIsSent}" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding NonCommercial}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+
+        <TextBlock Text="Your contact address (required by MusicBrainz)" FontWeight="SemiBold" Margin="0,16,0,4"/>
+        <Border Style="{StaticResource MF.InputBorder}" Height="36">
+            <TextBox x:Name="ContactBox" Style="{StaticResource MF.PlainTextBox}" Padding="12,0"
+                     Text="{Binding Contact, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
+
+        <TextBlock Text="AcoustID application key (optional)" FontWeight="SemiBold" Margin="0,14,0,4"/>
+        <Border Style="{StaticResource MF.InputBorder}" Height="36">
+            <PasswordBox x:Name="KeyBox" Padding="12,0" BorderThickness="0" Background="Transparent"
+                         Foreground="{StaticResource MF.Brush.TextPrimary}" VerticalContentAlignment="Center"
+                         PasswordChanged="KeyBox_PasswordChanged"/>
+        </Border>
+        <TextBlock Text="{Binding KeyHelp}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+
+        <TextBlock Text="{Binding Error}" Foreground="{StaticResource MF.Brush.Warning}" TextWrapping="Wrap" Margin="0,12,0,0"
+                   Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Not now" Style="{StaticResource MF.PillButton}" Margin="0,0,10,0" Command="{Binding DeclineCommand}"/>
+            <Button Content="Turn on" Style="{StaticResource MF.AccentButton}" Command="{Binding AcceptCommand}"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

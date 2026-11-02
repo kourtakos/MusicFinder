@@ -65,6 +65,12 @@ public static class TagChangeValidator
             case TagField.Key:
                 return IsPlainText(value, MaxKeyLength) ? value : Fail($"Key is limited to {MaxKeyLength} characters.", out error);
 
+            case TagField.MusicBrainzRecordingId:
+                // A MusicBrainz id is a UUID; store it in the usual lower-case, hyphenated form.
+                return Guid.TryParseExact(value, "D", out var mbid)
+                    ? mbid.ToString("D")
+                    : Fail($"A MusicBrainz recording id must look like 3d9f1c2e-0a4b-4c5d-8e6f-7a8b9c0d1e2f (got '{value}').", out error);
+
             default:
                 return IsPlainText(value, MaxTextLength)
                     ? value

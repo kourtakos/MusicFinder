@@ -46,4 +46,19 @@ public sealed class AppSettings
     public bool SimilarHalfDoubleTempo { get; set; } = true;
     /// <summary>Find Similar: leave out tracks played (even only possibly) in the last 24 hours.</summary>
     public bool SimilarHideRecentlyPlayed { get; set; }
+
+    /// <summary>Online identification (MusicBrainz / AcoustID). Off by default and honoured only after <see cref="IdentificationConsentUtc"/> is set.</summary>
+    public bool IdentificationEnabled { get; set; }
+    /// <summary>When the user last accepted the explanation of exactly what is sent.</summary>
+    public DateTime? IdentificationConsentUtc { get; set; }
+    /// <summary>The user's AcoustID application key. Stored in settings.json as plain text, never logged and never committed.</summary>
+    public string? AcoustIdApiKey { get; set; }
+    /// <summary>Path of fpcalc.exe; empty means look beside the program, then on PATH.</summary>
+    public string? FpcalcPath { get; set; }
+    /// <summary>E-mail or URL MusicBrainz can reach the user at; sent in the User-Agent header as its rules require.</summary>
+    public string? MusicBrainzContact { get; set; }
+    /// <summary>Seconds of audio fingerprinted (fpcalc -length).</summary>
+    public int FingerprintLengthSeconds { get; set; } = 120;
+    /// <summary>Offer MusicBrainz community genres as an (unticked) suggestion.</summary>
+    public bool SuggestGenresFromMusicBrainz { get; set; } = true;
 }

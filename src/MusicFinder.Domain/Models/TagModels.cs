@@ -1,7 +1,7 @@
 namespace MusicFinder.Domain.Models;
 
 /// <summary>The tag fields the editor can change. Anything else in the file (comments, lyrics, cover, ...) is left alone.</summary>
-public enum TagField { Title, Artist, AlbumArtist, Album, Genre, Year, TrackNumber, Bpm, Key }
+public enum TagField { Title, Artist, AlbumArtist, Album, Genre, Year, TrackNumber, Bpm, Key, MusicBrainzRecordingId }
 
 /// <summary>
 /// The fields to change, as the text the user typed. A field that is absent is not touched; a null or blank value clears it.

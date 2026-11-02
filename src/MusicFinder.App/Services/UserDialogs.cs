@@ -14,6 +14,12 @@ public interface IUserDialogs
     void CopyToClipboard(string text);
     /// <summary>Shows the tag editor as a modal dialog over the main window.</summary>
     void ShowTagEditor(ViewModels.TagEditorViewModel viewModel);
+    /// <summary>Asks the user to agree to what online identification sends. The view model has already saved the settings when it was accepted.</summary>
+    void ShowIdentificationConsent(ViewModels.IdentificationConsentViewModel viewModel);
+    /// <summary>Shows the online identification window as a modal dialog over the main window.</summary>
+    void ShowIdentify(ViewModels.IdentifyViewModel viewModel);
+    /// <summary>A file picker; <paramref name="filter"/> is in the Windows form "Name|*.ext|Name2|*.ext2". Null when cancelled.</summary>
+    string? PickFile(string title, string filter);
 }
 
 public sealed class UserDialogs : IUserDialogs
@@ -48,6 +54,18 @@ public sealed class UserDialogs : IUserDialogs
 
     public void ShowTagEditor(ViewModels.TagEditorViewModel viewModel) =>
         new Views.TagEditorWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public void ShowIdentificationConsent(ViewModels.IdentificationConsentViewModel viewModel) =>
+        new Views.IdentificationConsentWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public void ShowIdentify(ViewModels.IdentifyViewModel viewModel) =>
+        new Views.IdentifyWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.ShowDialog();
+
+    public string? PickFile(string title, string filter)
+    {
+        var dialog = new OpenFileDialog { Title = title, Filter = filter, CheckFileExists = true };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
 
     public void CopyToClipboard(string text)
     {

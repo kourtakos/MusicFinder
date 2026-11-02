@@ -36,10 +36,14 @@ public partial class LibraryViewModel : ObservableObject
     private readonly IUserDialogs _dialogs;
     private readonly MusicFinder.Infrastructure.AppPaths _paths;
     private readonly DispatcherTimer _saveTimer;
+    private readonly IIdentificationService _identification;
+    private readonly IdentificationSettingsViewModel _identificationSettings;
+    private readonly TimeProvider _time;
 
     public LibraryViewModel(FolderTreeViewModel tree, SearchViewModel search, ScanCoordinator scans,
         ILibraryRootRepository roots, ITrackRepository tracks, ISettingsStore settings, GenreMappingJob genreJob,
-        ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths)
+        ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths,
+        IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time)
     {
         Tree = tree;
         Search = search;
@@ -51,6 +55,9 @@ public partial class LibraryViewModel : ObservableObject
         _tagEditing = tagEditing;
         _dialogs = dialogs;
         _paths = paths;
+        _identification = identification;
+        _identificationSettings = identificationSettings;
+        _time = time;
 
         var saved = settings.Load();
         _leftPanelWidth = new GridLength(Math.Clamp(saved.LeftPanelWidth, 180, 420));
@@ -123,6 +130,33 @@ public partial class LibraryViewModel : ObservableObject
         var editor = new TagEditorViewModel(selected, _tagEditing, _dialogs, _settings, _paths);
         await editor.LoadAsync();
         _dialogs.ShowTagEditor(editor);
+    }
+
+    /// <summary>
+    /// Opens the online identification window for the selected tracks. The first time, the user is shown exactly what is sent and
+    /// must agree; declining changes nothing. Refused while indexing, like the tag editor, because it can write tags.
+    /// </summary>
+    [RelayCommand]
+    private void Identify()
+    {
+        var selected = Search.SelectedItems.ToList();
+        if (selected.Count == 0) return;
+        if (_scans.IsScanning)
+        {
+            _dialogs.ShowInfo("Identify online", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            return;
+        }
+
+        var readiness = _identification.GetReadiness();
+        if (!readiness.Enabled || !readiness.Consented)
+        {
+            var consent = new IdentificationConsentViewModel(_settings, _time);
+            _dialogs.ShowIdentificationConsent(consent);
+            _identificationSettings.Reload();
+            if (!consent.Accepted) return;
+        }
+
+        _dialogs.ShowIdentify(new IdentifyViewModel(selected, _identification, _tagEditing, _tracks, _settings, _paths));
     }
 
     /// <summary>Raised when the view should move keyboard focus to the search box (Ctrl+F / Ctrl+K).</summary>

@@ -19,6 +19,14 @@ internal sealed class FakeDialogs : IUserDialogs
     public void RevealInExplorer(string path) { }
     public void CopyToClipboard(string text) { }
     public void ShowTagEditor(TagEditorViewModel viewModel) => Editor = viewModel;
+    public IdentifyViewModel? Identify { get; private set; }
+    public IdentificationConsentViewModel? Consent { get; private set; }
+    /// <summary>What the user answers when the consent dialog opens; the view model saves its own settings when accepted.</summary>
+    public Action<IdentificationConsentViewModel>? OnConsent { get; set; }
+    public string? FilePicked { get; set; }
+    public void ShowIdentificationConsent(IdentificationConsentViewModel viewModel) { Consent = viewModel; OnConsent?.Invoke(viewModel); }
+    public void ShowIdentify(IdentifyViewModel viewModel) => Identify = viewModel;
+    public string? PickFile(string title, string filter) => FilePicked;
 }
 
 public class TagEditorTests

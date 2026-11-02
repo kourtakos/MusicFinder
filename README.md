@@ -4,9 +4,9 @@ Fast, offline-first Windows DJ music library organizer and finder. Instant searc
 music folders, a folder tree, cover art, genre/tag organisation and a safe tag editor.
 See `CLAUDE.md` for the full implementation contract.
 
-**Status: Milestones M1 (search foundation) and M2 (covers, genres, tags, tag editor) are implemented.**
+**Status: M1 (search), M2 (covers, genres, tags), M3 (DJ session and drag-out), the Quick Search pop-up, M7 (smart Greek search, Find Similar) and M5 (online identification) are implemented.**
 MusicFinder only changes your music files when you press *Write* in the tag editor, after a preview, and never silently.
-It never renames, moves or deletes files, and makes no network connections.
+It never renames, moves or deletes files. It makes no network connection unless you turn on **online identification** in Settings, after being shown exactly what is sent (`docs/identification.md`).
 
 ## Requirements
 
@@ -45,7 +45,8 @@ Command-line options for the app:
 8. **Find similar** (right-click a track) lists tracks that fit next to it by genre, BPM, key and DJ tags, with the reason for each match (`docs/find-similar.md`).
 9. Drag tracks from the grid into VirtualDJ, Traktor or any player that accepts files. The **Session** tab lists what you dragged and what MusicFinder
    infers about it ("exported", "possibly played" after a quiet period, "confirmed" only when you say so). See `docs/dj-session.md`.
-10. Press **Ctrl+Alt+Space** in any program to open a small always-on-top search window; drag results into your player and move the window out of the way.
+10. **Identify online** (`Ctrl+I`, right-click, or the button in the details panel) looks tracks up on MusicBrainz, optionally by audio fingerprint through AcoustID, and proposes tags you tick, preview and confirm. Off until you agree (`docs/identification.md`).
+11. Press **Ctrl+Alt+Space** in any program to open a small always-on-top search window; drag results into your player and move the window out of the way.
    Change the shortcut in Settings. See `docs/quick-search.md`.
 
 ### Search syntax
@@ -79,4 +80,5 @@ docs/                           architecture, database, search syntax, Greek sea
 - Find Similar compares metadata only (genre, BPM, key, DJ tags), never how the music sounds; tracks without BPM, key or genre cannot be compared (`docs/find-similar.md`).
 - Favorites (shown in the reference design) need a database migration and are not implemented.
 - Drag-out is verified with Windows Media Player and Winamp only; Traktor and VirtualDJ are untested (checklist in `docs/dj-session.md`).
-- No DJ-history import yet (M4), so nothing is "confirmed" except by you. Identification and file organisation are later milestones.
+- No DJ-history import yet (M4), so nothing is "confirmed" except by you. File organisation, duplicates and Library Health (M6) and backup (M8) are later milestones.
+- Online identification is tested with fake services only; it has not yet been run against the real MusicBrainz and AcoustID with a real key and fpcalc. `fpcalc.exe` is not bundled (its licence is not verified); you supply it. BPM and key are never looked up online (`docs/identification.md`).

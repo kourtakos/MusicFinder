@@ -64,6 +64,17 @@ App ──► Application ──► Domain
   Find Similar mode; Settings has the Search panel.
 - Two search engines coexist on purpose: the original index and the alias index. A query is answered from the alias index, and from the original one only while some tracks are not indexed yet.
 
+## M5 additions (online identification)
+
+- **Domain** (`Contracts/Identification.cs`, `Models/IdentificationModels.cs`): `IIdentificationService`, `IFingerprintService`, `IAcoustIdClient`, `IMusicBrainzClient`, `IIdentificationCache`, and the candidate / outcome / readiness models.
+- **Application** (`Identification`): `IdentificationService` (opt-in gate, method choice, caching, candidates; it only proposes), `IdentificationProposalBuilder` (per-field proposals; nothing is ticked that would replace a value),
+  `CandidateEvidence`, `MusicBrainzQueryBuilder` (Lucene phrases, only `\` and `"` escaped inside quotes), `RateLimiter` and `RetryPolicy` (pure, `TimeProvider`-driven), `UserAgentBuilder`.
+- **Infrastructure** (`Identification`): `IdentificationHttp` (retry -> rate limit -> network pipeline, hand-built, no extra package), `MusicBrainzClient` + `MusicBrainzJson`, `AcoustIdClient` (gzip POST),
+  `ChromaprintFingerprintService` + `FpcalcLocator` + `WindowsProcessRunner` (no shell, `ArgumentList`, killed on cancel or timeout), `IdentificationCacheRepository`.
+- **App**: `IdentificationConsentViewModel` / window (what is sent, contact, key), `IdentificationSettingsViewModel` (Settings section), `IdentifyViewModel` / `IdentifyWindow` (queue, candidates, release, proposals, preview, write).
+  Writing goes only through `ITagEditingService`; `TagField.MusicBrainzRecordingId` is the one new writable field.
+- Tests replace the network (`FakeHttpHandler`), the process (`FakeRunner`) and the whole service (`FakeIdentification`); nothing in the default suite contacts a real service.
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

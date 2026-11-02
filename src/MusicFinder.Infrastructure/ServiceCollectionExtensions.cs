@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Infrastructure.Genres;
@@ -68,6 +69,26 @@ public static class ServiceCollectionExtensions
         {
             ReaderConcurrency = sp.GetRequiredService<ISettingsStore>().Load().ReaderConcurrency
         });
+        AddIdentification(services);
         return services;
+    }
+
+    /// <summary>Online identification (M5). Nothing here touches the network until the user turns it on and accepts the explanation.</summary>
+    private static void AddIdentification(IServiceCollection services)
+    {
+        services.TryAddSingleton(new MusicFinder.Application.Identification.AppInfo("MusicFinder",
+            System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.0.0"));
+        services.AddSingleton<MusicFinder.Application.Identification.IRateLimiter>(sp =>
+            new MusicFinder.Application.Identification.RateLimiter(sp.GetRequiredService<TimeProvider>()));
+        services.AddSingleton(sp => new Identification.IdentificationHttp(
+            sp.GetRequiredService<MusicFinder.Application.Identification.IRateLimiter>(), sp.GetRequiredService<TimeProvider>(),
+            innerFactory: null, sp.GetService<ILogger<Identification.IdentificationHttp>>()));
+        services.AddSingleton<IIdentificationCache, IdentificationCacheRepository>();
+        services.AddSingleton<Identification.IProcessRunner, Identification.WindowsProcessRunner>();
+        services.AddSingleton(sp => new Identification.FpcalcLocator(sp.GetRequiredService<ISettingsStore>()));
+        services.AddSingleton<IFingerprintService, Identification.ChromaprintFingerprintService>();
+        services.AddSingleton<IMusicBrainzClient, Identification.MusicBrainzClient>();
+        services.AddSingleton<IAcoustIdClient, Identification.AcoustIdClient>();
+        services.AddSingleton<IIdentificationService, MusicFinder.Application.Identification.IdentificationService>();
     }
 }

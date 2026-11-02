@@ -96,6 +96,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<FolderTreeViewModel>();
         services.AddSingleton<SearchViewModel>();
         services.AddSingleton<LibraryViewModel>();
+        services.AddSingleton<IdentificationSettingsViewModel>();
         services.AddSingleton<SettingsViewModel>();
         services.AddSingleton<TagsViewModel>();
         services.AddSingleton<SessionViewModel>();

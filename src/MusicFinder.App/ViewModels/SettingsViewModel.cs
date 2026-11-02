@@ -46,13 +46,15 @@ public sealed partial class SettingsViewModel : ObservableObject
     public string DatabasePath { get; }
     public string LogDirectory { get; }
     public string SettingsPath { get; }
+    public IdentificationSettingsViewModel Identification { get; }
 
     [ObservableProperty] private int _readerConcurrency;
     [ObservableProperty] private bool _useFolderArtwork;
 
     public SettingsViewModel(ILibraryRootRepository roots, LibraryRootService rootService, IUserDialogs dialogs,
         ISettingsStore store, AppPaths paths, ScanCoordinator scans, Services.Artwork.ArtworkService artwork,
-        Services.Hotkeys.QuickSearchService quickSearch, ISearchAliasService aliasService, ISearchDiagnostics diagnostics)
+        Services.Hotkeys.QuickSearchService quickSearch, ISearchAliasService aliasService, ISearchDiagnostics diagnostics,
+        IdentificationSettingsViewModel identification)
     {
         _roots = roots;
         _rootService = rootService;
@@ -63,6 +65,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         _quickSearch = quickSearch;
         _aliasService = aliasService;
         _diagnostics = diagnostics;
+        Identification = identification;
         DatabasePath = paths.DatabasePath;
         LogDirectory = paths.LogDir;
         SettingsPath = paths.SettingsPath;

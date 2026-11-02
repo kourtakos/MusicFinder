@@ -150,6 +150,7 @@ public sealed class TagEditingService : ITagEditingService
         TagField.TrackNumber => track.TrackNumber?.ToString(CultureInfo.InvariantCulture),
         TagField.Bpm => track.Bpm is { } b ? Math.Round(b, MidpointRounding.AwayFromZero).ToString(CultureInfo.InvariantCulture) : null,
         TagField.Key => track.MusicalKey,
+        TagField.MusicBrainzRecordingId => track.MusicBrainzRecordingId,
         _ => null
     };
 

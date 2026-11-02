@@ -232,6 +232,8 @@
                             <ContextMenu>
                                 <MenuItem Header="Edit tags…  (F2)"
                                           Command="{Binding PlacementTarget.DataContext.EditTagsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Identify online…  (Ctrl+I)"
+                                          Command="{Binding PlacementTarget.DataContext.IdentifyCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Find similar"
                                           Command="{Binding PlacementTarget.DataContext.Search.FindSimilarCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <Separator/>
@@ -411,6 +413,9 @@
                             </StackPanel>
                             <Button Content="Edit tags of selection…" Style="{StaticResource MF.AccentButton}" Height="34" Padding="14,0"
                                     HorizontalAlignment="Center" Margin="0,16,0,0" Command="{Binding EditTagsCommand}"/>
+                            <Button Content="Identify selection online…" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Center" Margin="0,8,0,0" Command="{Binding IdentifyCommand}"
+                                    ToolTip="Look the selected tracks up on MusicBrainz (Ctrl+I)"/>
                         </StackPanel>
                     </StackPanel>
 
@@ -553,6 +558,9 @@
                             <Button Content="Edit tags…" Style="{StaticResource MF.AccentButton}" Height="34" Padding="14,0"
                                     HorizontalAlignment="Left" Margin="0,8,0,0" ToolTip="Edit tags of the selected track (F2)"
                                     Command="{Binding DataContext.EditTagsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            <Button Content="Identify online…" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
+                                    HorizontalAlignment="Left" Margin="0,8,0,0" ToolTip="Look this track up on MusicBrainz and fill in missing tags (Ctrl+I)"
+                                    Command="{Binding DataContext.IdentifyCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
                             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
                                 <Button Content="Open in Explorer" Style="{StaticResource MF.PillButton}" Height="34" Padding="14,0"
                                         Command="{Binding DataContext.Search.RevealInExplorerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>

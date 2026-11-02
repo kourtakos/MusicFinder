@@ -88,6 +88,38 @@ public class TagWriterTests : IDisposable
 
     [Theory]
     [MemberData(nameof(Formats))]
+    public async Task TheMusicBrainzRecordingId_RoundTrips_AndCanBeCleared(string kind)
+    {
+        var path = Make(kind);
+        const string id = "5f2c9a0e-7b1d-4c3a-9e84-0d6b2a1f7c33";
+
+        var written = await _writer.WriteAsync(path, Set((TagField.MusicBrainzRecordingId, id.ToUpperInvariant())), NoBackup, default);
+
+        Assert.True(written.Success, written.Error);
+        var read = await _reader.ReadAsync(path, default);
+        Assert.Equal(id, read.MusicBrainzRecordingId);     // stored lower-case
+        Assert.Equal("Original Album", read.Album);
+
+        var cleared = await _writer.WriteAsync(path, Set((TagField.MusicBrainzRecordingId, null)), NoBackup, default);
+        Assert.True(cleared.Success, cleared.Error);
+        Assert.Null((await _reader.ReadAsync(path, default)).MusicBrainzRecordingId);
+    }
+
+    [Fact]
+    public async Task ANotAnId_IsRejected_AndTheFileIsUntouched()
+    {
+        var path = Make("mp3");
+        var before = Hash(path);
+
+        var result = await _writer.WriteAsync(path, Set((TagField.MusicBrainzRecordingId, "not-a-uuid")), NoBackup, default);
+
+        Assert.False(result.Success);
+        Assert.Contains("MusicBrainz recording id", result.Error);
+        Assert.Equal(before, Hash(path));
+    }
+
+    [Theory]
+    [MemberData(nameof(Formats))]
     public async Task UntouchedFields_AndOtherFrames_Survive(string kind)
     {
         var path = Make(kind);

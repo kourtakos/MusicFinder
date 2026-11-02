@@ -7,7 +7,36 @@ namespace MusicFinder.App.Views;
 
 public partial class SettingsView : UserControl
 {
-    public SettingsView() => InitializeComponent();
+    public SettingsView()
+    {
+        InitializeComponent();
+        Loaded += (_, _) =>
+        {
+            SyncKeyBox();
+            if (DataContext is SettingsViewModel vm)
+            {
+                vm.Identification.PropertyChanged -= OnIdentificationChanged;
+                vm.Identification.PropertyChanged += OnIdentificationChanged;
+            }
+        };
+    }
+
+    // A PasswordBox cannot be data-bound, so the application key is copied both ways by hand.
+    private void OnIdentificationChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(IdentificationSettingsViewModel.ApiKey)) SyncKeyBox();
+    }
+
+    private void SyncKeyBox()
+    {
+        if (DataContext is SettingsViewModel vm && AcoustIdKeyBox.Password != vm.Identification.ApiKey)
+            AcoustIdKeyBox.Password = vm.Identification.ApiKey;
+    }
+
+    private void AcoustIdKeyBox_PasswordChanged(object sender, System.Windows.RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel vm) vm.Identification.ApiKey = AcoustIdKeyBox.Password;
+    }
 
     /// <summary>The shortcut box records the keys that are pressed instead of letting the user type text.</summary>
     private void HotkeyBox_PreviewKeyDown(object sender, KeyEventArgs e)

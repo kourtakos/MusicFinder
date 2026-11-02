@@ -119,6 +119,7 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
                 case TagField.TrackNumber: tag.Track = value is null ? 0u : uint.Parse(value); break;
                 case TagField.Bpm: tag.BeatsPerMinute = value is null ? 0u : uint.Parse(value); break;
                 case TagField.Key: tag.InitialKey = value; break;
+                case TagField.MusicBrainzRecordingId: tag.MusicBrainzTrackId = value; break;
             }
         }
         f.Save();
@@ -141,6 +142,7 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
                 TagField.TrackNumber => after.TrackNumber?.ToString(),
                 TagField.Bpm => after.Bpm is { } b ? Math.Round(b).ToString("0") : null,
                 TagField.Key => after.MusicalKey,
+                TagField.MusicBrainzRecordingId => after.MusicBrainzRecordingId,
                 _ => null
             };
             if (!string.Equals(expected, actual, StringComparison.Ordinal))
