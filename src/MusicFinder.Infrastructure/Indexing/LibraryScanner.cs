@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using MusicFinder.Application.Health;
 using MusicFinder.Application.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Entities;
@@ -104,6 +105,7 @@ public sealed class LibraryScanner : IIndexer
             }
 
             Report("Finalizing", null, force: true);
+            await _roots.SetUnsupportedAsync(rootId, state.Unsupported.ToDictionary(kv => kv.Key, kv => kv.Value), ct);
             await _tracks.MarkMissingAsync(rootId, scanStart, ct);
             await _folders.RecomputeCountsAsync(rootId, ct);
             await _roots.UpdateStatusAsync(rootId, ScanStatus.Indexed, DateTime.UtcNow, ct);
@@ -139,7 +141,12 @@ public sealed class LibraryScanner : IIndexer
 
         foreach (var path in files)
         {
-            if (!SupportedFormats.IsSupported(path)) continue;
+            if (!SupportedFormats.IsSupported(path))
+            {
+                if (SupportedFormats.IsKnownUnsupported(path))
+                    state.Unsupported.AddOrUpdate(Path.GetExtension(path).ToLowerInvariant(), 1, (_, n) => n + 1);
+                continue;
+            }
             FileInfo info;
             try { info = new FileInfo(path); _ = info.Length; }
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
@@ -184,6 +191,7 @@ public sealed class LibraryScanner : IIndexer
     private async Task<Track> BuildTrackAsync(FileInfo info, long folderId, DateTime scanStart, ScanState state, CancellationToken ct)
     {
         TrackMetadata meta;
+        string? readError = null;
         try
         {
             meta = await _reader.ReadAsync(info.FullName, ct);
@@ -198,6 +206,7 @@ public sealed class LibraryScanner : IIndexer
             _log.LogWarning(ex, "Could not read tags from {Path}.", info.FullName);
             Interlocked.Increment(ref state.Errors);
             meta = new TrackMetadata();
+            readError = ex.GetType().Name + ": " + ex.Message;
         }
 
         return new Track
@@ -223,6 +232,11 @@ public sealed class LibraryScanner : IIndexer
             MusicalKey = meta.MusicalKey,
             MusicBrainzRecordingId = meta.MusicBrainzRecordingId,
             ArtworkCacheKey = meta.ArtworkHash,
+            Codec = meta.Codec,
+            Channels = meta.Channels,
+            BitDepth = meta.BitDepth,
+            ReadError = readError,
+            IssueFlags = (int)QualityRules.Evaluate(info.Extension, info.Length, meta, readError is not null),
             MetaVersion = Track.CurrentMetaVersion,
             NormalizedText = TextNormalizer.BuildSearchText(
                 info.Name, meta.Title, meta.Artist, meta.AlbumArtist, meta.Album, meta.GenreRaw)
@@ -252,6 +266,7 @@ public sealed class LibraryScanner : IIndexer
 
     private sealed class ScanState
     {
+        public readonly System.Collections.Concurrent.ConcurrentDictionary<string, int> Unsupported = new();
         public int Folders;
         public int Files;
         public int Processed;

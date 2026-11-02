@@ -539,6 +539,18 @@
                                 <TextBlock Text="Duration" Style="{StaticResource DetailLabel}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding DurationText}"/>
                             </Grid>
+                            <Grid Margin="0,0,0,10" Visibility="{Binding HasQualityText, Converter={StaticResource BoolToVis}}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Audio" Style="{StaticResource DetailLabel}" VerticalAlignment="Top"/>
+                                <TextBlock Grid.Column="1" Text="{Binding QualityText, Mode=OneWay}" TextWrapping="Wrap" TextTrimming="None"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,10" Visibility="{Binding HasIssues, Converter={StaticResource BoolToVis}}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Check" Style="{StaticResource DetailLabel}" VerticalAlignment="Top"/>
+                                <TextBlock Grid.Column="1" Text="{Binding IssueText, Mode=OneWay}" TextWrapping="Wrap" TextTrimming="None"
+                                           Foreground="{StaticResource MF.Brush.Possible}"
+                                           ToolTip="Hints from the file's own properties. They are suspicions, not proof."/>
+                            </Grid>
 
                             <Rectangle Height="1" Fill="{StaticResource MF.Brush.PanelBorder}" Margin="0,6,0,14"/>
 

@@ -185,3 +185,11 @@ public interface ISimilarTracksService
 {
     Task<SimilarTracksResult> FindAsync(long trackId, SimilarTracksOptions options, CancellationToken ct);
 }
+
+/// <summary>Library Health: counts and lists derived from the stored metadata. Never rescans the music.</summary>
+public interface IMetadataHealthService
+{
+    Task<HealthSummary> GetSummaryAsync(CancellationToken ct);
+    /// <summary>Track ids with the given finding, ordered by id. Files that are gone count only for MissingFiles.</summary>
+    Task<IReadOnlyList<long>> QueryIssuesAsync(HealthIssueKind kind, int skip, int take, CancellationToken ct);
+}

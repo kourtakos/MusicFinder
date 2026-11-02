@@ -20,4 +20,8 @@ public sealed record TrackMetadata
     public string? MusicBrainzRecordingId { get; init; }
     /// <summary>Lowercase hex SHA-1 of the embedded front cover; the content-addressed artwork cache key. Null when none.</summary>
     public string? ArtworkHash { get; init; }
+    /// <summary>First codec the container reports ("MPEG Version 1 Audio, Layer 3", "FLAC", ...). Null when unknown.</summary>
+    public string? Codec { get; init; }
+    public int? Channels { get; init; }
+    public int? BitDepth { get; init; }
 }

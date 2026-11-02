@@ -53,7 +53,7 @@ Command-line options for the app:
 ### Search syntax
 
 `artist:madonna` `title:"like a prayer"` `album:` `genre:disco` `ext:flac` `key:8A`
-`bpm:115-125` `year:1980-1989` `decade:80s` `missing:title|artist|album|genre|year|bpm`
+`bpm:115-125` `year:1980-1989` `decade:80s` `missing:title|artist|album|genre|year|bpm|key|art` `issue:any|lowbitrate|mojibake|error` `bitrate:0-127` `codec:flac`
 
 Quoted phrases are supported. Invalid expressions show a warning and never block the search.
 `played:never|session|possible|confirmed` filters by play status (see `docs/dj-session.md`). Greek, Greeklish and wrong-keyboard-layout matching is automatic (`docs/greek-search.md`).

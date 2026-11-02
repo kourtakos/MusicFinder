@@ -212,6 +212,13 @@ public partial class LibraryViewModel : ObservableObject
 
     public void RequestFocusSearch() => FocusSearchRequested?.Invoke(this, EventArgs.Empty);
 
+    /// <summary>Lists the tracks a search text finds, across the whole library (Library Health opens its findings this way).</summary>
+    public void ShowFiltered(string query)
+    {
+        Tree.GlobalSearch = true;
+        Search.ShowQuery(query);
+    }
+
     public async Task InitializeAsync()
     {
         await Tree.ReloadAsync();

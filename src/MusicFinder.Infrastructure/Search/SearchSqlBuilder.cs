@@ -13,6 +13,7 @@ public static class SearchSqlBuilder
     private const string SelectColumns =
         "t.Id, t.FolderId, t.FullPath, t.FileName, t.Extension, t.FileSize, t.Title, t.Artist, t.Album, t.GenreRaw, " +
         "t.Year, t.DurationMs, t.BitrateKbps, t.Bpm, t.MusicalKey, t.Missing, t.ArtworkCacheKey, " +
+        "t.Codec, t.SampleRateHz, t.Channels, t.BitDepth, t.IssueFlags, t.ReadError, " +
         // Names are collected per page row; the (TrackId, ...) primary keys make these lookups index-only.
         "(SELECT group_concat(Name, char(31)) FROM (SELECT g.Name FROM TrackGenres tg JOIN Genres g ON g.Id = tg.GenreId " +
         "WHERE tg.TrackId = t.Id ORDER BY g.SortOrder, g.Name)) AS GenreNames, " +
@@ -197,9 +198,27 @@ public static class SearchSqlBuilder
                 "year" => "t.Year IS NULL",
                 "bpm" => "(t.Bpm IS NULL OR t.Bpm <= 0)",
                 "key" => "(t.MusicalKey IS NULL OR TRIM(t.MusicalKey) = '')",
+                "art" or "cover" => "(t.ArtworkCacheKey IS NULL OR t.ArtworkCacheKey = '')",
                 _ => "1 = 1"
             });
         }
+
+        foreach (var issue in parsed.Issues.Distinct())
+        {
+            where.Add(issue switch
+            {
+                "mojibake" => $"(t.IssueFlags & {(int)IssueFlags.Mojibake}) <> 0",
+                "error" => $"(t.IssueFlags & {(int)IssueFlags.Unreadable}) <> 0",
+                "lowbitrate" => $"(t.IssueFlags & {(int)IssueFlags.LowBitrate}) <> 0",
+                "samplerate" => $"(t.IssueFlags & {(int)IssueFlags.OddSampleRate}) <> 0",
+                "mismatch" => $"(t.IssueFlags & {(int)IssueFlags.CodecMismatch}) <> 0",
+                "size" => $"(t.IssueFlags & {(int)IssueFlags.SizeMismatch}) <> 0",
+                "duration" => $"(t.IssueFlags & {(int)IssueFlags.ZeroDuration}) <> 0",
+                _ => "t.IssueFlags <> 0"
+            });
+        }
+        AddRange(where, p, "t.BitrateKbps", "kbpsQ", parsed.BitrateMin, parsed.BitrateMax);
+        if (parsed.Codec is not null) { where.Add("t.Codec LIKE @codecQ ESCAPE '\\'"); p.Add("codecQ", "%" + EscapeLike(parsed.Codec) + "%"); }
 
         if (q.SessionId is { } sid) p.Add("sid", sid);
         if (f.Played is { } pill) where.Add(PlayedClause(pill, q.SessionId));
@@ -297,6 +316,8 @@ public static class SearchSqlBuilder
                   $"FROM Tracks t WHERE {string.Join(" AND ", where)} ORDER BY {RelevanceExpression(match)} ASC, t.Id ASC LIMIT @limit";
         return (sql, p);
     }
+
+    private static string EscapeLike(string s) => s.Replace("\\", "\\\\").Replace("%", "\\%").Replace("_", "\\_");
 
     private static void AddRange(List<string> where, DynamicParameters p, string column, string name, double? min, double? max)
     {

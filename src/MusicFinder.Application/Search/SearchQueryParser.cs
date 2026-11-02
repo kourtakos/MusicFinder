@@ -18,21 +18,28 @@ public sealed class ParsedQuery
     /// <summary>From <c>played:never|session|possible|confirmed</c>.</summary>
     public PlayedFilter? Played { get; set; }
     public List<string> Missing { get; } = [];
+    /// <summary>From <c>issue:mojibake|error|lowbitrate|samplerate|mismatch|size|duration|any</c>; each value is a bit of <see cref="Domain.Enums.IssueFlags"/> (any = any bit).</summary>
+    public List<string> Issues { get; } = [];
+    public double? BitrateMin { get; set; }
+    public double? BitrateMax { get; set; }
+    public string? Codec { get; set; }
     /// <summary>Non-blocking validation messages; parsing never throws.</summary>
     public List<string> Warnings { get; } = [];
 }
 
 /// <summary>
 /// Lexer/parser for the search grammar: tokens, "quoted phrases", and field:value filters
-/// (artist, title, album, genre, ext, key, bpm, year, decade, missing, played).
+/// (artist, title, album, genre, ext, key, bpm, year, decade, missing, played, issue, bitrate, codec).
 /// </summary>
 public static class SearchQueryParser
 {
     private static readonly HashSet<string> TextFields = new(StringComparer.OrdinalIgnoreCase) { "artist", "title", "album", "genre" };
     private static readonly HashSet<string> KnownFields = new(StringComparer.OrdinalIgnoreCase)
-        { "artist", "title", "album", "genre", "ext", "key", "bpm", "year", "decade", "missing", "played" };
+        { "artist", "title", "album", "genre", "ext", "key", "bpm", "year", "decade", "missing", "played", "issue", "bitrate", "codec" };
+    private static readonly HashSet<string> IssueNames = new(StringComparer.OrdinalIgnoreCase)
+        { "any", "mojibake", "error", "lowbitrate", "samplerate", "mismatch", "size", "duration" };
     private static readonly HashSet<string> MissingFields = new(StringComparer.OrdinalIgnoreCase)
-        { "title", "artist", "album", "genre", "year", "bpm", "key" };
+        { "title", "artist", "album", "genre", "year", "bpm", "key", "art", "cover" };
 
     public static ParsedQuery Parse(string? input)
     {
@@ -121,7 +128,18 @@ public static class SearchQueryParser
                 break;
             case "missing":
                 if (MissingFields.Contains(value)) q.Missing.Add(value.ToLowerInvariant());
-                else q.Warnings.Add($"Unknown missing:{value} (title, artist, album, genre, year, bpm, key).");
+                else q.Warnings.Add($"Unknown missing:{value} (title, artist, album, genre, year, bpm, key, art).");
+                break;
+            case "issue":
+                if (IssueNames.Contains(value)) q.Issues.Add(value.ToLowerInvariant());
+                else q.Warnings.Add($"Unknown issue:{value} (any, mojibake, error, lowbitrate, samplerate, mismatch, size, duration).");
+                break;
+            case "bitrate":
+                if (TryParseRange(value, out var kmin, out var kmax)) { q.BitrateMin = kmin; q.BitrateMax = kmax; }
+                else q.Warnings.Add($"Invalid bitrate range '{value}' (use bitrate:320 or bitrate:0-127).");
+                break;
+            case "codec":
+                q.Codec = value;
                 break;
             case "played":
                 if (value.All(char.IsLetter) && Enum.TryParse<PlayedFilter>(value, ignoreCase: true, out var played))

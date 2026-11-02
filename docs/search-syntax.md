@@ -24,6 +24,10 @@ Genre / BPM / Decade filters; filters never exclude one another.
 | `year:1985` / `year:1980-1989` | Year or range. |
 | `decade:80s` / `decade:1980s` | Decade shorthand for a ten-year `year` range (`10s` = 2010–2019, `00s` = 2000–2009). |
 | `missing:title` | Tracks with no value for `title`, `artist`, `album`, `genre`, `year`, `bpm` or `key` (a BPM of 0 or a blank key counts as missing). |
+| `missing:art` | Tracks with no embedded cover (also `missing:cover`). |
+| `issue:any` | Tracks flagged by Library Health: `issue:mojibake`, `error`, `lowbitrate`, `samplerate`, `mismatch`, `size`, `duration`, or `any` (see library-health.md). |
+| `bitrate:320` / `bitrate:0-127` | Bitrate in kbps, exact or range. |
+| `codec:flac` | Part of the codec name the file reports. |
 | `played:never` | Never played (no possible or confirmed play). |
 | `played:possible` / `played:confirmed` | At least one possible / confirmed play. |
 | `played:session` | Played (possibly or confirmed) in the live DJ session; matches nothing when no session is running. |

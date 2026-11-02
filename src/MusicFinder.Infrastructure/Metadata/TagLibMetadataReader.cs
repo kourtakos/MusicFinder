@@ -42,7 +42,10 @@ public sealed class TagLibMetadataReader : IMetadataReader
             ArtworkHash = Artwork.ArtworkExtractor.PickFront(tag.Pictures)?.Hash,
             DurationMs = props is { Duration.TotalMilliseconds: > 0 } ? (long)props.Duration.TotalMilliseconds : null,
             BitrateKbps = props is { AudioBitrate: > 0 } ? props.AudioBitrate : null,
-            SampleRateHz = props is { AudioSampleRate: > 0 } ? props.AudioSampleRate : null
+            SampleRateHz = props is { AudioSampleRate: > 0 } ? props.AudioSampleRate : null,
+            Codec = Clean(props?.Codecs?.FirstOrDefault(c => c is not null)?.Description),
+            Channels = props is { AudioChannels: > 0 } ? props.AudioChannels : null,
+            BitDepth = props is { BitsPerSample: > 0 } ? props.BitsPerSample : null
         };
     }
 

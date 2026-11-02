@@ -376,6 +376,19 @@ public partial class SearchViewModel : ObservableObject
     [RelayCommand]
     private void ClearQuery() => QueryText = "";
 
+    /// <summary>Replaces the search with the given text and clears every other filter, so exactly that query is shown.</summary>
+    public void ShowQuery(string text)
+    {
+        ExitSimilarMode();
+        foreach (var o in GenreOptions.Concat(TagOptions).Concat(DecadeOptions).Concat(BpmOptions).Concat(PlayedOptions)) o.SetSilently(false);
+        SortField = SortField.Relevance;
+        SortDirection = SortDirection.Asc;
+        var changed = QueryText != text;
+        QueryText = text;
+        OnPropertyChanged(nameof(HasActiveFilters));
+        if (!changed) ScheduleSearch(0);
+    }
+
     [RelayCommand]
     private void Reset()
     {

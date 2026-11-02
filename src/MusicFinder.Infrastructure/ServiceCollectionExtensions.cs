@@ -51,6 +51,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<MusicFinder.Application.Search.IVocabularyLookup>(sp => sp.GetRequiredService<FtsVocabulary>());
         services.AddSingleton<SqliteSearchService>();
         services.AddSingleton<ISearchService>(sp => sp.GetRequiredService<SqliteSearchService>());
+        services.AddSingleton<IMetadataHealthService, Health.MetadataHealthService>();
         services.AddSingleton<ISearchDiagnostics>(sp => sp.GetRequiredService<SqliteSearchService>());
         services.AddSingleton<ISearchAliasService, MusicFinder.Application.Search.SearchAliasService>();
         services.AddSingleton<ISimilarCandidateSource, SimilarCandidateRepository>();

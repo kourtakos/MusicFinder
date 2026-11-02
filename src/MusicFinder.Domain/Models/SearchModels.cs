@@ -52,7 +52,8 @@ public sealed record SearchResultRow(
     long? DurationMs, int? BitrateKbps, double? Bpm, string? MusicalKey, bool Missing,
     string? ArtworkCacheKey = null, IReadOnlyList<string>? MappedGenres = null, IReadOnlyList<string>? Tags = null,
     DateTime? LastPlayedUtc = null, DateTime? LastConfirmedUtc = null, DateTime? LastPossibleUtc = null,
-    int ConfirmedCount = 0, int PossibleCount = 0, SessionPlayStatus SessionStatus = SessionPlayStatus.None)
+    int ConfirmedCount = 0, int PossibleCount = 0, SessionPlayStatus SessionStatus = SessionPlayStatus.None,
+    string? Codec = null, int? SampleRateHz = null, int? Channels = null, int? BitDepth = null, int IssueFlags = 0, string? ReadError = null)
 {
     public int PlayCount => ConfirmedCount + PossibleCount;
 

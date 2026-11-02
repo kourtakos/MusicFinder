@@ -83,6 +83,13 @@ App ──► Application ──► Domain
 - **Infrastructure**: `Audio/AudioDecoders.cs` (`MediaFoundationAudioDecoder`, `WaveAiffAudioDecoder`, `VorbisAudioDecoder`, `AudioDecoderRouter`), `TrackAnalysisRepository`, migration 0008.
 - **App**: `AnalyzeViewModel` / `AnalyzeWindow`, `AnalysisSettingsViewModel`; entry points in `LibraryViewModel` (`AnalyzeCommand`, `AnalyzeMissingCommand`). Writing goes only through `ITagEditingService`.
 
+## Library Health (M6)
+
+- **Domain**: `Enums/IssueFlags.cs`, `Models/HealthModels.cs` (`HealthIssueKind`, `HealthSummary`), `IMetadataHealthService` (`GetSummaryAsync`, `QueryIssuesAsync`).
+- **Application/Health**: `MojibakeDetector`, `QualityRules`, `HealthIssues` (titles, explanations and the Library search for each finding).
+- **Infrastructure**: `Health/MetadataHealthService` (SQL counts, no file read), reader fields in `TagLibMetadataReader`, `ReadError` and unsupported-file counting in `LibraryScanner`, migration 0009.
+- **App**: `HealthViewModel` / `HealthView` (the Health tab), `LibraryViewModel.ShowFiltered` (a card opens the Library on its search).
+
 ## Threading and data rules
 
 - All writes go through one serialized queue, each in its own short transaction. Reads use separate pooled connections (WAL mode).

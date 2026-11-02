@@ -19,10 +19,12 @@ public sealed class TrackRepository : ITrackRepository
         """
         INSERT INTO Tracks (FolderId, FullPath, FileName, Extension, FileSize, ModifiedUtc, IndexedUtc,
             Title, Artist, AlbumArtist, Album, GenreRaw, Year, TrackNumber, DurationMs, BitrateKbps, SampleRateHz,
-            Bpm, MusicalKey, MusicBrainzRecordingId, ArtworkCacheKey, Missing, NormalizedText, GenreMapVersion, MetaVersion)
+            Bpm, MusicalKey, MusicBrainzRecordingId, ArtworkCacheKey, Missing, NormalizedText, GenreMapVersion, MetaVersion,
+            Codec, Channels, BitDepth, ReadError, IssueFlags)
         VALUES (@FolderId, @FullPath, @FileName, @Extension, @FileSize, @ModifiedUtc, @IndexedUtc,
             @Title, @Artist, @AlbumArtist, @Album, @GenreRaw, @Year, @TrackNumber, @DurationMs, @BitrateKbps, @SampleRateHz,
-            @Bpm, @MusicalKey, @MusicBrainzRecordingId, @ArtworkCacheKey, @Missing, @NormalizedText, 0, @MetaVersion)
+            @Bpm, @MusicalKey, @MusicBrainzRecordingId, @ArtworkCacheKey, @Missing, @NormalizedText, 0, @MetaVersion,
+            @Codec, @Channels, @BitDepth, @ReadError, @IssueFlags)
         ON CONFLICT(FullPath) DO UPDATE SET
             FolderId = excluded.FolderId, FileName = excluded.FileName, Extension = excluded.Extension,
             FileSize = excluded.FileSize, ModifiedUtc = excluded.ModifiedUtc, IndexedUtc = excluded.IndexedUtc,
@@ -31,7 +33,9 @@ public sealed class TrackRepository : ITrackRepository
             DurationMs = excluded.DurationMs, BitrateKbps = excluded.BitrateKbps, SampleRateHz = excluded.SampleRateHz,
             Bpm = excluded.Bpm, MusicalKey = excluded.MusicalKey, MusicBrainzRecordingId = excluded.MusicBrainzRecordingId,
             ArtworkCacheKey = excluded.ArtworkCacheKey, Missing = excluded.Missing, NormalizedText = excluded.NormalizedText,
-            GenreMapVersion = 0, SearchAliasVersion = 0, MetaVersion = excluded.MetaVersion
+            GenreMapVersion = 0, SearchAliasVersion = 0, MetaVersion = excluded.MetaVersion,
+            Codec = excluded.Codec, Channels = excluded.Channels, BitDepth = excluded.BitDepth,
+            ReadError = excluded.ReadError, IssueFlags = excluded.IssueFlags
         """;
 
     public Task UpsertBatchAsync(IReadOnlyList<Track> tracks, CancellationToken ct = default) =>
@@ -54,7 +58,11 @@ public sealed class TrackRepository : ITrackRepository
 
     public Task ApplyMetadataAsync(long trackId, Domain.Models.TrackMetadata m, long fileSize, DateTime modifiedUtc, string normalizedText,
         CancellationToken ct = default) =>
-        _writes.EnqueueAsync((conn, tx) => conn.Execute(
+        _writes.EnqueueAsync((conn, tx) =>
+        {
+            var extension = conn.ExecuteScalar<string>("SELECT Extension FROM Tracks WHERE Id = @trackId", new { trackId }, tx) ?? "";
+            var issueFlags = (int)Application.Health.QualityRules.Evaluate(extension, fileSize, m, readFailed: false);
+            return conn.Execute(
             """
             UPDATE Tracks SET
                 Title = @Title, Artist = @Artist, AlbumArtist = @AlbumArtist, Album = @Album, GenreRaw = @GenreRaw,
@@ -62,15 +70,18 @@ public sealed class TrackRepository : ITrackRepository
                 SampleRateHz = @SampleRateHz, Bpm = @Bpm, MusicalKey = @MusicalKey,
                 MusicBrainzRecordingId = @MusicBrainzRecordingId, ArtworkCacheKey = @ArtworkHash,
                 FileSize = @fileSize, ModifiedUtc = @modifiedUtc, NormalizedText = @normalizedText,
-                GenreMapVersion = 0, SearchAliasVersion = 0, MetaVersion = @metaVersion, Missing = 0
+                GenreMapVersion = 0, SearchAliasVersion = 0, MetaVersion = @metaVersion, Missing = 0,
+                Codec = @Codec, Channels = @Channels, BitDepth = @BitDepth, ReadError = NULL, IssueFlags = @issueFlags
             WHERE Id = @trackId
             """,
             new
             {
                 trackId, m.Title, m.Artist, m.AlbumArtist, m.Album, m.GenreRaw, m.Year, m.TrackNumber, m.DurationMs,
                 m.BitrateKbps, m.SampleRateHz, m.Bpm, m.MusicalKey, m.MusicBrainzRecordingId, m.ArtworkHash,
-                fileSize, modifiedUtc, normalizedText, metaVersion = Track.CurrentMetaVersion
-            }, tx), ct);
+                fileSize, modifiedUtc, normalizedText, metaVersion = Track.CurrentMetaVersion,
+                m.Codec, m.Channels, m.BitDepth, issueFlags
+            }, tx);
+        }, ct);
 
     public async Task<IReadOnlyList<IndexedFile>> GetIndexedFilesAsync(long rootId, CancellationToken ct = default)
     {

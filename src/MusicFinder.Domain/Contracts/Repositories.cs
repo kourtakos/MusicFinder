@@ -11,6 +11,10 @@ public interface ILibraryRootRepository
     Task<LibraryRoot?> GetAsync(long id, CancellationToken ct = default);
     Task UpdateStatusAsync(long id, ScanStatus status, DateTime? lastScanUtc = null, CancellationToken ct = default);
     Task SetEnabledAsync(long id, bool enabled, CancellationToken ct = default);
+    /// <summary>Replaces the counts of audio-like files this root holds that the scanner does not index, by extension.</summary>
+    Task SetUnsupportedAsync(long rootId, IReadOnlyDictionary<string, int> countsByExtension, CancellationToken ct = default);
+    /// <summary>Unsupported audio-like files across all enabled roots, by extension (largest first).</summary>
+    Task<IReadOnlyList<(string Extension, int Count)>> GetUnsupportedAsync(CancellationToken ct = default);
 }
 
 public interface IFolderRepository

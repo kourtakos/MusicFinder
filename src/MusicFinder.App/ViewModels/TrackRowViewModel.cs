@@ -114,6 +114,41 @@ public sealed partial class TrackRowViewModel : ObservableObject
         }
     }
 
+    /// <summary>Codec, sample rate and channels as stored, e.g. "MPEG Version 1 Audio, Layer 3 · 44.1 kHz · stereo". Empty when unknown.</summary>
+    public string QualityText
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(Row.Codec)) parts.Add(Row.Codec!);
+            if (Row.SampleRateHz is > 0) parts.Add((Row.SampleRateHz.Value / 1000.0).ToString("0.##", CultureInfo.InvariantCulture) + " kHz");
+            if (Row.Channels is > 0) parts.Add(Row.Channels == 1 ? "mono" : Row.Channels == 2 ? "stereo" : Row.Channels + " channels");
+            if (Row.BitDepth is > 0) parts.Add(Row.BitDepth + "-bit");
+            return string.Join(" · ", parts);
+        }
+    }
+
+    /// <summary>The suspicions about this file, in plain words ("Low bitrate; Garbled text"). They are hints, not proof.</summary>
+    public string IssueText
+    {
+        get
+        {
+            var flags = (Domain.Enums.IssueFlags)Row.IssueFlags;
+            var items = new List<string>();
+            if (flags.HasFlag(Domain.Enums.IssueFlags.Unreadable)) items.Add("Tags could not be read" + (string.IsNullOrEmpty(Row.ReadError) ? "" : " (" + Row.ReadError + ")"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.Mojibake)) items.Add("Garbled text in the tags");
+            if (flags.HasFlag(Domain.Enums.IssueFlags.LowBitrate)) items.Add("Low bitrate");
+            if (flags.HasFlag(Domain.Enums.IssueFlags.OddSampleRate)) items.Add("Unusual sample rate");
+            if (flags.HasFlag(Domain.Enums.IssueFlags.CodecMismatch)) items.Add("Audio is not the kind the extension suggests");
+            if (flags.HasFlag(Domain.Enums.IssueFlags.SizeMismatch)) items.Add("Size does not fit the bitrate and length");
+            if (flags.HasFlag(Domain.Enums.IssueFlags.ZeroDuration)) items.Add("No duration");
+            return string.Join("; ", items);
+        }
+    }
+
+    public bool HasIssues => Row.IssueFlags != 0;
+    public bool HasQualityText => QualityText.Length > 0;
+
     public bool IsMissing => Row.Missing;
 
     private static string FormatSize(long bytes) => bytes switch

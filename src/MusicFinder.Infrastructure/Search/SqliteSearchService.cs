@@ -164,7 +164,8 @@ public sealed class SqliteSearchService : ISearchService, ISearchDiagnostics
         r.Artist, r.Album, r.GenreRaw, r.Year, r.DurationMs, r.BitrateKbps, r.Bpm, r.MusicalKey, r.Missing,
         r.ArtworkCacheKey, SplitNames(r.GenreNames), SplitNames(r.TagNames),
         ParseUtc(r.LastPlayedUtc), ParseUtc(r.LastConfirmedUtc), ParseUtc(r.LastPossibleUtc),
-        r.ConfirmedCount, r.PossibleCount, (SessionPlayStatus)r.SessionStatus);
+        r.ConfirmedCount, r.PossibleCount, (SessionPlayStatus)r.SessionStatus,
+        r.Codec, r.SampleRateHz, r.Channels, r.BitDepth, r.IssueFlags, r.ReadError);
 
     private static DateTime? ParseUtc(string? text) => string.IsNullOrEmpty(text) ? null : DapperConfig.FromDb(text);
 
@@ -191,6 +192,12 @@ public sealed class SqliteSearchService : ISearchService, ISearchDiagnostics
         public string? MusicalKey { get; set; }
         public bool Missing { get; set; }
         public string? ArtworkCacheKey { get; set; }
+        public string? Codec { get; set; }
+        public int? SampleRateHz { get; set; }
+        public int? Channels { get; set; }
+        public int? BitDepth { get; set; }
+        public int IssueFlags { get; set; }
+        public string? ReadError { get; set; }
         public string? GenreNames { get; set; }
         public string? TagNames { get; set; }
         public string? LastPlayedUtc { get; set; }

@@ -16,6 +16,7 @@
         <DataTemplate DataType="{x:Type vm:LibraryViewModel}"><views:LibraryView/></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><views:SettingsView/></DataTemplate>
         <DataTemplate DataType="{x:Type vm:TagsViewModel}"><views:TagsView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:HealthViewModel}"><views:HealthView/></DataTemplate>
         <DataTemplate DataType="{x:Type vm:PlaceholderViewModel}"><views:PlaceholderView/></DataTemplate>
         <DataTemplate DataType="{x:Type vm:SessionViewModel}"><views:SessionView/></DataTemplate>
     </Window.Resources>
@@ -65,6 +66,13 @@
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8EC;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
                             <TextBlock Text="Tags" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
+                        </StackPanel>
+                    </RadioButton>
+                    <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"
+                                 IsChecked="{Binding SelectedTab, Mode=TwoWay, Converter={StaticResource EqualsConv}, ConverterParameter=Health}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE95E;" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}" Margin="0,0,9,0"/>
+                            <TextBlock Text="Health" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"/>
                         </StackPanel>
                     </RadioButton>
                     <RadioButton GroupName="Nav" Style="{StaticResource MF.NavTab}"

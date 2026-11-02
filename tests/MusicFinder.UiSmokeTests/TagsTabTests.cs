@@ -265,7 +265,7 @@ public class TagsTabTests
         var c = await StartAsync();
         await using var _ = c.App;
         var tabs = FindAll<System.Windows.Controls.RadioButton>(c.App.Window).ToList();
-        Assert.Equal(5, tabs.Count);
+        Assert.Equal(6, tabs.Count);                                // Library, Tags, Health, History, Session, Settings
         Assert.True(tabs[0].IsChecked);                                 // Library
 
         // Keyboard navigation and UI Automation check a tab without clicking it; the content must follow.
@@ -273,14 +273,18 @@ public class TagsTabTests
         Assert.Equal(AppTab.Tags, c.App.Main.SelectedTab);
         await Ui.WaitUntilAsync(() => Ui.FindDescendant<TagsView>(c.App.Window) is not null, what: "tags view");
 
-        tabs[4].IsChecked = true;
+        tabs[2].IsChecked = true;
+        Assert.Equal(AppTab.Health, c.App.Main.SelectedTab);
+        await Ui.WaitUntilAsync(() => Ui.FindDescendant<HealthView>(c.App.Window) is not null, what: "health view");
+
+        tabs[5].IsChecked = true;
         Assert.Equal(AppTab.Settings, c.App.Main.SelectedTab);
         await Ui.WaitUntilAsync(() => Ui.FindDescendant<SettingsView>(c.App.Window) is not null, what: "settings view");
 
         // And the other way round: navigating in code moves the highlighted tab.
         c.App.Main.NavigateCommand.Execute(AppTab.Library);
         Assert.True(tabs[0].IsChecked);
-        Assert.False(tabs[4].IsChecked);
+        Assert.False(tabs[5].IsChecked);
     });
 
     private static IEnumerable<T> FindAll<T>(System.Windows.DependencyObject root) where T : System.Windows.DependencyObject

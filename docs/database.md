@@ -116,3 +116,9 @@ Times are written with `DapperConfig.ToDb` (fixed-width ISO), so "not yet expire
 KeyScore, KeyLevel, KeyRunner, KeyFlags, TuningCents, AnalyzedSeconds, Decoder, Message, AnalyzedUtc)`. Estimates are kept **apart from `Tracks.Bpm` and `Tracks.MusicalKey`** (the tags): Find Similar and the grid read only
 the tags, so an estimate never looks like a tag value until the user writes it. A row is used only while the file's size and modified time and `AudioAnalyzer.Version` are unchanged; after a tag write the row is moved to
 the file's new size and time (the audio did not change). "No estimate" is stored too (a silent file stays silent); decode failures are not.
+
+## Quality and health (M6, migration 0009)
+
+`0009_QualityAndHealth.sql` adds to `Tracks`: `Codec`, `Channels`, `BitDepth` (container facts from TagLib; NULL = unknown), `ReadError` (why the tags could not be read; NULL = read fine) and `IssueFlags` (bit mask, see `Domain/Enums/IssueFlags.cs`, 0 = nothing suspect),
+with a partial index on non-zero flags. `Track.CurrentMetaVersion` is now 2, so every row indexed earlier is re-read once by the next scan and gains the new facts. `IssueFlags` is computed in C# by `QualityRules` whenever a row is written (scan or tag write), from
+data the row already has; nothing is hashed or decoded. `ScanUnsupported(RootId, Extension, FileCount)` holds the per-root counts of audio-like files the scanner skips. Library Health counts are plain SQL over `Tracks` (`MetadataHealthService`), always current.

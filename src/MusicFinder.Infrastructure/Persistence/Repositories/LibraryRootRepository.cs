@@ -45,4 +45,21 @@ public sealed class LibraryRootRepository : ILibraryRootRepository
     public Task SetEnabledAsync(long id, bool enabled, CancellationToken ct = default) =>
         _writes.EnqueueAsync((conn, tx) =>
             conn.Execute("UPDATE LibraryRoots SET Enabled = @enabled WHERE Id = @id", new { id, enabled }, tx), ct);
+
+    public Task SetUnsupportedAsync(long rootId, IReadOnlyDictionary<string, int> countsByExtension, CancellationToken ct = default) =>
+        _writes.EnqueueAsync((conn, tx) =>
+        {
+            conn.Execute("DELETE FROM ScanUnsupported WHERE RootId = @rootId", new { rootId }, tx);
+            conn.Execute("INSERT INTO ScanUnsupported(RootId, Extension, FileCount) VALUES (@rootId, @ext, @n)",
+                countsByExtension.Select(kv => new { rootId, ext = kv.Key, n = kv.Value }), tx);
+        }, ct);
+
+    public async Task<IReadOnlyList<(string Extension, int Count)>> GetUnsupportedAsync(CancellationToken ct = default)
+    {
+        using var conn = _factory.Open();
+        var rows = await conn.QueryAsync<(string Extension, long Count)>(
+            "SELECT u.Extension, SUM(u.FileCount) AS Count FROM ScanUnsupported u JOIN LibraryRoots r ON r.Id = u.RootId " +
+            "WHERE r.Enabled = 1 GROUP BY u.Extension ORDER BY Count DESC, u.Extension");
+        return rows.Select(r => (r.Extension, (int)r.Count)).ToList();
+    }
 }
