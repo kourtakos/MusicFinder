@@ -7,7 +7,12 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <AssemblyName>MusicFinder</AssemblyName>
     <RootNamespace>MusicFinder.App</RootNamespace>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon.png" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MusicFinder.Domain\MusicFinder.Domain.csproj" />

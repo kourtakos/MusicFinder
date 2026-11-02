@@ -659,6 +659,7 @@
 
     <!-- ===== Window ===== -->
     <Style x:Key="MF.Window" TargetType="Window">
+        <Setter Property="Icon" Value="pack://application:,,,/MusicFinder;component/Assets/icon.png"/>
         <Setter Property="Background" Value="{StaticResource MF.Brush.WindowBg}"/>
         <Setter Property="Foreground" Value="{StaticResource MF.Brush.TextPrimary}"/>
         <Setter Property="FontFamily" Value="{StaticResource MF.Font.Text}"/>
