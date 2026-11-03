@@ -95,6 +95,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         _hotkeyStatusIsError = quickSearch.StatusIsError;
         quickSearch.StatusChanged += (_, _) => ShowHotkeyStatus(); // e.g. registration failed at start-up, after this page was created
 
+        UiZoom.Changed += OnZoomChanged;
         _rootService.RootsChanged += async (_, _) => await ReloadAsync();
         _scans.ScanFinished += async (_, _) => await ReloadAsync();
     }
@@ -115,6 +116,21 @@ public sealed partial class SettingsViewModel : ObservableObject
         settings.UseFolderArtwork = value;
         _store.Save(settings);
     }
+
+    // ===== Text size (zoom of the whole interface) =====
+
+    [ObservableProperty] private int _uiZoomPercent = MusicFinder.Application.Display.ZoomLevel.ToPercent(UiZoom.Level);
+
+    /// <summary>The slider's top: what this screen can show without cutting the layout.</summary>
+    public int UiZoomMaxPercent => MusicFinder.Application.Display.ZoomLevel.ToPercent(UiZoom.MaxLevel);
+
+    partial void OnUiZoomPercentChanged(int value) => UiZoom.Set(MusicFinder.Application.Display.ZoomLevel.FromPercent(value));
+
+    [RelayCommand]
+    private void ResetZoom() => UiZoom.Set(MusicFinder.Application.Display.ZoomLevel.Default);
+
+    /// <summary>Keeps the slider in step when the zoom is changed with Ctrl+wheel or the keyboard.</summary>
+    private void OnZoomChanged(object? sender, EventArgs e) => UiZoomPercent = MusicFinder.Application.Display.ZoomLevel.ToPercent(UiZoom.Level);
 
     [ObservableProperty] private int _sessionHeuristicSeconds;
     [ObservableProperty] private bool _autoStartSessionOnDrag;

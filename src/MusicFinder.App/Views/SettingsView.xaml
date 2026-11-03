@@ -80,6 +80,21 @@
 
             <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
                 <StackPanel>
+                    <TextBlock Text="Text size" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Make everything bigger" VerticalAlignment="Center" Width="170"/>
+                        <Slider x:Name="ZoomSlider" Minimum="80" Maximum="{Binding UiZoomMaxPercent, Mode=OneWay}" TickFrequency="10" IsSnapToTickEnabled="True" SmallChange="10" LargeChange="20" Width="260"
+                                VerticalAlignment="Center" Value="{Binding UiZoomPercent, Mode=TwoWay}" AutomationProperties.Name="Text size"/>
+                        <TextBlock Text="{Binding UiZoomPercent, StringFormat={}{0}%}" Width="56" TextAlignment="Right" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                        <Button Content="Reset" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="14,0,0,0" Command="{Binding ResetZoomCommand}"/>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,10,0,0"
+                               Text="Text, icons and spacing grow together, in every window. In any window you can also hold Ctrl and turn the mouse wheel, or press Ctrl and + or −; Ctrl+0 goes back to 100%. A very large size leaves less room for the lists."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
                     <TextBlock Text="DJ session" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Quiet period after a drag" VerticalAlignment="Center" Width="170"/>

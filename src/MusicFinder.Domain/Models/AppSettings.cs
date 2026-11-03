@@ -73,6 +73,9 @@ public sealed class AppSettings
     /// <summary>Preview volume, 0 to 1. Starts at half so a first preview is never a surprise.</summary>
     public double PreviewVolume { get; set; } = 0.5;
 
+    /// <summary>How big the whole interface is: 1.0 normal, 1.5 half as big again. 0.8 to 2.0 (Ctrl+wheel, Ctrl +/-, or the slider in Settings).</summary>
+    public double UiZoom { get; set; } = 1.0;
+
     /// <summary>The welcome and song-recognition setup window has been shown (or closed) once. It can be opened again from Settings.</summary>
     public bool FirstRunCompleted { get; set; }
 

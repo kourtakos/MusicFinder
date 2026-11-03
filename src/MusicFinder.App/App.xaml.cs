@@ -66,6 +66,7 @@ public partial class App : System.Windows.Application
             _host.Services.GetRequiredService<MigrationRunner>().Migrate();
             await _host.Services.GetRequiredService<GenreTaxonomySeeder>().EnsureSeededAsync();
 
+            Services.UiZoom.Initialize(_host.Services.GetRequiredService<ISettingsStore>());    // text size from last time, and the zoom shortcuts
             var appSettings = _host.Services.GetRequiredService<ISettingsStore>().Load();
             var artwork = _host.Services.GetRequiredService<Services.Artwork.ArtworkService>();
             artwork.UseFolderArtwork = appSettings.UseFolderArtwork;
