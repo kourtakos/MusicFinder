@@ -99,7 +99,7 @@ public static class ServiceCollectionExtensions
         {
             ReaderConcurrency = sp.GetRequiredService<ISettingsStore>().Load().ReaderConcurrency
         });
-        AddIdentification(services);
+        AddIdentification(services, paths);
         AddAnalysis(services);
         return services;
     }
@@ -114,7 +114,7 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>Online identification (M5). Nothing here touches the network until the user turns it on and accepts the explanation.</summary>
-    private static void AddIdentification(IServiceCollection services)
+    private static void AddIdentification(IServiceCollection services, AppPaths paths)
     {
         services.TryAddSingleton(new MusicFinder.Application.Identification.AppInfo("MusicFinder",
             System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3) ?? "0.0.0"));
@@ -125,7 +125,8 @@ public static class ServiceCollectionExtensions
             innerFactory: null, sp.GetService<ILogger<Identification.IdentificationHttp>>()));
         services.AddSingleton<IIdentificationCache, IdentificationCacheRepository>();
         services.AddSingleton<Identification.IProcessRunner, Identification.WindowsProcessRunner>();
-        services.AddSingleton(sp => new Identification.FpcalcLocator(sp.GetRequiredService<ISettingsStore>()));
+        services.AddSingleton(sp => new Identification.FpcalcLocator(sp.GetRequiredService<ISettingsStore>(),
+            toolsDirectory: Path.Combine(paths.DataDir, Identification.FpcalcLocator.ToolsFolderName)));
         services.AddSingleton<IFingerprintService, Identification.ChromaprintFingerprintService>();
         services.AddSingleton<IMusicBrainzClient, Identification.MusicBrainzClient>();
         services.AddSingleton<IAcoustIdClient, Identification.AcoustIdClient>();

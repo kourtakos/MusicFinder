@@ -62,24 +62,40 @@ public sealed class WindowsProcessRunner : IProcessRunner
     }
 }
 
-/// <summary>Finds fpcalc.exe: the path in the settings, then beside the program, in a Tools folder there, then on PATH.</summary>
+/// <summary>
+/// Finds fpcalc.exe: the path in the settings, then the app's own tools folder (where the first-run setup puts it, inside the data folder, so it
+/// survives upgrades and works in portable mode), then beside the program, in a Tools folder there, then on PATH.
+/// </summary>
 public sealed class FpcalcLocator
 {
+    public const string ToolsFolderName = "tools";
+
     private readonly ISettingsStore _settings;
     private readonly string _baseDirectory;
     private readonly string? _pathVariable;
+    private readonly string? _toolsDirectory;
 
-    public FpcalcLocator(ISettingsStore settings, string? baseDirectory = null, string? pathVariable = null)
+    public FpcalcLocator(ISettingsStore settings, string? baseDirectory = null, string? pathVariable = null, string? toolsDirectory = null)
     {
         _settings = settings;
         _baseDirectory = baseDirectory ?? AppContext.BaseDirectory;
         _pathVariable = pathVariable ?? Environment.GetEnvironmentVariable("PATH");
+        _toolsDirectory = toolsDirectory;
     }
+
+    /// <summary>The folder the setup copies fpcalc.exe into, or null when the locator was made without one.</summary>
+    public string? ToolsDirectory => _toolsDirectory;
 
     public FingerprinterInfo? Locate()
     {
         var configured = _settings.Load().FpcalcPath?.Trim().Trim('"');
         if (!string.IsNullOrEmpty(configured) && File.Exists(configured)) return new FingerprinterInfo(configured, "settings");
+
+        if (!string.IsNullOrEmpty(_toolsDirectory))
+        {
+            var own = Path.Combine(_toolsDirectory, "fpcalc.exe");
+            if (File.Exists(own)) return new FingerprinterInfo(own, "MusicFinder's tools folder");
+        }
 
         foreach (var candidate in new[] { Path.Combine(_baseDirectory, "fpcalc.exe"), Path.Combine(_baseDirectory, "Tools", "fpcalc.exe") })
             if (File.Exists(candidate)) return new FingerprinterInfo(candidate, "beside the program");

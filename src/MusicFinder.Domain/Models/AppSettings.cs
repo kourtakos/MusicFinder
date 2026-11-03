@@ -73,6 +73,9 @@ public sealed class AppSettings
     /// <summary>Preview volume, 0 to 1. Starts at half so a first preview is never a surprise.</summary>
     public double PreviewVolume { get; set; } = 0.5;
 
+    /// <summary>The welcome and song-recognition setup window has been shown (or closed) once. It can be opened again from Settings.</summary>
+    public bool FirstRunCompleted { get; set; }
+
     /// <summary>The folder with VirtualDJ's history files. Null: the folder found automatically (VirtualDJ's own default).</summary>
     public string? VirtualDjHistoryFolder { get; set; }
     /// <summary>The folder with Traktor's history files. Null: the folder found automatically.</summary>
