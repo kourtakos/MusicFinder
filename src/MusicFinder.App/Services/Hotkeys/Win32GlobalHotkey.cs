@@ -15,6 +15,7 @@ public sealed class Win32GlobalHotkey : IGlobalHotkey
     private const int ErrorHotkeyAlreadyRegistered = 1409;
     private static readonly IntPtr HwndMessage = new(-3);
 
+    private readonly System.Windows.Threading.Dispatcher _owner = System.Windows.Threading.Dispatcher.CurrentDispatcher;
     private readonly HwndSource _window;
     private int _currentId;      // 0 = nothing registered
     private int _nextId = 1;
@@ -67,6 +68,12 @@ public sealed class Win32GlobalHotkey : IGlobalHotkey
 
     public void Dispose()
     {
+        // The window belongs to the thread that made it. A container that disposes services after an await may arrive on another thread.
+        if (!_owner.CheckAccess())
+        {
+            _owner.BeginInvoke(Dispose);
+            return;
+        }
         Unregister();
         _window.RemoveHook(WndProc);
         _window.Dispose();

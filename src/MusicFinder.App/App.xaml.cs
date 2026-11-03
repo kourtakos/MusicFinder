@@ -80,6 +80,7 @@ public partial class App : System.Windows.Application
             var main = _host.Services.GetRequiredService<MainViewModel>();
             await _host.Services.GetRequiredService<MusicFinder.Domain.Contracts.ISessionService>().InitializeAsync(default);
             await main.InitializeAsync();
+            _host.Services.GetRequiredService<HistoryAutoImporter>().Start();               // VirtualDJ/Traktor history, read-only, in the background
 
             // Pick up changes made while the app was closed (unchanged files are skipped cheaply).
             await _host.Services.GetRequiredService<LibraryRootService>().RescanAllAsync();
@@ -121,6 +122,8 @@ public partial class App : System.Windows.Application
         services.AddSingleton<RenameViewModelFactory>();
         services.AddSingleton<SessionViewModel>();
         services.AddSingleton<PreviewViewModel>();
+        services.AddSingleton<HistoryImportSettingsViewModel>();
+        services.AddSingleton<HistoryAutoImporter>();
         services.AddSingleton<QuickSearchViewModel>();
         services.AddSingleton<Views.QuickSearchWindow>();
         services.AddSingleton<Services.Hotkeys.IQuickSearchPresenter>(sp => sp.GetRequiredService<Views.QuickSearchWindow>());
@@ -133,6 +136,8 @@ public partial class App : System.Windows.Application
     {
         if (_host is not null)
         {
+            try { _host.Services.GetService<HistoryAutoImporter>()?.Dispose(); }
+            catch (Exception ex) { Log.Warning(ex, "History importer shutdown failed"); }
             // A preview lets go of its audio file and output first.
             try { _host.Services.GetService<PreviewViewModel>()?.Dispose(); }
             catch (Exception ex) { Log.Warning(ex, "Preview shutdown failed"); }

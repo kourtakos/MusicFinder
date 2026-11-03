@@ -265,6 +265,45 @@
             </Border>
 
             <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel DataContext="{Binding History}">
+                    <TextBlock Text="DJ history" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"
+                               Text="VirtualDJ and Traktor keep a list of what you played. MusicFinder reads those files (read-only, it never changes them) and turns a 'possibly played' guess into a confirmed play when the DJ software reports the same track. If the history is not in the usual place, choose its folder here."/>
+
+                    <ItemsControl ItemsSource="{Binding Programs}" Margin="0,12,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,14">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" Width="110" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding SyncText}" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <Border Style="{StaticResource MF.InputBorder}" Width="470" Height="32">
+                                            <TextBlock Text="{Binding FolderText}" Padding="12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" ToolTip="{Binding FolderText}"/>
+                                        </Border>
+                                        <Button Content="Browse…" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="10,0,0,0" Command="{Binding BrowseCommand}"
+                                                AutomationProperties.Name="Choose the history folder"/>
+                                        <Button Content="Use detected" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="8,0,0,0" Command="{Binding UseDetectedCommand}"
+                                                Visibility="{Binding HasChosenFolder, Converter={StaticResource BoolToVis}}"/>
+                                        <Button Content="Import now" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="8,0,0,0" Command="{Binding ImportNowCommand}"
+                                                IsEnabled="{Binding IsBusy, Converter={StaticResource InvBool}}"/>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding FolderHint}" Style="{StaticResource MF.Secondary}" Margin="0,4,0,0"/>
+                                    <TextBlock Text="{Binding ResultText}" TextWrapping="Wrap" Margin="0,4,0,0" Style="{StaticResource MF.Secondary}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <CheckBox Content="Read the history automatically (at start, with a session, and every minute during one)" IsChecked="{Binding AutoImport}"/>
+                    <TextBlock Text="{Binding PendingText}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,8,0,0"
+                               Text="VirtualDJ writes an entry only after a track has played for a while, so a very short play never appears. Traktor writes its history when it is closed, so its plays arrive after you quit it. Plays that are not in your library, or fit several files, are kept aside and are never guessed."/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
                 <StackPanel DataContext="{Binding Preview}">
                     <TextBlock Text="Preview player" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"

@@ -50,6 +50,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     public AnalysisSettingsViewModel Analysis { get; }
     public BackupSettingsViewModel Backup { get; }
     public PreviewViewModel Preview { get; }
+    public HistoryImportSettingsViewModel History { get; }
 
     [ObservableProperty] private int _readerConcurrency;
     [ObservableProperty] private bool _useFolderArtwork;
@@ -57,8 +58,10 @@ public sealed partial class SettingsViewModel : ObservableObject
     public SettingsViewModel(ILibraryRootRepository roots, LibraryRootService rootService, IUserDialogs dialogs,
         ISettingsStore store, AppPaths paths, ScanCoordinator scans, Services.Artwork.ArtworkService artwork,
         Services.Hotkeys.QuickSearchService quickSearch, ISearchAliasService aliasService, ISearchDiagnostics diagnostics,
-        IdentificationSettingsViewModel identification, AnalysisSettingsViewModel analysis, BackupSettingsViewModel backup, PreviewViewModel preview)
+        IdentificationSettingsViewModel identification, AnalysisSettingsViewModel analysis, BackupSettingsViewModel backup, PreviewViewModel preview,
+        HistoryImportSettingsViewModel history)
     {
+        History = history;
         Backup = backup;
         Preview = preview;
         _roots = roots;
@@ -102,6 +105,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         Roots.Clear();
         foreach (var root in roots) Roots.Add(new RootItemViewModel(root, _rootService));
         await LoadSearchAliasesAsync();
+        await History.ReloadAsync();
     }
 
     partial void OnUseFolderArtworkChanged(bool value)

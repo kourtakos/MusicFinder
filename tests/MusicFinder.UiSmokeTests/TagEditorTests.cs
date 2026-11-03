@@ -12,7 +12,8 @@ internal sealed class FakeDialogs : IUserDialogs
 {
     public TagEditorViewModel? Editor { get; private set; }
     public List<string> Infos { get; } = [];
-    public string? PickFolder() => null;
+    public string? FolderPicked { get; set; }
+    public string? PickFolder() => FolderPicked;
     public List<string> Confirmed { get; } = [];
     public bool ConfirmAnswer { get; set; } = true;
     public bool Confirm(string title, string message) { Confirmed.Add(title); return ConfirmAnswer; }
