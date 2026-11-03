@@ -32,23 +32,24 @@ Command-line options for the app:
 
 ## Using it
 
-1. Open **Settings** (or press `+` in the Folders panel) and add the folders that contain your music.
+1. On the first start a welcome window gives a short tour and helps set up song recognition (`fpcalc` and the AcoustID key, with a key test); reopen it any time from Settings.
+2. Open **Settings** (or press `+` in the Folders panel) and add the folders that contain your music.
    Indexing runs in the background and results appear as they are found. After an upgrade, existing files are re-read once.
-2. Type in the search box (`Ctrl+F` / `Ctrl+K`). Search is token-AND with prefix matching and is
+3. Type in the search box (`Ctrl+F` / `Ctrl+K`). Search is token-AND with prefix matching and is
    accent- and case-insensitive for Greek and Latin text, and finds Greek names typed in Greeklish or with the wrong keyboard layout (`docs/greek-search.md`).
-3. Double-click a track to preview it in the slim player at the top of the window (choose its output in Settings so it does not play through the main speakers; see `docs/preview-player.md`).
-4. Combine search with the folder selection and the Genre / BPM / Decade / Tags filters.
-4. Select tracks to see cover art and details. Use the `+` buttons to give them DJ tags or your own genres (works on a whole selection).
-5. `F2` (or *Edit tagsβ€¦*) opens the tag editor: change fields, preview the before/after, then write. See `docs/tags-and-genres.md`.
-6. The **Tags** tab manages the genre taxonomy, aliases and DJ tags, and lists genre text from your files that matches nothing yet,
+4. Double-click a track to preview it in the slim player at the top of the window (choose its output in Settings so it does not play through the main speakers; see `docs/preview-player.md`).
+5. Combine search with the folder selection and the Genre / BPM / Decade / Tags filters.
+6. Select tracks to see cover art and details. Use the `+` buttons to give them DJ tags or your own genres (works on a whole selection).
+7. `F2` (or *Edit tags…*) opens the tag editor: change fields, preview the before/after, then write. See `docs/tags-and-genres.md`.
+8. The **Tags** tab manages the genre taxonomy, aliases and DJ tags, and lists genre text from your files that matches nothing yet,
    so you can map it with one click.
-7. `Ctrl+C` copies the selected file paths, `Ctrl+O` shows the file in Explorer. `Delete` never deletes anything.
-8. **Find similar** (right-click a track) lists tracks that fit next to it by genre, BPM, key and DJ tags, with the reason for each match (`docs/find-similar.md`).
-9. Drag tracks from the grid into VirtualDJ, Traktor or any player that accepts files. The **Session** tab lists what you dragged and what MusicFinder
+9. `Ctrl+C` copies the selected file paths, `Ctrl+O` shows the file in Explorer. `Delete` never deletes anything.
+10. **Find similar** (right-click a track) lists tracks that fit next to it by genre, BPM, key and DJ tags, with the reason for each match (`docs/find-similar.md`).
+11. Drag tracks from the grid into VirtualDJ, Traktor or any player that accepts files. The **Session** tab lists what you dragged and what MusicFinder
    infers about it ("exported", "possibly played" after a quiet period, "confirmed" only when you say so). See `docs/dj-session.md`.
-10. **Identify online** (`Ctrl+I`, right-click, or the button in the details panel) looks tracks up on MusicBrainz, optionally by audio fingerprint through AcoustID, and proposes tags (and the release's cover) and shows exactly what Write will change. Many tracks at once get one list with the clear matches ticked. Off until you agree (`docs/identification.md`).
+12. **Identify online** (`Ctrl+I`, right-click, or the button in the details panel) looks tracks up on MusicBrainz, optionally by audio fingerprint through AcoustID, and proposes tags (and the release's cover) and shows exactly what Write will change. Many tracks at once get one list with the clear matches ticked. Off until you agree (`docs/identification.md`).
    **Analyze BPM and key** (`Ctrl+B`) listens to tracks on your computer and estimates their tempo and key, with a confidence, shown apart from your tags; only confident tempos are ticked for you, keys never, and nothing is written until you press Write (`docs/audio-analysis.md`).
-11. Press **Ctrl+Alt+Space** in any program to open a small always-on-top search window; drag results into your player and move the window out of the way.
+13. Press **Ctrl+Alt+Space** in any program to open a small always-on-top search window; drag results into your player and move the window out of the way.
    Change the shortcut in Settings. See `docs/quick-search.md`.
 
 ### Search syntax
@@ -67,7 +68,7 @@ src/MusicFinder.Application     search parser, text/genre normalization, genre/t
 src/MusicFinder.Infrastructure  SQLite (FTS5) persistence, scanner, TagLib reader/writer, artwork extraction, settings
 src/MusicFinder.App             WPF shell, MVVM view models, artwork service, DI composition root
 tests/                          unit, integration (temp folders and SQLite) and UI smoke tests
-docs/                           architecture, database, search syntax, Greek search, find similar, performance, tags and genres, DJ sessions, quick search
+docs/                           architecture, database, search syntax, Greek search, find similar, performance, tags and genres, DJ sessions, quick search, identification, audio analysis, preview player, release checklist
 ```
 
 ## Known gaps
@@ -77,8 +78,8 @@ docs/                           architecture, database, search syntax, Greek sea
   "General Indie Pop" or "Eurodance"); map them in the Tags tab.
 - Panel widths, window size and the folder-scope toggles are saved; visible/resized grid columns are not yet.
 - UI strings are English only; the Greek resource files are not added yet.
-- Search was benchmarked on 100,000 synthetic tracks (`docs/performance.md`): typical queries meet 50 ms, very broad ones (two-letter prefixes, a word on a quarter of the library) take 70β€“85 ms. Real-library use is tested on about 3,700 tracks only.
-- Greek β†” Greeklish matching is heuristic (`docs/greek-search.md`); names such as `Daft Punk` / `Ξ½Ο„Ξ±Ο†Ο„ Ο€Ξ±Ξ½ΞΊ` need an alias. Wrong-layout input understands the standard Windows Greek layout only.
+- Search was benchmarked on 100,000 synthetic tracks (`docs/performance.md`): typical queries meet 50 ms, very broad ones (two-letter prefixes, a word on a quarter of the library) take 70–85 ms. Real-library use is tested on about 3,700 tracks only.
+- Greek ↔ Greeklish matching is heuristic (`docs/greek-search.md`); names such as `Daft Punk` / `νταφτ πανκ` need an alias. Wrong-layout input understands the standard Windows Greek layout only.
 - Find Similar compares metadata only (genre, BPM, key, DJ tags), never how the music sounds; tracks without BPM, key or genre cannot be compared (`docs/find-similar.md`).
 - Favorites (shown in the reference design) need a database migration and are not implemented.
 - Drag-out is verified with Windows Media Player and Winamp only; Traktor and VirtualDJ are untested (checklist in `docs/dj-session.md`).
