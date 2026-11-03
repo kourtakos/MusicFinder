@@ -32,6 +32,10 @@ public interface IUserDialogs
     string? PickSaveFile(string title, string filter, string defaultName);
     /// <summary>A file picker; <paramref name="filter"/> is in the Windows form "Name|*.ext|Name2|*.ext2". Null when cancelled.</summary>
     string? PickFile(string title, string filter);
+    /// <summary>Opens a web page in the default browser. Only http and https addresses are opened.</summary>
+    void OpenUrl(string url);
+    /// <summary>Shows the welcome tour and song-recognition setup. Not modal: the library stays usable behind it.</summary>
+    void ShowFirstRun(ViewModels.FirstRunViewModel viewModel);
 }
 
 public sealed class UserDialogs : IUserDialogs
@@ -99,6 +103,17 @@ public sealed class UserDialogs : IUserDialogs
         var dialog = new OpenFileDialog { Title = title, Filter = filter, CheckFileExists = true };
         return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
+
+    public void OpenUrl(string url)
+    {
+        // Only web addresses: this never starts a program or opens a file.
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https")) return;
+        try { Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true }); }
+        catch (Exception ex) { ShowError("Open web page", ex.Message); }
+    }
+
+    public void ShowFirstRun(ViewModels.FirstRunViewModel viewModel) =>
+        new Views.FirstRunWindow(viewModel) { Owner = System.Windows.Application.Current?.MainWindow }.Show();
 
     public void CopyToClipboard(string text)
     {

@@ -83,6 +83,14 @@ public partial class App : System.Windows.Application
             await main.InitializeAsync();
             _host.Services.GetRequiredService<HistoryAutoImporter>().Start();               // VirtualDJ/Traktor history, read-only, in the background
 
+            // The first time only: a short tour and the song-recognition setup. Not modal, so the library is usable behind it.
+            if (!_host.Services.GetRequiredService<ISettingsStore>().Load().FirstRunCompleted)
+            {
+                var firstRun = _host.Services.GetRequiredService<FirstRunViewModel>();
+                firstRun.Open(toRecognition: false);
+                _host.Services.GetRequiredService<IUserDialogs>().ShowFirstRun(firstRun);
+            }
+
             // Pick up changes made while the app was closed (unchanged files are skipped cheaply).
             await _host.Services.GetRequiredService<LibraryRootService>().RescanAllAsync();
         }
@@ -123,6 +131,8 @@ public partial class App : System.Windows.Application
         services.AddSingleton<RenameViewModelFactory>();
         services.AddSingleton<SessionViewModel>();
         services.AddSingleton<PreviewViewModel>();
+        services.AddSingleton<IDownloadsFolder, UserDownloadsFolder>();
+        services.AddSingleton<FirstRunViewModel>();
         services.AddSingleton<HistoryImportSettingsViewModel>();
         services.AddSingleton<HistoryAutoImporter>();
         services.AddSingleton<QuickSearchViewModel>();

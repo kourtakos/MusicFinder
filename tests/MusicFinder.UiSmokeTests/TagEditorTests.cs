@@ -16,7 +16,8 @@ internal sealed class FakeDialogs : IUserDialogs
     public string? PickFolder() => FolderPicked;
     public List<string> Confirmed { get; } = [];
     public bool ConfirmAnswer { get; set; } = true;
-    public bool Confirm(string title, string message) { Confirmed.Add(title); return ConfirmAnswer; }
+    public List<string> ConfirmMessages { get; } = [];
+    public bool Confirm(string title, string message) { Confirmed.Add(title); ConfirmMessages.Add(message); return ConfirmAnswer; }
     public void ShowError(string title, string message) { }
     public void ShowInfo(string title, string message) => Infos.Add(message);
     public void RevealInExplorer(string path) { }
@@ -42,6 +43,10 @@ internal sealed class FakeDialogs : IUserDialogs
     public string? SavePicked { get; set; }
     public string? PickSaveFile(string title, string filter, string defaultName) => SavePicked;
     public string? PickFile(string title, string filter) => FilePicked;
+    public List<string> UrlsOpened { get; } = [];
+    public void OpenUrl(string url) => UrlsOpened.Add(url);
+    public FirstRunViewModel? FirstRun { get; private set; }
+    public void ShowFirstRun(FirstRunViewModel viewModel) => FirstRun = viewModel;
 }
 
 public class TagEditorTests

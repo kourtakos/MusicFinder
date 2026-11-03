@@ -1,0 +1,146 @@
+<Window x:Class="MusicFinder.App.Views.FirstRunWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Welcome to MusicFinder" Style="{StaticResource MF.Window}"
+        Width="760" Height="680" MinWidth="620" MinHeight="520"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False" AllowDrop="True">
+
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding CloseCommand}"/>
+    </Window.InputBindings>
+
+    <Grid Margin="28,22,28,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- 0: welcome -->
+                <StackPanel Visibility="{Binding IsWelcome, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Welcome to MusicFinder" FontSize="26" FontWeight="SemiBold"/>
+                    <TextBlock TextWrapping="Wrap" Margin="0,12,0,0"
+                               Text="Find the right track fast. Everything works on this computer, without an account and without the internet. Your music files are never changed unless you confirm it."/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,14,0,0"
+                               Text="This short tour shows the main things in about a minute. At the end there is an optional step for song recognition (finding out what an unknown track is), which needs two small things from you."/>
+                    <Button Content="Skip the tour: set up song recognition" Style="{StaticResource MF.PillButton}" HorizontalAlignment="Left" Height="34" Padding="16,0" Margin="0,22,0,0"
+                            Command="{Binding GoToRecognitionCommand}"/>
+                </StackPanel>
+
+                <!-- 1..N: the tour -->
+                <StackPanel Visibility="{Binding IsTourStep, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding CurrentStep.Title}" FontSize="24" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding CurrentStep.Body}" TextWrapping="Wrap" FontSize="15" LineHeight="23" Margin="0,14,0,0"/>
+                </StackPanel>
+
+                <!-- last: song recognition -->
+                <StackPanel Visibility="{Binding IsRecognition, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="Song recognition (optional)" FontSize="24" FontWeight="SemiBold"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,8,0,0"
+                               Text="To find out what an unknown track is, MusicFinder needs two things it cannot include itself: a small program called fpcalc, and a free key from AcoustID. You can skip this and come back any time from Settings."/>
+
+                    <!-- 1. fpcalc -->
+                    <Border Style="{StaticResource MF.Panel}" Padding="16" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock Text="1. Save fpcalc.exe" FontWeight="SemiBold" FontSize="15"/>
+                            <TextBlock x:Name="FpcalcStatusText" Text="{Binding FpcalcStatus}" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                       Text="Open the download page, download the Windows version of fpcalc (a zip), then drop that zip onto this window, or use Choose a file. MusicFinder keeps its own copy and does not change your download."/>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button Content="Open the download page" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Command="{Binding OpenFpcalcPageCommand}"/>
+                                <Button Content="Choose a file…" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="8,0,0,0" Command="{Binding BrowseFpcalcCommand}"/>
+                            </StackPanel>
+                            <ItemsControl ItemsSource="{Binding Candidates}" Margin="0,10,0,0" Visibility="{Binding HasCandidates, Converter={StaticResource BoolToVis}}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <TextBlock Text="Found in your Downloads:" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center"/>
+                                            <Button Content="{Binding Label}" Style="{StaticResource MF.AccentButton}" Height="30" Padding="12,0" Margin="10,0,0,0"
+                                                    Command="{Binding DataContext.UseCandidateCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock x:Name="FpcalcMessageText" Text="{Binding FpcalcMessage}" TextWrapping="Wrap" Margin="0,8,0,0">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource MF.Brush.TextSecondary}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding FpcalcMessageIsError}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource MF.Brush.Warning}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 2. key -->
+                    <Border Style="{StaticResource MF.Panel}" Padding="16" Margin="0,12,0,0">
+                        <StackPanel>
+                            <TextBlock Text="2. Get your free AcoustID key" FontWeight="SemiBold" FontSize="15"/>
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                       Text="AcoustID asks every program to have its own key. It is free for personal, non-commercial use. On the page, sign in (or register), give the application any name (for example MusicFinder) and any version, then copy the short key it shows and paste it here."/>
+                            <Button Content="Open the AcoustID page" Style="{StaticResource MF.PillButton}" HorizontalAlignment="Left" Height="32" Padding="14,0" Margin="0,10,0,0"
+                                    Command="{Binding OpenKeyPageCommand}"/>
+                            <Border Style="{StaticResource MF.InputBorder}" Height="36" Margin="0,10,0,0">
+                                <TextBox x:Name="KeyBox" Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding KeyText, UpdateSourceTrigger=PropertyChanged}"
+                                         AutomationProperties.Name="AcoustID key"/>
+                            </Border>
+                            <TextBlock x:Name="KeyProblemText" Text="{Binding KeyProblem}" Foreground="{StaticResource MF.Brush.Warning}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                       Visibility="{Binding HasKeyProblem, Converter={StaticResource BoolToVis}}"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                <Button x:Name="TestKeyButton" Content="Test the key" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Command="{Binding TestKeyCommand}"
+                                        IsEnabled="{Binding IsTesting, Converter={StaticResource InvBool}}"
+                                        ToolTip="Makes one lookup at AcoustID with a song you choose. You see exactly what is sent before it happens."/>
+                            </StackPanel>
+                            <TextBlock x:Name="KeyResultText" Text="{Binding KeyResult}" TextWrapping="Wrap" Margin="0,8,0,0" Visibility="{Binding HasKeyResult, Converter={StaticResource BoolToVis}}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="{StaticResource MF.Brush.Warning}"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding KeyResultOk}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource MF.Brush.TextPrimary}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 3. contact + switch -->
+                    <Border Style="{StaticResource MF.Panel}" Padding="16" Margin="0,12,0,0" DataContext="{Binding Identification}">
+                        <StackPanel>
+                            <TextBlock Text="3. Your contact address and the switch" FontWeight="SemiBold" FontSize="15"/>
+                            <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,6,0,0"
+                                       Text="MusicBrainz, the music database used to fill in titles and albums, requires programs to say who is asking. Your address is only used in that request."/>
+                            <Border Style="{StaticResource MF.InputBorder}" Height="36" Margin="0,10,0,0">
+                                <TextBox Style="{StaticResource MF.PlainTextBox}" Padding="12,0" Text="{Binding Contact, UpdateSourceTrigger=PropertyChanged}"
+                                         AutomationProperties.Name="Contact address"/>
+                            </Border>
+                            <CheckBox x:Name="EnableBox" Content="Turn on online identification (you will see exactly what is sent first)" IsChecked="{Binding Enabled}" Margin="0,12,0,0"/>
+                            <TextBlock Text="{Binding ReadinessText}" Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="0,12,0,0"
+                               Text="Your key and address stay in this computer's settings file. They are left out of backups unless you choose to include them, so after a restore you may need to enter them again."/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Grid Grid.Row="1" Margin="0,16,0,0">
+            <TextBlock Text="{Binding PageText}" Style="{StaticResource MF.Secondary}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="SkipButton" Content="Skip" Style="{StaticResource MF.PillButton}" Height="34" Padding="16,0" Margin="0,0,10,0" Command="{Binding CloseCommand}"
+                        ToolTip="Close this. You can open it again from Settings."/>
+                <Button x:Name="BackButton" Content="Back" Style="{StaticResource MF.PillButton}" Height="34" Padding="16,0" Margin="0,0,10,0" Command="{Binding BackCommand}"
+                        IsEnabled="{Binding CanGoBack}"/>
+                <Button x:Name="NextButton" Content="{Binding NextText}" Style="{StaticResource MF.AccentButton}" Height="34" Padding="22,0" Command="{Binding NextCommand}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

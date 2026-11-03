@@ -59,8 +59,9 @@ public sealed partial class SettingsViewModel : ObservableObject
         ISettingsStore store, AppPaths paths, ScanCoordinator scans, Services.Artwork.ArtworkService artwork,
         Services.Hotkeys.QuickSearchService quickSearch, ISearchAliasService aliasService, ISearchDiagnostics diagnostics,
         IdentificationSettingsViewModel identification, AnalysisSettingsViewModel analysis, BackupSettingsViewModel backup, PreviewViewModel preview,
-        HistoryImportSettingsViewModel history)
+        HistoryImportSettingsViewModel history, FirstRunViewModel firstRun)
     {
+        _firstRun = firstRun;
         History = history;
         Backup = backup;
         Preview = preview;
@@ -115,6 +116,24 @@ public sealed partial class SettingsViewModel : ObservableObject
         var settings = _store.Load();
         settings.UseFolderArtwork = value;
         _store.Save(settings);
+    }
+
+    // ===== Welcome tour and song-recognition setup =====
+
+    private readonly FirstRunViewModel _firstRun;
+
+    [RelayCommand]
+    private void ShowTour()
+    {
+        _firstRun.Open(toRecognition: false);
+        _dialogs.ShowFirstRun(_firstRun);
+    }
+
+    [RelayCommand]
+    private void SetUpRecognition()
+    {
+        _firstRun.Open(toRecognition: true);
+        _dialogs.ShowFirstRun(_firstRun);
     }
 
     // ===== Text size (zoom of the whole interface) =====

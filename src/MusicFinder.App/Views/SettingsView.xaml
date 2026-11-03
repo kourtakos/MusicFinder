@@ -80,6 +80,19 @@
 
             <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
                 <StackPanel>
+                    <TextBlock Text="Welcome tour and song recognition" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"
+                               Text="A one-minute tour of the main things, and the guided setup for song recognition: saving fpcalc.exe, getting your free AcoustID key and testing it."/>
+                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                        <Button x:Name="ShowTourButton" Content="Show the tour" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Command="{Binding ShowTourCommand}"/>
+                        <Button x:Name="SetUpRecognitionButton" Content="Set up song recognition…" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="8,0,0,0"
+                                Command="{Binding SetUpRecognitionCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel>
                     <TextBlock Text="Text size" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Make everything bigger" VerticalAlignment="Center" Width="170"/>

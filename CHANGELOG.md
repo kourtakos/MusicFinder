@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- **Text size**: Ctrl+wheel, Ctrl +/-/0 or the slider in Settings make the whole interface bigger (80-200 %, never more than the screen can show). Remembered.
+- **Welcome tour and song-recognition setup** on first run (`docs/first-run.md`): save fpcalc from its zip or exe, get and test your AcoustID key, set the contact address.
+- **VirtualDJ history** is read (Settings > DJ history): a drag guess becomes a confirmed play; the history folder can be chosen. Traktor is not read yet.
+- MIT licence.
+
 ## 0.9.0 (first packaged build)
 
 Everything is offline-first; nothing is sent anywhere unless online identification is turned on.

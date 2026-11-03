@@ -61,6 +61,13 @@ public sealed class FpcalcInstaller
         }
     }
 
+    /// <summary>The version a program reports with <c>-version</c>, or null when it cannot be started or says nothing recognisable.</summary>
+    public async Task<string?> ReadVersionAsync(string exe, CancellationToken ct)
+    {
+        var (ok, version, _) = await TryRunAsync(exe, ct);
+        return ok ? version : null;
+    }
+
     private string? CopyFromExe(string source, string trial)
     {
         if (!string.Equals(Path.GetFileName(source), FileName, StringComparison.OrdinalIgnoreCase))

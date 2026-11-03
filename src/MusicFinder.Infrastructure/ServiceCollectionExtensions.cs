@@ -127,6 +127,9 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<Identification.IProcessRunner, Identification.WindowsProcessRunner>();
         services.AddSingleton(sp => new Identification.FpcalcLocator(sp.GetRequiredService<ISettingsStore>(),
             toolsDirectory: Path.Combine(paths.DataDir, Identification.FpcalcLocator.ToolsFolderName)));
+        services.AddSingleton(sp => new Identification.FpcalcInstaller(
+            Path.Combine(paths.DataDir, Identification.FpcalcLocator.ToolsFolderName), sp.GetRequiredService<Identification.IProcessRunner>()));
+        services.AddSingleton<MusicFinder.Application.Identification.AcoustIdKeyChecker>();
         services.AddSingleton<IFingerprintService, Identification.ChromaprintFingerprintService>();
         services.AddSingleton<IMusicBrainzClient, Identification.MusicBrainzClient>();
         services.AddSingleton<IAcoustIdClient, Identification.AcoustIdClient>();
