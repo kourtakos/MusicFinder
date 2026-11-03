@@ -4,7 +4,7 @@ Read this first on a fresh machine or in a fresh Claude Code session. `CLAUDE.md
 
 ## Set up
 
-1. Install Git, the **.NET SDK 9.0.x** (`global.json` pins the band; .NET 10 upgrade = set `NetVersion` in `Directory.Build.props` to `10.0` and bump `Microsoft.*` in `Directory.Packages.props`), and Windows 10/11 x64.
+1. Install Git, the **.NET 9 SDK** (`global.json` pins the version band) and Windows 10/11 x64.
 2. `git clone <repo>`; `dotnet build`; `dotnet test` (expect all green (about 963 unit, 607 integration, 257 UI smoke; the RealRegisterHotKey UI test needs a free Ctrl+Alt+Space and an interactive desktop); UI tests need an interactive desktop session).
 3. Run: `src\MusicFinder.App\bin\Debug\net9.0-windows\MusicFinder.exe --portable --software` (`--portable` keeps data in `Data\` beside the exe; `--software` avoids GPU rendering problems).
    Stop a running `MusicFinder.exe` before building (it locks the exe).
