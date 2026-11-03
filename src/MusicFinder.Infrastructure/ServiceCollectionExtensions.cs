@@ -31,6 +31,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<MusicFinder.Application.Dj.DjSessionService>();
         services.AddSingleton<ISessionService>(sp => sp.GetRequiredService<MusicFinder.Application.Dj.DjSessionService>());
         services.AddSingleton<IPlayHistoryQuery>(sp => sp.GetRequiredService<MusicFinder.Application.Dj.DjSessionService>());
+        services.AddSingleton<IImportedPlayRecorder>(sp => sp.GetRequiredService<MusicFinder.Application.Dj.DjSessionService>());
+        services.AddSingleton<HistoryImportRepository>();
+        services.AddSingleton<IHistoryImportStore>(sp => sp.GetRequiredService<HistoryImportRepository>());
+        services.AddSingleton<IHistoryTrackLookup>(sp => sp.GetRequiredService<HistoryImportRepository>());
+        services.AddSingleton<MusicFinder.Application.Dj.HistoryTrackMatcher>();
         services.AddSingleton<ITrackGenreRepository, TrackGenreRepository>();
         services.AddSingleton<MusicFinder.Application.Genres.GenreMappingJob>();
         services.AddSingleton<ITrackSearchAliasRepository, TrackSearchAliasRepository>();

@@ -11,7 +11,7 @@ using MusicFinder.Domain.Models;
 namespace MusicFinder.Application.Dj;
 
 /// <inheritdoc cref="ISessionService"/>
-public sealed class DjSessionService : ISessionService, IPlayHistoryQuery
+public sealed class DjSessionService : ISessionService, IPlayHistoryQuery, IImportedPlayRecorder
 {
     /// <summary>Quiet this long inside a session and the next drag starts a new one instead of extending an unrelated night.</summary>
     public static readonly TimeSpan SessionGap = TimeSpan.FromHours(4);
@@ -399,6 +399,69 @@ public sealed class DjSessionService : ISessionService, IPlayHistoryQuery
             _undo.AddLast(step);
             while (_undo.Count > UndoLimit) _undo.RemoveFirst();
         }
+    }
+
+    // ===== imported history =====
+
+    /// <summary>
+    /// A drag comes before the load, which comes before the entry in the DJ program's history; allow for a track parked on a deck for a while.
+    /// A history time a little before the drag is still accepted: clocks and the program's own stamping differ by seconds.
+    /// </summary>
+    public static readonly TimeSpan ImportMatchBefore = TimeSpan.FromMinutes(30);
+    public static readonly TimeSpan ImportMatchAfter = TimeSpan.FromMinutes(2);
+
+    /// <inheritdoc cref="IImportedPlayRecorder.RecordImportedPlayAsync"/>
+    public async Task<ImportedPlayOutcome> RecordImportedPlayAsync(
+        ImportedPlayEvent play, long trackId, string matchedBy, double confidence, CancellationToken ct = default)
+    {
+        await _gate.WaitAsync(ct);
+        try
+        {
+            var from = play.PlayedUtc - ImportMatchBefore;
+            var to = play.PlayedUtc + ImportMatchAfter;
+            TimeSpan Gap(DateTime t) => (t - play.PlayedUtc).Duration();
+
+            // Read first, change after: a play imported before changes nothing, so nothing may be replaced for it.
+            var target = (await _plays.FindUpgradableAsync(trackId, from, to, ct)).OrderBy(p => Gap(p.PlayedUtc)).FirstOrDefault();
+            var anchorId = target?.RelatedEventId;
+            if (target is null)
+                anchorId = _engine.Pending.Where(p => p.TrackId == trackId && p.ExportedUtc >= from && p.ExportedUtc <= to)
+                    .OrderBy(p => Gap(p.ExportedUtc)).FirstOrDefault()?.AnchorEventId;
+            var anchor = anchorId is { } id ? await _events.GetAsync(id, ct) : null;
+            var sessionId = target?.SessionId ?? anchor?.SessionId ?? await SessionAtAsync(play.PlayedUtc, ct);
+
+            var confirmedId = await _plays.AddAsync(new PlayRecord
+            {
+                TrackId = trackId, SessionId = sessionId, PlayedUtc = play.PlayedUtc, Status = nameof(PlayStatus.Confirmed),
+                Source = play.Source, ExternalEventKey = play.ExternalEventKey, RelatedEventId = anchor?.Id
+            }, ct);
+            if (confirmedId is not { } newId) return ImportedPlayOutcome.Duplicate;
+
+            if (target is not null) await _plays.MarkSupersededAsync(target.Id, newId, ct);
+            if (anchor is not null) _engine.Cancel(anchor.Id);
+
+            await _events.AddAsync([new TrackEvent
+            {
+                TrackId = trackId, SessionId = sessionId, EventType = nameof(TrackEventType.HistoryConfirmed), OccurredUtc = play.PlayedUtc,
+                Source = play.Source, Confidence = confidence,
+                EvidenceJson = Json(new
+                {
+                    file = play.FilePath, key = play.ExternalEventKey, matchedBy, anchorEventId = anchor?.Id, supersededPlayId = target?.Id
+                })
+            }], ct);
+
+            RaisePlayState([trackId]);
+            return target is null && anchor is null ? ImportedPlayOutcome.Added : ImportedPlayOutcome.Upgraded;
+        }
+        finally { _gate.Release(); }
+    }
+
+    /// <summary>The session that was running at that time, if any. Importing never creates a session.</summary>
+    private async Task<long?> SessionAtAsync(DateTime utc, CancellationToken ct)
+    {
+        foreach (var s in await _sessions.GetRecentAsync(20, ct))
+            if (s.StartedUtc <= utc && utc <= (s.EndedUtc ?? DateTime.MaxValue)) return s.Id;
+        return null;
     }
 
     // ===== queries =====

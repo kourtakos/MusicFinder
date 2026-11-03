@@ -32,6 +32,7 @@ public sealed class TestDb : IAsyncDisposable
     public IdentificationCacheRepository Identification { get; }
     public TrackAnalysisRepository Analysis { get; }
     public FileHashRepository Hashes { get; }
+    public HistoryImportRepository HistoryImport { get; }
 
     public TestDb()
     {
@@ -58,6 +59,7 @@ public sealed class TestDb : IAsyncDisposable
         Identification = new IdentificationCacheRepository(Factory, Writes);
         Analysis = new TrackAnalysisRepository(Factory, Writes);
         Hashes = new FileHashRepository(Factory, Writes);
+        HistoryImport = new HistoryImportRepository(Factory, Writes);
     }
 
     /// <summary>Seeds the starter genre taxonomy and DJ tags (the app does this at startup).</summary>

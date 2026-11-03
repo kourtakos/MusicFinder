@@ -113,6 +113,8 @@ public interface IPlayHistoryRepository
     /// <summary>Puts a previously deleted play back with its original id.</summary>
     Task RestoreAsync(PlayRecord play, CancellationToken ct = default);
     Task MarkSupersededAsync(long possiblePlayId, long confirmedPlayId, CancellationToken ct = default);
+    /// <summary>The track's inferred or manual plays (not yet replaced by anything) between the two times, for an imported play to take over.</summary>
+    Task<IReadOnlyList<PlayRecord>> FindUpgradableAsync(long trackId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default);
     Task<IReadOnlyList<Models.PlayHistoryItem>> GetForTrackAsync(long trackId, int limit, CancellationToken ct = default);
     Task<IReadOnlyList<Models.SessionEntryRow>> GetSessionEntriesAsync(long sessionId, CancellationToken ct = default);
 }

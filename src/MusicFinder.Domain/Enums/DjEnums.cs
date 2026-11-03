@@ -16,7 +16,9 @@ public enum TrackEventType
     ActivityInterrupted,
     ManualMarkPlayed,
     ManualMarkNotPlayed,
-    ManualUndo
+    ManualUndo,
+    /// <summary>A DJ program's own history reported this play (VirtualDJ, Traktor): the evidence behind a Confirmed play.</summary>
+    HistoryConfirmed
 }
 
 /// <summary>The only statuses allowed in PlayHistory (a CHECK constraint enforces it).</summary>

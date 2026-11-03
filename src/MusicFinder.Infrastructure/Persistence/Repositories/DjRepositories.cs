@@ -183,6 +183,18 @@ public sealed class PlayHistoryRepository : IPlayHistoryRepository
             "UPDATE PlayHistory SET SupersededByPlayId = @confirmedPlayId WHERE Id = @possiblePlayId",
             new { possiblePlayId, confirmedPlayId }, tx), ct);
 
+    public async Task<IReadOnlyList<PlayRecord>> FindUpgradableAsync(long trackId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
+    {
+        using var conn = _factory.Open();
+        return (await conn.QueryAsync<PlayRecord>(
+            $"""
+            SELECT {Columns} FROM PlayHistory
+            WHERE TrackId = @trackId AND SupersededByPlayId IS NULL AND {Removable}
+              AND PlayedUtc >= @from AND PlayedUtc <= @to
+            ORDER BY PlayedUtc, Id
+            """, new { trackId, from = DapperConfig.ToDb(fromUtc), to = DapperConfig.ToDb(toUtc) })).AsList();
+    }
+
     public async Task<IReadOnlyList<PlayHistoryItem>> GetForTrackAsync(long trackId, int limit, CancellationToken ct = default)
     {
         using var conn = _factory.Open();
