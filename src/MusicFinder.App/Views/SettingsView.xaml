@@ -265,6 +265,27 @@
             </Border>
 
             <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
+                <StackPanel DataContext="{Binding Preview}">
+                    <TextBlock Text="Preview player" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"
+                               Text="Double-click a track to hear it in the bar at the top of the window. A preview is only a listen: it is not a drag, it does not count as a play in a DJ session, and your files are opened read-only. Choose the output so a preview never goes to the main speakers by accident, for example your headphone card."/>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <TextBlock Text="Preview output" VerticalAlignment="Center" Width="190"/>
+                        <ComboBox x:Name="PreviewDeviceBox" Style="{StaticResource MF.ComboBox}" ItemsSource="{Binding Devices}" SelectedItem="{Binding SelectedDevice, Mode=TwoWay}" Width="380" Height="32"
+                                  AutomationProperties.Name="Preview output">
+                            <ComboBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Label}"/></DataTemplate></ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Button Content="Refresh" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="10,0,0,0" Command="{Binding RefreshDevicesCommand}"
+                                ToolTip="Look for outputs again, for example after plugging in headphones."/>
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap" Margin="190,6,0,0"
+                               Text="If the chosen output is not connected the preview says so and stays silent; it never falls back to the Windows default. The volume starts at half and is remembered."/>
+                    <TextBlock Text="{Binding DevicesStatus}" Style="{StaticResource MF.Secondary}" Margin="190,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource MF.Panel}" Padding="18" Margin="0,0,0,14">
                 <StackPanel DataContext="{Binding Analysis}">
                     <TextBlock Text="BPM and key analysis" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,10"/>
                     <TextBlock Style="{StaticResource MF.Secondary}" TextWrapping="Wrap"

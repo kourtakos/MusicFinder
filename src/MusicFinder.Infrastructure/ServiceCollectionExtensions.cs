@@ -74,6 +74,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISimilarTracksService, MusicFinder.Application.Similar.SimilarTracksService>();
         services.AddSingleton<IMetadataReader, TagLibMetadataReader>();
         services.AddSingleton<IArtworkSource, Artwork.ArtworkExtractor>();
+        // The preview player is created lazily and touches no audio device until a track is played.
+        services.AddSingleton<IPreviewPlayer>(sp => OperatingSystem.IsWindows()
+            ? new Audio.WasapiPreviewPlayer(sp.GetService<Microsoft.Extensions.Logging.ILogger<Audio.WasapiPreviewPlayer>>())
+            : new Audio.NullPreviewPlayer());
+        services.AddSingleton<IPreviewOutputDevices>(_ => OperatingSystem.IsWindows() ? new Audio.MmPreviewOutputDevices() : new Audio.NoPreviewDevices());
         services.AddSingleton<IMetadataWriter, TagLibMetadataWriter>();
         services.AddSingleton<ITagEditingService, MusicFinder.Application.Tags.TagEditingService>();
         services.AddSingleton<ISettingsStore>(new JsonSettingsStore(paths.SettingsPath));

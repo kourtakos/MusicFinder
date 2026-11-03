@@ -49,6 +49,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     public IdentificationSettingsViewModel Identification { get; }
     public AnalysisSettingsViewModel Analysis { get; }
     public BackupSettingsViewModel Backup { get; }
+    public PreviewViewModel Preview { get; }
 
     [ObservableProperty] private int _readerConcurrency;
     [ObservableProperty] private bool _useFolderArtwork;
@@ -56,9 +57,10 @@ public sealed partial class SettingsViewModel : ObservableObject
     public SettingsViewModel(ILibraryRootRepository roots, LibraryRootService rootService, IUserDialogs dialogs,
         ISettingsStore store, AppPaths paths, ScanCoordinator scans, Services.Artwork.ArtworkService artwork,
         Services.Hotkeys.QuickSearchService quickSearch, ISearchAliasService aliasService, ISearchDiagnostics diagnostics,
-        IdentificationSettingsViewModel identification, AnalysisSettingsViewModel analysis, BackupSettingsViewModel backup)
+        IdentificationSettingsViewModel identification, AnalysisSettingsViewModel analysis, BackupSettingsViewModel backup, PreviewViewModel preview)
     {
         Backup = backup;
+        Preview = preview;
         _roots = roots;
         _rootService = rootService;
         _dialogs = dialogs;

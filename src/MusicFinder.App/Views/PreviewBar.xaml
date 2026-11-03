@@ -1,0 +1,136 @@
+<UserControl x:Class="MusicFinder.App.Views.PreviewBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:MusicFinder.App.Controls">
+
+    <UserControl.Resources>
+        <!-- A slim volume slider: thin track, small round thumb, no stock chrome. -->
+        <Style x:Key="MF.SliderStop" TargetType="RepeatButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton"><Border Background="Transparent"/></ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MF.SliderThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Ellipse Width="10" Height="10" Fill="{StaticResource MF.Brush.TextPrimary}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MF.SlimSlider" TargetType="Slider">
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="1"/>
+            <Setter Property="Height" Value="18"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid Background="Transparent">
+                            <Border Height="3" CornerRadius="1.5" Background="{StaticResource MF.Brush.InputBorder}" VerticalAlignment="Center"/>
+                            <Track x:Name="PART_Track" VerticalAlignment="Center">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="Slider.DecreaseLarge" Style="{StaticResource MF.SliderStop}"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource MF.SliderThumb}"/>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="Slider.IncreaseLarge" Style="{StaticResource MF.SliderStop}"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MF.PreviewButton" TargetType="Button" BasedOn="{StaticResource MF.IconButton}">
+            <Setter Property="Width" Value="30"/>
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Foreground" Value="{StaticResource MF.Brush.TextPrimary}"/>
+            <Setter Property="Focusable" Value="False"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Border x:Name="Strip" x:FieldModifier="public" Background="{StaticResource MF.Brush.PanelBg}" BorderBrush="{StaticResource MF.Brush.PanelBorder}" BorderThickness="0,0,0,1"
+            Visibility="{Binding HasTrack, Converter={StaticResource BoolToVis}}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="34"/>
+                <RowDefinition Height="5"/>
+            </Grid.RowDefinitions>
+
+            <Grid Margin="14,0,10,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="PlayButton" Style="{StaticResource MF.PreviewButton}" Command="{Binding TogglePlayPauseCommand}" ToolTip="{Binding PlayToolTip}"
+                        AutomationProperties.Name="Play or pause the preview">
+                    <TextBlock Style="{StaticResource MF.Icon}" Text="{Binding PlayGlyph}" FontSize="15"/>
+                </Button>
+                <Button x:Name="StopButton" Grid.Column="1" Style="{StaticResource MF.PreviewButton}" Command="{Binding StopCommand}" ToolTip="Stop"
+                        AutomationProperties.Name="Stop the preview">
+                    <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE71A;" FontSize="14"/>
+                </Button>
+
+                <!-- Fixed width so the digits do not shift the layout as they change. -->
+                <TextBlock x:Name="TimerText" Grid.Column="2" Text="{Binding TimeText}" FontFamily="Consolas" FontSize="15" FontWeight="SemiBold"
+                           Width="132" TextAlignment="Center" VerticalAlignment="Center" Margin="6,0,10,0"
+                           Foreground="{StaticResource MF.Brush.AccentHover}" ToolTip="Elapsed / total"/>
+
+                <ctl:ArtworkThumbnail Grid.Column="3" Width="26" Height="26" PixelSize="64" Margin="0,0,10,0"
+                                      AudioPath="{Binding AudioPath}" ArtKey="{Binding ArtKey}" Service="{Binding Artwork}"/>
+
+                <TextBlock x:Name="TitleText" Grid.Column="4" Text="{Binding Title}" FontWeight="Bold" MaxWidth="260" TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" Margin="0,0,14,0" ToolTip="{Binding PathText}"/>
+
+                <ctl:MarqueeText x:Name="CaptionText" x:FieldModifier="public" Grid.Column="5" Text="{Binding Caption}" IsActive="{Binding IsScrolling}" VerticalAlignment="Center"
+                                 Foreground="{StaticResource MF.Brush.TextSecondary}" ToolTip="{Binding Caption}"
+                                 Visibility="{Binding HasError, Converter={StaticResource InvBoolToVis}}"/>
+                <TextBlock x:Name="ErrorText" x:FieldModifier="public" Grid.Column="5" Text="{Binding Error}" Foreground="{StaticResource MF.Brush.Warning}" TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" ToolTip="{Binding Error}"
+                           Visibility="{Binding HasError, Converter={StaticResource BoolToVis}}"/>
+
+                <Slider x:Name="VolumeSlider" Grid.Column="6" Style="{StaticResource MF.SlimSlider}" Width="76" Margin="14,0,0,0"
+                        Value="{Binding Volume, Mode=TwoWay}" LargeChange="0.1" SmallChange="0.05" Focusable="False" ToolTip="Preview volume"
+                        AutomationProperties.Name="Preview volume"/>
+
+                <!-- Where the sound goes. The Windows default is shown in the warning colour: during a gig that may be the PA. -->
+                <TextBlock x:Name="DeviceChip" Grid.Column="7" Text="{Binding DeviceText}" FontSize="12" MaxWidth="170" TextTrimming="CharacterEllipsis"
+                           VerticalAlignment="Center" Margin="12,0,0,0" ToolTip="Output used by the preview (change it in Settings)">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource MF.Brush.TextMuted}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding DeviceIsDefault}" Value="True">
+                                    <Setter Property="Foreground" Value="{StaticResource MF.Brush.Warning}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <Button x:Name="CloseButton" Grid.Column="8" Style="{StaticResource MF.PreviewButton}" Command="{Binding DismissCommand}" Margin="6,0,0,0"
+                        ToolTip="Close the player" AutomationProperties.Name="Close the player">
+                    <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE711;" FontSize="11"/>
+                </Button>
+            </Grid>
+
+            <!-- Thin progress line; a click on it jumps to that point. -->
+            <ProgressBar x:Name="SeekBar" Grid.Row="1" Minimum="0" Maximum="1" Value="{Binding Progress, Mode=OneWay}" Height="5" BorderThickness="0"
+                         Background="Transparent" Foreground="{StaticResource MF.Brush.Accent}" Cursor="Hand"
+                         MouseLeftButtonDown="SeekBar_MouseLeftButtonDown"/>
+        </Grid>
+    </Border>
+</UserControl>

@@ -97,6 +97,17 @@ public partial class QuickSearchWindow : Window, IQuickSearchPresenter
     private void ResultList_SelectionChanged(object sender, SelectionChangedEventArgs e) =>
         _vm.SetSelectedItems(ResultList.SelectedItems.OfType<TrackRowViewModel>().ToList());
 
+    /// <summary>Double-click on a result plays a preview (it does not open the library or start a drag).</summary>
+    private void ResultList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        var item = ItemsControl.ContainerFromElement(ResultList, (DependencyObject)e.OriginalSource) as ListBoxItem;
+        if (item?.DataContext is TrackRowViewModel row)
+        {
+            _vm.Preview.PlayRow(row);
+            e.Handled = true;
+        }
+    }
+
     private void SearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         switch (e.Key)

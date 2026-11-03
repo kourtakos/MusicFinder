@@ -36,7 +36,8 @@ Command-line options for the app:
    Indexing runs in the background and results appear as they are found. After an upgrade, existing files are re-read once.
 2. Type in the search box (`Ctrl+F` / `Ctrl+K`). Search is token-AND with prefix matching and is
    accent- and case-insensitive for Greek and Latin text, and finds Greek names typed in Greeklish or with the wrong keyboard layout (`docs/greek-search.md`).
-3. Combine search with the folder selection and the Genre / BPM / Decade / Tags filters.
+3. Double-click a track to preview it in the slim player at the top of the window (choose its output in Settings so it does not play through the main speakers; see `docs/preview-player.md`).
+4. Combine search with the folder selection and the Genre / BPM / Decade / Tags filters.
 4. Select tracks to see cover art and details. Use the `+` buttons to give them DJ tags or your own genres (works on a whole selection).
 5. `F2` (or *Edit tagsβ€¦*) opens the tag editor: change fields, preview the before/after, then write. See `docs/tags-and-genres.md`.
 6. The **Tags** tab manages the genre taxonomy, aliases and DJ tags, and lists genre text from your files that matches nothing yet,

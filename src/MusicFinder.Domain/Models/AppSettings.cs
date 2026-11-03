@@ -68,6 +68,11 @@ public sealed class AppSettings
     /// <summary>Tick "Embed this cover" for the user when the file has no cover yet. It is still written only after the user presses Write.</summary>
     public bool EmbedCoverByDefault { get; set; } = true;
 
+    /// <summary>Windows id of the output the preview player uses. Null: the Windows default. A DJ will usually pick the headphone card here.</summary>
+    public string? PreviewDeviceId { get; set; }
+    /// <summary>Preview volume, 0 to 1. Starts at half so a first preview is never a surprise.</summary>
+    public double PreviewVolume { get; set; } = 0.5;
+
     /// <summary>Seconds of a track the BPM and key analysis listens to (the middle of the track). 30 - 240.</summary>
     public int AnalysisSeconds { get; set; } = 90;
     /// <summary>How fast the duplicate scan may read files, in MB per second (0 = no limit).</summary>

@@ -6,6 +6,10 @@ namespace MusicFinder.Infrastructure.FileOperations;
 /// <summary>The real file system for renames. <see cref="File.Move(string,string,bool)"/> is always called without overwrite.</summary>
 public sealed class SystemFileMover : IFileMover, IFileProbe
 {
+    private readonly IPreviewPlayer? _preview;
+
+    public SystemFileMover(IPreviewPlayer? preview = null) => _preview = preview;
+
     public bool Exists(string path) => File.Exists(path);
 
     public bool ExistsExact(string path)
@@ -23,7 +27,11 @@ public sealed class SystemFileMover : IFileMover, IFileProbe
         catch (UnauthorizedAccessException) { return false; }
     }
 
-    public void Move(string from, string to) => File.Move(from, to, overwrite: false);
+    public void Move(string from, string to)
+    {
+        _preview?.ReleaseIfPlaying(from);                       // a file being previewed is let go of before it is renamed
+        File.Move(from, to, overwrite: false);
+    }
 
     public void EnsureFolder(string directory) => Directory.CreateDirectory(directory);
 }

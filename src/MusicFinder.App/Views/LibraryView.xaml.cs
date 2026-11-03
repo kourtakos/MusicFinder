@@ -109,10 +109,37 @@ public partial class LibraryView : UserControl
             _ = _vm.Search.LoadMoreAsync();
     }
 
+    /// <summary>Double-click on a row (not on a header or scroll bar) plays a preview of that track.</summary>
+    private void TrackGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (_vm is null || e.ChangedButton != MouseButton.Left) return;
+        var row = e.OriginalSource is DependencyObject source ? FindAncestor<DataGridRow>(source) : null;
+        if (row?.Item is not TrackRowViewModel track) return;
+        _vm.Preview.PlayRow(track);
+        e.Handled = true;
+    }
+
+    private void PlayPreview_Click(object sender, RoutedEventArgs e)
+    {
+        if (_vm is not null && TrackGrid.SelectedItems.OfType<TrackRowViewModel>().FirstOrDefault() is { } track)
+            _vm.Preview.PlayRow(track);
+    }
+
+    private static T? FindAncestor<T>(DependencyObject start) where T : DependencyObject
+    {
+        for (var node = start; node is not null; node = node is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D
+                 ? System.Windows.Media.VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node))
+            if (node is T found) return found;
+        return null;
+    }
+
     private void TrackGrid_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (_vm is null) return;
         var ctrl = Keyboard.Modifiers == ModifierKeys.Control;
+
+        // Space pauses or resumes a loaded preview. It never starts sound on its own.
+        if (e.Key == Key.Space && Keyboard.Modifiers == ModifierKeys.None && _vm.Preview.TogglePauseIfLoaded()) { e.Handled = true; return; }
 
         if (ctrl && e.Key == Key.C) { _vm.Search.CopyPathsCommand.Execute(null); e.Handled = true; }
         else if (ctrl && e.Key == Key.O) { _vm.Search.RevealInExplorerCommand.Execute(null); e.Handled = true; }

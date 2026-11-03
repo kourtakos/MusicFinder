@@ -44,13 +44,17 @@ public partial class LibraryViewModel : ObservableObject
     private readonly MusicFinder.Application.Analysis.AnalysisRunner _analysisRunner;
     private readonly RenameViewModelFactory _renameFactory;
 
+    /// <summary>The discreet player: a double-click on a row previews it.</summary>
+    public PreviewViewModel Preview { get; }
+
     public LibraryViewModel(FolderTreeViewModel tree, SearchViewModel search, ScanCoordinator scans,
         ILibraryRootRepository roots, ITrackRepository tracks, ISettingsStore settings, GenreMappingJob genreJob,
         ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths,
         IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time, ICoverArtClient coverArt,
         IAudioAnalysisService analysis, MusicFinder.Application.Analysis.AnalysisRunner analysisRunner,
-        RenameViewModelFactory renameFactory)
+        RenameViewModelFactory renameFactory, PreviewViewModel preview)
     {
+        Preview = preview;
         _renameFactory = renameFactory;
         Tree = tree;
         Search = search;

@@ -120,6 +120,7 @@ public partial class App : System.Windows.Application
         services.AddSingleton<HealthViewModel>();
         services.AddSingleton<RenameViewModelFactory>();
         services.AddSingleton<SessionViewModel>();
+        services.AddSingleton<PreviewViewModel>();
         services.AddSingleton<QuickSearchViewModel>();
         services.AddSingleton<Views.QuickSearchWindow>();
         services.AddSingleton<Services.Hotkeys.IQuickSearchPresenter>(sp => sp.GetRequiredService<Views.QuickSearchWindow>());
@@ -132,6 +133,9 @@ public partial class App : System.Windows.Application
     {
         if (_host is not null)
         {
+            // A preview lets go of its audio file and output first.
+            try { _host.Services.GetService<PreviewViewModel>()?.Dispose(); }
+            catch (Exception ex) { Log.Warning(ex, "Preview shutdown failed"); }
             // Unfinished 20-second windows become "interrupted" (never "played") and the session is closed.
             try { _host.Services.GetService<MusicFinder.Domain.Contracts.ISessionService>()?.ShutdownAsync().GetAwaiter().GetResult(); }
             catch (Exception ex) { Log.Warning(ex, "Session shutdown failed"); }

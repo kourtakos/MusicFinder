@@ -230,9 +230,12 @@
                               SelectionChanged="TrackGrid_SelectionChanged"
                               Sorting="TrackGrid_Sorting"
                               ScrollViewer.ScrollChanged="TrackGrid_ScrollChanged"
+                              MouseDoubleClick="TrackGrid_MouseDoubleClick"
                               PreviewKeyDown="TrackGrid_PreviewKeyDown">
                         <DataGrid.ContextMenu>
                             <ContextMenu>
+                                <MenuItem Header="Play preview  (double-click)" Click="PlayPreview_Click"/>
+                                <Separator/>
                                 <MenuItem Header="Edit tags…  (F2)"
                                           Command="{Binding PlacementTarget.DataContext.EditTagsCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Identify online…  (Ctrl+I)"

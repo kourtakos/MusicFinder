@@ -15,6 +15,7 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
     private const int LockRetries = 3;
     private static readonly TimeSpan LockRetryDelay = TimeSpan.FromMilliseconds(200);
     private readonly TagLibMetadataReader _reader = new();
+    private readonly IPreviewPlayer? _preview;
 
     static TagLibMetadataWriter()
     {
@@ -24,6 +25,9 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
         TagLib.Id3v2.Tag.ForceDefaultVersion = false;
         TagLib.Id3v2.Tag.UseNumericGenres = false;
     }
+
+    /// <param name="preview">When this file is being previewed, the preview lets go of it before the write (the write probes for exclusive access).</param>
+    public TagLibMetadataWriter(IPreviewPlayer? preview = null) => _preview = preview;
 
     public IReadOnlyList<string> Validate(TagChangeSet changes) => TagChangeValidator.Validate(changes);
 
@@ -40,6 +44,8 @@ public sealed class TagLibMetadataWriter : IMetadataWriter
         if (!File.Exists(path)) return Fail(path, "The file no longer exists.");
         if (File.GetAttributes(path).HasFlag(FileAttributes.ReadOnly))
             return Fail(path, "The file is read-only. Clear the read-only attribute in Explorer if you want to edit it.");
+
+        _preview?.ReleaseIfPlaying(path);
 
         string? temp = null;
         string? backup = null;

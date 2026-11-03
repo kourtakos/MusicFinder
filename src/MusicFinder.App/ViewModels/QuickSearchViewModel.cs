@@ -39,8 +39,12 @@ public sealed partial class QuickSearchViewModel : ObservableObject
     /// <summary>Raised with the current query when the user wants the full library view.</summary>
     public event EventHandler<string>? OpenInLibraryRequested;
 
-    public QuickSearchViewModel(ISearchService search, ISessionService session, TrackDragService drag, Services.Artwork.IArtworkService artwork)
+    /// <summary>The same discreet player as the main window; a double-click on a result previews it.</summary>
+    public PreviewViewModel Preview { get; }
+
+    public QuickSearchViewModel(ISearchService search, ISessionService session, TrackDragService drag, Services.Artwork.IArtworkService artwork, PreviewViewModel preview)
     {
+        Preview = preview;
         _search = search;
         _session = session;
         _drag = drag;

@@ -16,6 +16,7 @@ public sealed partial class MainViewModel : ObservableObject
     public SettingsViewModel Settings { get; }
     public TagsViewModel Tags { get; }
     public SessionViewModel Session { get; }
+    public PreviewViewModel Preview { get; }
     public HealthViewModel Health { get; }
     private readonly Services.SearchIndexCoordinator _searchIndex;
     private readonly MusicFinder.Domain.Contracts.IFileOperationService _fileOperations;
@@ -31,8 +32,9 @@ public sealed partial class MainViewModel : ObservableObject
 
     public MainViewModel(LibraryViewModel library, SettingsViewModel settings, TagsViewModel tags, SessionViewModel session,
         HealthViewModel health, Services.SearchIndexCoordinator searchIndex,
-        MusicFinder.Domain.Contracts.IFileOperationService fileOperations, Services.IUserDialogs dialogs)
+        MusicFinder.Domain.Contracts.IFileOperationService fileOperations, Services.IUserDialogs dialogs, PreviewViewModel preview)
     {
+        Preview = preview;
         _fileOperations = fileOperations;
         _dialogs = dialogs;
         Library = library;

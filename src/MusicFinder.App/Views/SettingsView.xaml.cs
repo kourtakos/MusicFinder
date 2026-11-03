@@ -17,6 +17,7 @@ public partial class SettingsView : UserControl
             {
                 vm.Identification.PropertyChanged -= OnIdentificationChanged;
                 vm.Identification.PropertyChanged += OnIdentificationChanged;
+                _ = vm.Preview.RefreshDevicesAsync();            // outputs are listed only when this page is opened
             }
         };
     }

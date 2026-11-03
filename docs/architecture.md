@@ -135,3 +135,7 @@ App ──► Application ──► Domain
 | `MusicFinder.UiSmokeTests` | The real `MainWindow` with the real composition root on a temp database: rows, search, selection, tabs, layout persistence, filters, tag/genre pickers, artwork service and control (real WPF decoding), the tag editor, the Tags tab, and a binding audit (open popups included) that fails on any broken binding. Runs serially because all tests share one WPF dispatcher. |
 
 Not covered by automated tests: the real OS drag loop and interoperability with VirtualDJ/Traktor (see `docs/dj-session.md` for what was checked by hand), real-hardware rendering, large-library performance.
+
+## Preview player
+
+IPreviewPlayer (Domain) is implemented by WasapiPreviewPlayer (Infrastructure, shared-mode WASAPI, read-only shared file handles). Pure transitions and text live in Application/Preview. PreviewViewModel feeds the PreviewBar strip in MainWindow; the tag writer and the file mover call ReleaseIfPlaying before touching a file. It is independent of the DJ session. See docs/preview-player.md.

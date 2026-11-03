@@ -72,6 +72,7 @@
                      MaxHeight="440" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.ScrollUnit="Pixel"
                      SelectionChanged="ResultList_SelectionChanged" PreviewKeyDown="ResultList_PreviewKeyDown"
+                     MouseDoubleClick="ResultList_MouseDoubleClick"
                      Visibility="{Binding Results.Count, Converter={StaticResource NotNullToVis}}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
