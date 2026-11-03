@@ -47,6 +47,8 @@ public interface IHistoryImportService
     IReadOnlyList<IHistoryImporter> Importers { get; }
     /// <summary>The folder an import would read now: the one the user chose, else the first one found. Null when there is none.</summary>
     string? ResolveFolder(string providerId);
+    /// <summary>The user chose a folder, but it does not exist on this PC (typically settings brought from another computer).</summary>
+    bool ChosenFolderIsMissing(string providerId);
     /// <summary>Imports one program, or all of them when <paramref name="providerId"/> is null.</summary>
     Task<IReadOnlyList<HistoryImportResult>> RunAsync(string? providerId, CancellationToken ct = default);
     /// <summary>Ties a pending unmatched play to a track chosen by the user.</summary>

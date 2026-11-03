@@ -36,8 +36,16 @@ public sealed class HistoryImportService : IHistoryImportService
         var importer = _importers.FirstOrDefault(i => i.ProviderId == providerId);
         if (importer is null) return null;
         var chosen = ChosenFolder(providerId);
-        return !string.IsNullOrWhiteSpace(chosen) ? chosen : importer.DetectDefaultFolders().FirstOrDefault();
+        if (string.IsNullOrWhiteSpace(chosen)) return importer.DetectDefaultFolders().FirstOrDefault();
+        if (Directory.Exists(chosen)) return chosen;
+        // Settings travel between PCs (restore, a copied portable folder): a folder chosen on another machine may not exist here.
+        // The detected one is used then; with none, the chosen path is returned so the import reports it as missing.
+        return importer.DetectDefaultFolders().FirstOrDefault() ?? chosen;
     }
+
+    /// <summary>True when the folder the user chose does not exist on this PC (so the detected one is used instead, if there is one).</summary>
+    public bool ChosenFolderIsMissing(string providerId) =>
+        ChosenFolder(providerId) is { Length: > 0 } chosen && !Directory.Exists(chosen);
 
     private string? ChosenFolder(string providerId)
     {

@@ -103,19 +103,18 @@ public class HistoryImportUiTests
     });
 
     [Fact]
-    public Task AMissingFolder_IsReportedAsAnError_NotAsSuccess() => Ui.RunAsync(async () =>
+    public Task AFolderChosenOnAnotherPc_IsSaidToBeMissing_NotTrustedSilently() => Ui.RunAsync(async () =>
     {
+        // Whether a detected folder exists depends on this PC (it may have VirtualDJ), so only the hint is checked here;
+        // the fallback and the error are covered against a controlled folder in the integration tests.
         var (app, dialogs) = await StartAsync();
         await using var _a = app;
-        var gone = NewHistoryFolder();
-        dialogs.FolderPicked = gone;
+        dialogs.FolderPicked = NewHistoryFolder();
         var vdj = app.Main.Settings.History.Programs[0];
+
         vdj.BrowseCommand.Execute(null);
 
-        await vdj.ImportNowCommand.ExecuteAsync(null);
-        await Ui.WaitUntilAsync(() => vdj.ResultIsError, what: "the error");
-
-        Assert.Contains("does not exist", vdj.ResultText);
+        Assert.Contains("does not exist on this computer", vdj.FolderHint);
     });
 
     [Fact]

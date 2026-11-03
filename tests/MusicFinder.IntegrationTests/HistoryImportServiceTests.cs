@@ -198,10 +198,19 @@ public class HistoryImportServiceTests
         Assert.Equal(rig.History, rig.Service.ResolveFolder(PlaySources.VirtualDj));       // chosen: that one, even if it is empty
         Assert.Equal(0, (await rig.ImportAsync()).Entries);
 
+        // A folder chosen on another computer does not exist here: the detected one is used instead of failing.
         rig.Settings.Value.VirtualDjHistoryFolder = Path.Combine(rig.History, "gone");
+        Assert.True(rig.Service.ChosenFolderIsMissing(PlaySources.VirtualDj));
+        Assert.Equal(detected, rig.Service.ResolveFolder(PlaySources.VirtualDj));
+        var fallback = await rig.ImportAsync();
+        Assert.Null(fallback.Error);
+        Assert.Equal(1, fallback.New);
+        Assert.Equal((1, 0), rig.Env.Counts(rig.Env.B));
+
+        // With nothing detected either, the missing folder is reported.
+        Directory.Delete(detected, true);
         var missing = await rig.ImportAsync();
         Assert.Contains("does not exist", missing.Error);
-        Assert.Equal((0, 0), rig.Env.Counts(rig.Env.B));
     }
 
     [Fact]

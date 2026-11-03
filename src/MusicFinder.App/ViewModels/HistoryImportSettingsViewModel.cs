@@ -48,9 +48,13 @@ public sealed partial class HistoryProgramViewModel : ObservableObject
         HasChosenFolder = !string.IsNullOrWhiteSpace(chosen);
         var resolved = _service.ResolveFolder(ProviderId);
         FolderText = resolved ?? "No folder found";
-        FolderHint = HasChosenFolder
-            ? "The folder you chose."
-            : resolved is null ? $"{DisplayName}'s history folder was not found. Choose it with Browse." : "Found automatically.";
+        FolderHint = _service.ChosenFolderIsMissing(ProviderId)
+            ? (resolved is not null && resolved != chosen
+                ? "The folder you chose does not exist on this computer, so the one found automatically is used."
+                : "The folder you chose does not exist on this computer. Choose it with Browse.")
+            : HasChosenFolder
+                ? "The folder you chose."
+                : resolved is null ? $"{DisplayName}'s history folder was not found. Choose it with Browse." : "Found automatically.";
     }
 
     private void Save(string? folder)
