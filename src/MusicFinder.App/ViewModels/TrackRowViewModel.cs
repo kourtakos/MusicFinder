@@ -2,6 +2,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MusicFinder.Domain.Enums;
 using MusicFinder.Domain.Models;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -59,21 +60,21 @@ public sealed partial class TrackRowViewModel : ObservableObject
 
     public string LastPlayedText => Row.LastPlayedUtc is { } at
         ? MusicFinder.Application.Dj.RelativeTime.Format(at, DateTime.UtcNow)
-        : "Not played";
+        : Loc.T("Not played");
 
     public int Plays => Row.PlayCount;
 
     /// <summary>Counts spelled out, because "played 3 times" would hide how many of them are only guesses.</summary>
     public string PlayDetailText => Row.PlayCount == 0
-        ? "Never played"
-        : $"{Row.ConfirmedCount} confirmed, {Row.PossibleCount} possible";
+        ? Loc.T("Never played")
+        : Loc.T("{0} confirmed, {1} possible", Row.ConfirmedCount, Row.PossibleCount);
 
     /// <summary>This track's strongest evidence in the live session, as a short chip. Empty when there is none.</summary>
     public string SessionBadge => Row.SessionStatus switch
     {
-        SessionPlayStatus.Exported => "Exported",
-        SessionPlayStatus.Possible => "Possible",
-        SessionPlayStatus.Confirmed => "Played",
+        SessionPlayStatus.Exported => Loc.T("Exported"),
+        SessionPlayStatus.Possible => Loc.T("Possible"),
+        SessionPlayStatus.Confirmed => Loc.T("Played"),
         _ => ""
     };
 
@@ -85,17 +86,17 @@ public sealed partial class TrackRowViewModel : ObservableObject
     /// <summary>The pill as the pop-up shows it: longer than the chip, and honest about how much is known.</summary>
     public string SessionPillText => Row.SessionStatus switch
     {
-        SessionPlayStatus.Exported => "Dragged this session",
-        SessionPlayStatus.Possible => "Possibly played",
-        SessionPlayStatus.Confirmed => "Played this session",
+        SessionPlayStatus.Exported => Loc.T("Dragged this session"),
+        SessionPlayStatus.Possible => Loc.T("Possibly played"),
+        SessionPlayStatus.Confirmed => Loc.T("Played this session"),
         _ => ""
     };
 
     public string SessionPillTip => Row.SessionStatus switch
     {
-        SessionPlayStatus.Exported => "You dragged this track out in the current session. MusicFinder cannot tell whether it was loaded or played.",
-        SessionPlayStatus.Possible => "Dragged out, then nothing else happened for the quiet period: probably played, but this is a guess, not proof.",
-        SessionPlayStatus.Confirmed => "Marked as played in the current session (by you or by your DJ software's history).",
+        SessionPlayStatus.Exported => Loc.T("You dragged this track out in the current session. MusicFinder cannot tell whether it was loaded or played."),
+        SessionPlayStatus.Possible => Loc.T("Dragged out, then nothing else happened for the quiet period: probably played, but this is a guess, not proof."),
+        SessionPlayStatus.Confirmed => Loc.T("Marked as played in the current session (by you or by your DJ software's history)."),
         _ => ""
     };
 
@@ -122,7 +123,7 @@ public sealed partial class TrackRowViewModel : ObservableObject
             var parts = new List<string>();
             if (!string.IsNullOrWhiteSpace(Row.Codec)) parts.Add(Row.Codec!);
             if (Row.SampleRateHz is > 0) parts.Add((Row.SampleRateHz.Value / 1000.0).ToString("0.##", CultureInfo.InvariantCulture) + " kHz");
-            if (Row.Channels is > 0) parts.Add(Row.Channels == 1 ? "mono" : Row.Channels == 2 ? "stereo" : Row.Channels + " channels");
+            if (Row.Channels is > 0) parts.Add(Row.Channels == 1 ? Loc.T("mono") : Row.Channels == 2 ? Loc.T("stereo") : Loc.T("{0} channels", Row.Channels));
             if (Row.BitDepth is > 0) parts.Add(Row.BitDepth + "-bit");
             return string.Join(" · ", parts);
         }
@@ -135,13 +136,13 @@ public sealed partial class TrackRowViewModel : ObservableObject
         {
             var flags = (Domain.Enums.IssueFlags)Row.IssueFlags;
             var items = new List<string>();
-            if (flags.HasFlag(Domain.Enums.IssueFlags.Unreadable)) items.Add("Tags could not be read" + (string.IsNullOrEmpty(Row.ReadError) ? "" : " (" + Row.ReadError + ")"));
-            if (flags.HasFlag(Domain.Enums.IssueFlags.Mojibake)) items.Add("Garbled text in the tags");
-            if (flags.HasFlag(Domain.Enums.IssueFlags.LowBitrate)) items.Add("Low bitrate");
-            if (flags.HasFlag(Domain.Enums.IssueFlags.OddSampleRate)) items.Add("Unusual sample rate");
-            if (flags.HasFlag(Domain.Enums.IssueFlags.CodecMismatch)) items.Add("Audio is not the kind the extension suggests");
-            if (flags.HasFlag(Domain.Enums.IssueFlags.SizeMismatch)) items.Add("Size does not fit the bitrate and length");
-            if (flags.HasFlag(Domain.Enums.IssueFlags.ZeroDuration)) items.Add("No duration");
+            if (flags.HasFlag(Domain.Enums.IssueFlags.Unreadable)) items.Add(Loc.T("Tags could not be read") + (string.IsNullOrEmpty(Row.ReadError) ? "" : " (" + Row.ReadError + ")"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.Mojibake)) items.Add(Loc.T("Garbled text in the tags"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.LowBitrate)) items.Add(Loc.T("Low bitrate"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.OddSampleRate)) items.Add(Loc.T("Unusual sample rate"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.CodecMismatch)) items.Add(Loc.T("Audio is not the kind the extension suggests"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.SizeMismatch)) items.Add(Loc.T("Size does not fit the bitrate and length"));
+            if (flags.HasFlag(Domain.Enums.IssueFlags.ZeroDuration)) items.Add(Loc.T("No duration"));
             return string.Join("; ", items);
         }
     }
@@ -167,8 +168,8 @@ public sealed record PlayHistoryLine(string Label, string When, string Session, 
     {
         var local = item.PlayedUtc.ToLocalTime();
         var when = $"{local:dd/MM/yyyy HH:mm}  ·  {MusicFinder.Application.Dj.RelativeTime.Format(item.PlayedUtc, DateTime.UtcNow)}";
-        var session = item.SessionName is { Length: > 0 } name ? name : item.SessionId is null ? "No session" : "Session";
-        if (item.Superseded) session += "  ·  replaced by a confirmed play";
+        var session = item.SessionName is { Length: > 0 } name ? name : item.SessionId is null ? Loc.T("No session") : Loc.T("Session");
+        if (item.Superseded) session += "  ·  " + Loc.T("replaced by a confirmed play");
         return new PlayHistoryLine(item.Label, when, session, item.Status == PlayStatus.Confirmed, item.Superseded);
     }
 }

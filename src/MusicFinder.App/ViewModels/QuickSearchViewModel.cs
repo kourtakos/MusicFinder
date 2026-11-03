@@ -6,6 +6,7 @@ using MusicFinder.Application.Dj;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Enums;
 using MusicFinder.Domain.Models;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -94,7 +95,7 @@ public sealed partial class QuickSearchViewModel : ObservableObject
                 Results.Clear();
                 HasMore = false;
                 Warning = null;
-                StatusText = "Type to search your library";
+                StatusText = Loc.T("Type to search your library");
                 return;
             }
 
@@ -116,14 +117,14 @@ public sealed partial class QuickSearchViewModel : ObservableObject
             HasMore = page.HasMore;
             Warning = page.Warnings.Count > 0 ? string.Join(" ", page.Warnings) : null;
             StatusText = page.Items.Count == 0
-                ? "No matches"
-                : page.HasMore ? $"Showing the first {page.Items.Count}. Press Enter to see all of them in the library."
-                               : $"{page.Items.Count} {(page.Items.Count == 1 ? "match" : "matches")}";
+                ? Loc.T("No matches")
+                : page.HasMore ? Loc.T("Showing the first {0}. Press Enter to see all of them in the library.", page.Items.Count)
+                               : page.Items.Count == 1 ? Loc.T("1 match") : Loc.T("{0} matches", page.Items.Count);
         }
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            Warning = "Search failed: " + ex.Message;
+            Warning = Loc.T("Search failed: {0}", ex.Message);
         }
     }
 
@@ -141,7 +142,7 @@ public sealed partial class QuickSearchViewModel : ObservableObject
             foreach (var row in fresh)
                 if (byId.TryGetValue(row.Id, out var vm)) vm.Update(row);
         }
-        catch (Exception ex) { Warning = "Could not refresh: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not refresh: {0}", ex.Message); }
     }
 
     /// <summary>Drags the selected tracks to another application as real files (same rules as the library grid).</summary>
@@ -157,7 +158,7 @@ public sealed partial class QuickSearchViewModel : ObservableObject
     private async Task ReportAsync(Task recording)
     {
         try { await recording; }
-        catch (Exception ex) { Warning = "The drag could not be recorded: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("The drag could not be recorded: {0}", ex.Message); }
     }
 
     [RelayCommand]

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Enums;
 using MusicFinder.Domain.Models;
@@ -26,13 +27,13 @@ public sealed class SessionEntryItem
 
     public string StatusText => Entry.Status switch
     {
-        SessionPlayStatus.Confirmed => "Confirmed",
-        SessionPlayStatus.Possible => "Possibly played",
-        _ => "Exported"
+        SessionPlayStatus.Confirmed => Loc.T("Confirmed"),
+        SessionPlayStatus.Possible => Loc.T("Possibly played"),
+        _ => Loc.T("Exported")
     };
 
     /// <summary>"Copy to Traktor". The target is a hint taken from the window under the cursor at the drop.</summary>
-    public string TargetText => Entry.Target is { Length: > 0 } t ? $"{Entry.Effect} → {t}" : Entry.Effect;
+    public string TargetText => Entry.Target is { Length: > 0 } t ? $"{Loc.T(Entry.Effect)} → {t}" : Loc.T(Entry.Effect);
 }
 
 /// <summary>
@@ -42,7 +43,7 @@ public sealed class SessionEntryItem
 /// </summary>
 public sealed partial class SessionViewModel : ObservableObject
 {
-    public static readonly string[] SoftwareChoices = ["Not specified", "Traktor", "VirtualDJ", "Other"];
+    public static readonly string[] SoftwareChoices = [Loc.T("Not specified"), "Traktor", "VirtualDJ", Loc.T("Other")];
 
     private readonly ISessionService _session;
     private readonly SynchronizationContext _ui;
@@ -51,8 +52,8 @@ public sealed partial class SessionViewModel : ObservableObject
     public ObservableCollection<SessionEntryItem> Entries { get; } = [];
 
     [ObservableProperty] private bool _isLive;
-    [ObservableProperty] private string _title = "No live session";
-    [ObservableProperty] private string _subtitle = "Start a session, or just drag a track to your DJ software and one starts automatically.";
+    [ObservableProperty] private string _title = Loc.T("No live session");
+    [ObservableProperty] private string _subtitle = Loc.T("Start a session, or just drag a track to your DJ software and one starts automatically.");
     [ObservableProperty] private string _editName = "";
     [ObservableProperty] private string _editSoftware = SoftwareChoices[0];
     [ObservableProperty] private int _exportedCount;
@@ -80,10 +81,12 @@ public sealed partial class SessionViewModel : ObservableObject
 
     /// <summary>"Traktor · 3 exported · 1 possible · 1 played", or "No session" for the status bar.</summary>
     public string StatusBarText => !IsLive
-        ? "No session"
-        : $"Session{(SoftwareOf(_session.Active?.DjSoftware) is { } s ? " · " + s : "")} · {ExportedCount} exported · {PossibleCount} possible · {ConfirmedCount} played";
+        ? Loc.T("No session")
+        : SoftwareOf(_session.Active?.DjSoftware) is { } s
+            ? Loc.T("Session · {0} · {1} exported · {2} possible · {3} played", s, ExportedCount, PossibleCount, ConfirmedCount)
+            : Loc.T("Session · {0} exported · {1} possible · {2} played", ExportedCount, PossibleCount, ConfirmedCount);
 
-    public string LiveBadgeText => SoftwareOf(_session.Active?.DjSoftware) is { } s ? $"LIVE · {s}" : "LIVE";
+    public string LiveBadgeText => SoftwareOf(_session.Active?.DjSoftware) is { } s ? Loc.T("LIVE · {0}", s) : Loc.T("LIVE");
 
     private static string? SoftwareOf(string? software) => string.IsNullOrWhiteSpace(software) ? null : software;
 
@@ -97,10 +100,12 @@ public sealed partial class SessionViewModel : ObservableObject
             if (generation != _generation) return; // a newer reload is already running
 
             IsLive = active is not null;
-            Title = active?.Name ?? "No live session";
+            Title = active?.Name ?? Loc.T("No live session");
             Subtitle = active is null
-                ? "Start a session, or just drag a track to your DJ software and one starts automatically."
-                : $"Started {active.StartedUtc.ToLocalTime():HH:mm}" + (active.AutoStarted ? " (started automatically by your first drag)" : "");
+                ? Loc.T("Start a session, or just drag a track to your DJ software and one starts automatically.")
+                : active.AutoStarted
+                    ? Loc.T("Started {0:HH:mm} (started automatically by your first drag)", active.StartedUtc.ToLocalTime())
+                    : Loc.T("Started {0:HH:mm}", active.StartedUtc.ToLocalTime());
             if (active is not null)
             {
                 EditName = active.Name ?? "";
@@ -119,7 +124,7 @@ public sealed partial class SessionViewModel : ObservableObject
             OnPropertyChanged(nameof(StatusBarText));
             OnPropertyChanged(nameof(LiveBadgeText));
         }
-        catch (Exception ex) { Error = "Could not load the session: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not load the session: {0}", ex.Message); }
     }
 
     private string? ChosenSoftware => EditSoftware == SoftwareChoices[0] ? null : EditSoftware;
@@ -128,14 +133,14 @@ public sealed partial class SessionViewModel : ObservableObject
     private async Task Start()
     {
         try { await _session.StartAsync(ChosenSoftware, CancellationToken.None); }
-        catch (Exception ex) { Error = "Could not start the session: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not start the session: {0}", ex.Message); }
     }
 
     [RelayCommand]
     private async Task Stop()
     {
         try { await _session.StopAsync(CancellationToken.None); }
-        catch (Exception ex) { Error = "Could not stop the session: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not stop the session: {0}", ex.Message); }
     }
 
     /// <summary>Saves the name and DJ software of the live session.</summary>
@@ -144,7 +149,7 @@ public sealed partial class SessionViewModel : ObservableObject
     {
         if (!IsLive) return;
         try { await _session.RenameAsync(string.IsNullOrWhiteSpace(EditName) ? null : EditName.Trim(), ChosenSoftware, CancellationToken.None); }
-        catch (Exception ex) { Error = "Could not save: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not save: {0}", ex.Message); }
     }
 
     [RelayCommand]
@@ -152,7 +157,7 @@ public sealed partial class SessionViewModel : ObservableObject
     {
         if (item is null) return;
         try { await _session.MarkPlayedAsync(item.TrackId, item.Entry.AnchorEventId, CancellationToken.None); }
-        catch (Exception ex) { Error = "Could not mark as played: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not mark as played: {0}", ex.Message); }
     }
 
     [RelayCommand]
@@ -160,14 +165,14 @@ public sealed partial class SessionViewModel : ObservableObject
     {
         if (item is null) return;
         try { await _session.MarkNotPlayedAsync(item.TrackId, item.Entry.AnchorEventId, CancellationToken.None); }
-        catch (Exception ex) { Error = "Could not mark as not played: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not mark as not played: {0}", ex.Message); }
     }
 
     [RelayCommand]
     private async Task Undo()
     {
         try { await _session.UndoAsync(CancellationToken.None); }
-        catch (Exception ex) { Error = "Could not undo: " + ex.Message; }
+        catch (Exception ex) { Error = Loc.T("Could not undo: {0}", ex.Message); }
         OnPropertyChanged(nameof(CanUndo));
     }
 }

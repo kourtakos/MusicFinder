@@ -11,9 +11,7 @@ It never deletes files. It makes no network connection unless you turn on **onli
 ## Requirements
 
 - Windows 10/11 x64
-- .NET SDK 9 (the contract targets .NET 10; it is not installed here, so the solution builds on net9.0).
-  To upgrade: install the .NET 10 SDK, set `<NetVersion>10.0</NetVersion>` in `Directory.Build.props`,
-  and bump the `Microsoft.*` package versions in `Directory.Packages.props`.
+- To build from source: .NET 9 SDK. The released installer and portable zip are self-contained, so running MusicFinder needs no .NET installation.
 
 ## Build, test, run
 
@@ -59,6 +57,8 @@ Command-line options for the app:
 
 Quoted phrases are supported. Invalid expressions show a warning and never block the search.
 `played:never|session|possible|confirmed` filters by play status (see `docs/dj-session.md`). Greek, Greeklish and wrong-keyboard-layout matching is automatic (`docs/greek-search.md`).
+**Language.** The interface is available in English and Greek. By default it follows the Windows display language; change it under **Settings > Language** (applies after a restart). The Greek texts live in `src/MusicFinder.App/Resources/Strings.el.resx` (the English text is the key; a text without an entry is shown in English). A test fails when a text has no Greek entry. The installer is also available in both languages.
+
 
 ## Layout
 

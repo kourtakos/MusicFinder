@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Interop;
 using MusicFinder.Application.Hotkeys;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Services.Hotkeys;
 
@@ -39,8 +40,8 @@ public sealed class Win32GlobalHotkey : IGlobalHotkey
         {
             var code = Marshal.GetLastWin32Error();
             return new HotkeyRegistration(false, code == ErrorHotkeyAlreadyRegistered
-                ? $"{gesture} is already used by another program (or by Windows). Choose a different shortcut."
-                : $"Windows did not accept {gesture} (error {code}). Choose a different shortcut.");
+                ? Loc.T("{0} is already used by another program (or by Windows). Choose a different shortcut.", gesture)
+                : Loc.T("Windows did not accept {0} (error {1}). Choose a different shortcut.", gesture, code));
         }
 
         if (_currentId != 0) UnregisterHotKey(_window.Handle, _currentId);

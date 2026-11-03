@@ -5,6 +5,7 @@ using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Enums;
 using MusicFinder.Domain.Models;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -105,8 +106,8 @@ public partial class SearchViewModel : ObservableObject
         }
 
         foreach (var (label, filter) in new[]
-                 { ("Never played", PlayedFilter.Never), ("Played in this session", PlayedFilter.Session),
-                   ("Possibly played", PlayedFilter.Possible), ("Confirmed played", PlayedFilter.Confirmed) })
+                 { (Loc.T("Never played"), PlayedFilter.Never), (Loc.T("Played in this session"), PlayedFilter.Session),
+                   (Loc.T("Possibly played"), PlayedFilter.Possible), (Loc.T("Confirmed played"), PlayedFilter.Confirmed) })
         {
             var option = new FilterOption(label) { Id = (long)filter };
             option.Toggled += (_, _) =>
@@ -119,8 +120,8 @@ public partial class SearchViewModel : ObservableObject
         }
         var saved = _settings.Load();
         foreach (var (label, id, initial) in new[]
-                 { ("Hide confirmed in session", HideConfirmedId, saved.HideConfirmedInSession),
-                   ("Hide possible in session", HidePossibleId, saved.HidePossibleInSession) })
+                 { (Loc.T("Hide confirmed in session"), HideConfirmedId, saved.HideConfirmedInSession),
+                   (Loc.T("Hide possible in session"), HidePossibleId, saved.HidePossibleInSession) })
         {
             var hide = new FilterOption(label) { Id = id };
             if (initial) hide.SetSilently(true);
@@ -160,11 +161,11 @@ public partial class SearchViewModel : ObservableObject
 
     public string ScopeLabel => _tree.ScopeLabel;
     public string ResultsText => IsSimilarMode
-        ? $"{Results.Count:N0} similar {(Results.Count == 1 ? "track" : "tracks")}"
+        ? (Results.Count == 1 ? Loc.T("{0:N0} similar track", Results.Count) : Loc.T("{0:N0} similar tracks", Results.Count))
         : IsCountReady
-        ? $"{TotalCount:N0} {(TotalCount == 1 ? "result" : "results")} ({ScopeLabel})"
-        : $"{Results.Count:N0}+ results ({ScopeLabel})";
-    public string SelectedText => SelectedCount == 1 ? "1 selected" : $"{SelectedCount} selected";
+        ? (TotalCount == 1 ? Loc.T("{0:N0} result ({1})", TotalCount, ScopeLabel) : Loc.T("{0:N0} results ({1})", TotalCount, ScopeLabel))
+        : Loc.T("{0:N0}+ results ({1})", Results.Count, ScopeLabel);
+    public string SelectedText => SelectedCount == 1 ? Loc.T("1 selected") : Loc.T("{0} selected", SelectedCount);
     public bool HasActiveFilters =>
         QueryText.Length > 0 || GenreOptions.Concat(TagOptions).Concat(DecadeOptions).Concat(BpmOptions).Concat(PlayedOptions).Any(o => o.IsSelected);
 
@@ -216,8 +217,8 @@ public partial class SearchViewModel : ObservableObject
         var selectedTags = TagOptions.Where(o => o.IsSelected).Select(o => o.Id).ToHashSet();
 
         GenreOptions.Clear();
-        AddGenre(new FilterOption("Unknown genre") { Kind = FilterKind.UnknownGenre }, selectedGenres);
-        AddGenre(new FilterOption("Uncategorized") { Kind = FilterKind.Uncategorized }, selectedGenres);
+        AddGenre(new FilterOption(Loc.T("Unknown genre")) { Kind = FilterKind.UnknownGenre }, selectedGenres);
+        AddGenre(new FilterOption(Loc.T("Uncategorized")) { Kind = FilterKind.Uncategorized }, selectedGenres);
 
         void Walk(GenreNode node, int depth)
         {
@@ -289,7 +290,7 @@ public partial class SearchViewModel : ObservableObject
             if (assign) await _tags.AssignAsync(ids, choice.Id);
             else await _tags.UnassignAsync(ids, choice.Id);
         }
-        catch (Exception ex) { Warning = "Could not update tags: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not update tags: {0}", ex.Message); }
     }
 
     private async Task ApplyGenreAsync(AssignmentChoice choice, bool assign)
@@ -297,7 +298,7 @@ public partial class SearchViewModel : ObservableObject
         var ids = SelectedIds;
         if (ids.Count == 0) return;
         try { await _genres.SetUserGenreAsync(ids, choice.Id, assign); }
-        catch (Exception ex) { Warning = "Could not update genres: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not update genres: {0}", ex.Message); }
     }
 
     /// <summary>Sets every popup row's tri-state from the current selection (all / some / none of the tracks have it).</summary>
@@ -335,7 +336,7 @@ public partial class SearchViewModel : ObservableObject
             await LoadFacetOptionsAsync();
             await RefreshLoadedRowsAsync();
         }
-        catch (Exception ex) { Warning = "Could not refresh: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not refresh: {0}", ex.Message); }
     }
 
     /// <summary>Files were rewritten by the tag editor: their covers, text, genres and facets all may have changed.</summary>
@@ -348,7 +349,7 @@ public partial class SearchViewModel : ObservableObject
             await RefreshLoadedRowsAsync();
             await LoadFacetOptionsAsync(); // genre counts and the genre list can change with edited genre text
         }
-        catch (Exception ex) { Warning = "Could not refresh after editing: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not refresh after editing: {0}", ex.Message); }
     }
 
     /// <summary>Re-reads the rows already on screen so chips update without losing selection or scroll position.</summary>
@@ -368,9 +369,9 @@ public partial class SearchViewModel : ObservableObject
 
     public string SelectionHint => SelectedCount switch
     {
-        0 => "Select a track to see its details.",
+        0 => Loc.T("Select a track to see its details."),
         1 => "",
-        _ => $"{SelectedCount} tracks selected."
+        _ => Loc.T("{0} tracks selected.", SelectedCount)
     };
 
     [RelayCommand]
@@ -497,7 +498,7 @@ public partial class SearchViewModel : ObservableObject
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            Warning = "Search failed: " + ex.Message;
+            Warning = Loc.T("Search failed: {0}", ex.Message);
         }
     }
 
@@ -519,7 +520,7 @@ public partial class SearchViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Warning = "Loading more results failed: " + ex.Message;
+            Warning = Loc.T("Loading more results failed: {0}", ex.Message);
         }
         finally { _isLoadingMore = false; }
     }
@@ -582,7 +583,7 @@ public partial class SearchViewModel : ObservableObject
     {
         if (SelectedItems.Count != 1)
         {
-            Warning = "Select one track to find tracks similar to it.";
+            Warning = Loc.T("Select one track to find tracks similar to it.");
             return;
         }
         _session.NotifyActivity(UserActivity.Search); // a new list on screen is activity, like any search
@@ -632,7 +633,7 @@ public partial class SearchViewModel : ObservableObject
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            Warning = "Find similar failed: " + ex.Message;
+            Warning = Loc.T("Find similar failed: {0}", ex.Message);
         }
     }
 
@@ -671,7 +672,7 @@ public partial class SearchViewModel : ObservableObject
     private async Task ReportRecordingFailureAsync(Task recording)
     {
         try { await recording; }
-        catch (Exception ex) { Warning = "The drag could not be recorded: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("The drag could not be recorded: {0}", ex.Message); }
     }
 
     // ===== Play status (DJ session) =====
@@ -695,7 +696,7 @@ public partial class SearchViewModel : ObservableObject
             SelectedPlays.Clear();
             foreach (var item in items) SelectedPlays.Add(PlayHistoryLine.From(item));
         }
-        catch (Exception ex) { Warning = "Could not load the play history: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not load the play history: {0}", ex.Message); }
     }
 
     /// <summary>The session started or ended: session-dependent filters and every row's session badge change.</summary>
@@ -706,7 +707,7 @@ public partial class SearchViewModel : ObservableObject
             if (UsesSession) await RunSearchAsync(0);
             else await RefreshLoadedRowsAsync();
         }
-        catch (Exception ex) { Warning = "Could not refresh after the session changed: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not refresh after the session changed: {0}", ex.Message); }
     }
 
     /// <summary>Plays changed (a window ended, or the user marked something): refresh those rows and the history list.</summary>
@@ -720,7 +721,7 @@ public partial class SearchViewModel : ObservableObject
             else await RefreshLoadedRowsAsync();
             if (SelectedTrack is { } t && ids.Contains(t.Id)) await LoadSelectedPlaysAsync();
         }
-        catch (Exception ex) { Warning = "Could not refresh play status: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not refresh play status: {0}", ex.Message); }
     }
 
     private bool UsesSession =>
@@ -734,20 +735,20 @@ public partial class SearchViewModel : ObservableObject
     public bool CanUndoPlay => _session.CanUndo;
 
     [RelayCommand]
-    private Task MarkPlayed() => ApplyToSelectionAsync((id, ct) => _session.MarkPlayedAsync(id, null, ct), "mark as played");
+    private Task MarkPlayed() => ApplyToSelectionAsync((id, ct) => _session.MarkPlayedAsync(id, null, ct), Loc.T("Could not mark as played: {0}"));
 
     [RelayCommand]
-    private Task MarkNotPlayed() => ApplyToSelectionAsync((id, ct) => _session.MarkNotPlayedAsync(id, null, ct), "mark as not played");
+    private Task MarkNotPlayed() => ApplyToSelectionAsync((id, ct) => _session.MarkNotPlayedAsync(id, null, ct), Loc.T("Could not mark as not played: {0}"));
 
     [RelayCommand]
     private async Task UndoPlay()
     {
         try { await _session.UndoAsync(CancellationToken.None); }
-        catch (Exception ex) { Warning = "Could not undo: " + ex.Message; }
+        catch (Exception ex) { Warning = Loc.T("Could not undo: {0}", ex.Message); }
         OnPropertyChanged(nameof(CanUndoPlay));
     }
 
-    private async Task ApplyToSelectionAsync(Func<long, CancellationToken, Task> action, string what)
+    private async Task ApplyToSelectionAsync(Func<long, CancellationToken, Task> action, string failureFormat)
     {
         var ids = SelectedIds;
         if (ids.Count == 0) return;
@@ -755,7 +756,7 @@ public partial class SearchViewModel : ObservableObject
         {
             foreach (var id in ids) await action(id, CancellationToken.None);
         }
-        catch (Exception ex) { Warning = $"Could not {what}: {ex.Message}"; }
+        catch (Exception ex) { Warning = string.Format(failureFormat, ex.Message); }
         OnPropertyChanged(nameof(CanUndoPlay));
     }
 

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MusicFinder.App.ViewModels;
 using MusicFinder.Application.Hotkeys;
 using MusicFinder.Domain.Contracts;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Services.Hotkeys;
 
@@ -55,11 +56,11 @@ public sealed class QuickSearchService : IDisposable
 
         if (!HotkeyGesture.TryParse(s.QuickSearchHotkey, out var gesture, out var error))
         {
-            SetStatus($"The saved shortcut '{s.QuickSearchHotkey}' is not valid ({error}) so quick search is not available. Choose another in Settings.", true);
+            SetStatus(Loc.T("The saved shortcut '{0}' is not valid ({1}) so quick search is not available. Choose another in Settings.", s.QuickSearchHotkey, error), true);
             return;
         }
         var result = _hotkey.Register(gesture);
-        SetStatus(result.Success ? Describe(s) : $"Quick search is not available: {result.Error}", !result.Success);
+        SetStatus(result.Success ? Describe(s) : Loc.T("Quick search is not available: {0}", result.Error), !result.Success);
     }
 
     /// <summary>
@@ -82,7 +83,7 @@ public sealed class QuickSearchService : IDisposable
         var result = _hotkey.Register(gesture);
         if (!result.Success)
         {
-            SetStatus(result.Error ?? "The shortcut could not be registered.", true);
+            SetStatus(result.Error ?? Loc.T("The shortcut could not be registered."), true);
             return result;
         }
 
@@ -101,8 +102,8 @@ public sealed class QuickSearchService : IDisposable
     }
 
     private static string Describe(Domain.Models.AppSettings s) => s.QuickSearchEnabled
-        ? $"Active. Press {s.QuickSearchHotkey} in any program to open the quick search; press it again (or Esc) to close it."
-        : "Off. The quick search does not open from other programs.";
+        ? Loc.T("Active. Press {0} in any program to open the quick search; press it again (or Esc) to close it.", s.QuickSearchHotkey)
+        : Loc.T("Off. The quick search does not open from other programs.");
 
     private void SetStatus(string text, bool isError)
     {

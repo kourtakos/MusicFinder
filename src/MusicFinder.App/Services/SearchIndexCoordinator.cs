@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MusicFinder.Application.Search;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Infrastructure.Search;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Services;
 
@@ -46,7 +47,7 @@ public sealed class SearchIndexCoordinator : IDisposable
         _scans.ScanFinished += (_, _) => Run();
         tagEditing.TracksChanged += (_, _) => Run();
 
-        _job.Progress += (_, p) => Post(() => SetStatus(p.Remaining > 0 ? $"Preparing Greek search… {p.Remaining:N0} left" : "", p.Remaining > 0));
+        _job.Progress += (_, p) => Post(() => SetStatus(p.Remaining > 0 ? Loc.T("Preparing Greek search… {0:N0} left", p.Remaining) : "", p.Remaining > 0));
     }
 
     /// <summary>Starts the first run. Call once on the UI thread after start-up.</summary>

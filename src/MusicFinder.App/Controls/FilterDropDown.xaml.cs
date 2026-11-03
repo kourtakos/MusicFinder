@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using MusicFinder.App.ViewModels;
 using MusicFinder.Application.Services;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Controls;
 
@@ -89,11 +90,12 @@ public partial class FilterDropDown : UserControl
         HasOptions = options.Count > 0;
         HasSearch = options.Count > SearchThreshold;
         var selected = options.Count(o => o.IsSelected);
+        var header = Loc.T(Header);
         ToggleText = selected switch
         {
-            0 => Header,
-            1 => $"{Header}: {options.First(o => o.IsSelected).Label}",
-            _ => $"{Header} · {selected}"
+            0 => header,
+            1 => $"{header}: {options.First(o => o.IsSelected).Label}",
+            _ => $"{header} · {selected}"
         };
     }
 }

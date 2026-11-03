@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Enums;
@@ -54,9 +55,9 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
 
     public static IReadOnlyList<GenreModeOption> GenreModes { get; } =
     [
-        new(GenreApplyMode.Add, "Add them to the genres the file already has (ticked)"),
-        new(GenreApplyMode.Fill, "Only fill a file that has no genre"),
-        new(GenreApplyMode.Replace, "Replace the file's genres (ticked)")
+        new(GenreApplyMode.Add, Loc.T("Add them to the genres the file already has (ticked)")),
+        new(GenreApplyMode.Fill, Loc.T("Only fill a file that has no genre")),
+        new(GenreApplyMode.Replace, Loc.T("Replace the file's genres (ticked)"))
     ];
     [ObservableProperty] private string _fingerprinterStatus = "";
     [ObservableProperty] private string _readinessText = "";
@@ -95,7 +96,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
     [RelayCommand]
     private void BrowseFpcalc()
     {
-        var path = _dialogs.PickFile("Choose fpcalc.exe", "fpcalc|fpcalc.exe|Programs|*.exe");
+        var path = _dialogs.PickFile(Loc.T("Choose fpcalc.exe"), "fpcalc|fpcalc.exe|Programs|*.exe");
         if (path is not null) FpcalcPath = path;
     }
 
@@ -121,12 +122,12 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
     public void RefreshStatus()
     {
         var r = _service.GetReadiness();
-        FingerprinterStatus = r.Fingerprinter is { } f ? $"Found: {f.Path} ({f.Source})" : "fpcalc.exe not found. Audio fingerprints are unavailable; searching by tags still works.";
-        ReadinessText = !r.Enabled || !r.Consented ? "Online identification is off. Nothing is sent anywhere."
-            : !r.HasContact ? "Add a contact address: MusicBrainz requires it."
-            : r.CanFingerprint ? "Ready: audio fingerprints and searching by tags."
-            : r.HasApiKey ? "Ready for searching by tags. Audio fingerprints need fpcalc.exe."
-            : "Ready for searching by tags. Audio fingerprints need an AcoustID key and fpcalc.exe.";
+        FingerprinterStatus = r.Fingerprinter is { } f ? Loc.T("Found: {0} ({1})", f.Path, f.Source) : Loc.T("fpcalc.exe not found. Audio fingerprints are unavailable; searching by tags still works.");
+        ReadinessText = !r.Enabled || !r.Consented ? Loc.T("Online identification is off. Nothing is sent anywhere.")
+            : !r.HasContact ? Loc.T("Add a contact address: MusicBrainz requires it.")
+            : r.CanFingerprint ? Loc.T("Ready: audio fingerprints and searching by tags.")
+            : r.HasApiKey ? Loc.T("Ready for searching by tags. Audio fingerprints need fpcalc.exe.")
+            : Loc.T("Ready for searching by tags. Audio fingerprints need an AcoustID key and fpcalc.exe.");
         _ = UpdateCacheTextAsync();
     }
 
@@ -135,7 +136,7 @@ public sealed partial class IdentificationSettingsViewModel : ObservableObject
         try
         {
             var n = await _cache.CountAsync(default);
-            CacheText = n == 0 ? "Nothing is remembered." : $"{n:N0} remembered answers on this computer.";
+            CacheText = n == 0 ? Loc.T("Nothing is remembered.") : Loc.T("{0:N0} remembered answers on this computer.", n);
         }
         catch (Exception) { CacheText = ""; }
     }

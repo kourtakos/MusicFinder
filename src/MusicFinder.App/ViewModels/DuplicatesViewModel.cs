@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -26,7 +27,7 @@ public sealed class DuplicateMemberViewModel
         FolderText = Path.GetDirectoryName(m.FullPath) ?? "";
         var ext = m.Extension.TrimStart('.').ToUpperInvariant();
         FormatText = m.BitrateKbps is > 0 ? $"{ext} · {m.BitrateKbps} kbps" : ext;
-        PlaysText = m.PlayCount switch { 0 => "Never played", 1 => "1 play", _ => $"{m.PlayCount} plays" };
+        PlaysText = m.PlayCount switch { 0 => Loc.T("Never played"), 1 => Loc.T("1 play"), _ => Loc.T("{0} plays", m.PlayCount) };
         IsSuggested = isSuggested;
     }
 }
@@ -46,9 +47,8 @@ public sealed class DuplicateGroupViewModel
         Heading = string.IsNullOrWhiteSpace(first.Title)
             ? Path.GetFileNameWithoutExtension(first.FullPath)
             : string.IsNullOrWhiteSpace(first.Artist) ? first.Title! : $"{first.Artist} - {first.Title}";
-        DetailText = $"{g.Members.Count} identical files · {DuplicatesViewModel.FormatSize(g.FileSize)} each · " +
-                     $"{DuplicatesViewModel.FormatSize(g.ExtraBytes)} in the extra copies";
-        KeepText = "Suggested to keep: the highlighted one. " + string.Join(". ", g.KeepReasons) + ".";
+        DetailText = Loc.T("{0} identical files · {1} each · {2} in the extra copies", g.Members.Count, DuplicatesViewModel.FormatSize(g.FileSize), DuplicatesViewModel.FormatSize(g.ExtraBytes));
+        KeepText = Loc.T("Suggested to keep: the highlighted one. ") + string.Join(". ", g.KeepReasons) + ".";
         Members = g.Members.Select(m => new DuplicateMemberViewModel(m, m.TrackId == g.SuggestedKeepTrackId)).ToList();
     }
 }
@@ -90,8 +90,8 @@ public sealed partial class DuplicatesViewModel : ObservableObject
     {
         await ReloadGroupsAsync();
         StatusText = HasGroups
-            ? "These are results of earlier scans. Scan again to include new files."
-            : "Press Scan to look for files with identical content. Files are compared by their bytes, not by name or tags.";
+            ? Loc.T("These are results of earlier scans. Scan again to include new files.")
+            : Loc.T("Press Scan to look for files with identical content. Files are compared by their bytes, not by name or tags.");
     }
 
     private async Task ReloadGroupsAsync()
@@ -103,7 +103,7 @@ public sealed partial class DuplicatesViewModel : ObservableObject
         var files = groups.Sum(g => g.Members.Count);
         var extra = groups.Sum(g => g.ExtraBytes);
         SummaryText = HasGroups
-            ? $"{groups.Count:N0} groups, {files:N0} files, {FormatSize(extra)} taken by the extra copies."
+            ? Loc.T("{0:N0} groups, {1:N0} files, {2} taken by the extra copies.", groups.Count, files, FormatSize(extra))
             : "";
     }
 
@@ -112,7 +112,7 @@ public sealed partial class DuplicatesViewModel : ObservableObject
     {
         _cts = new CancellationTokenSource();
         IsScanning = true;
-        StatusText = "Looking for files that could be identical…";
+        StatusText = Loc.T("Looking for files that could be identical…");
         ProgressValue = 0;
         try
         {
@@ -121,20 +121,19 @@ public sealed partial class DuplicatesViewModel : ObservableObject
                 ProgressMax = Math.Max(1, p.Total);
                 ProgressValue = p.Done;
                 StatusText = p.Total == 0
-                    ? "Nothing new to check."
-                    : $"Checked {p.Done:N0} of {p.Total:N0} files ({FormatSize(p.BytesHashed)} read)" +
-                      (p.Unreadable > 0 ? $", {p.Unreadable:N0} could not be read" : "") + ".";
+                    ? Loc.T("Nothing new to check.")
+                    : Loc.T("Checked {0:N0} of {1:N0} files ({2} read)", p.Done, p.Total, FormatSize(p.BytesHashed)) +
+                      (p.Unreadable > 0 ? Loc.T(", {0:N0} could not be read", p.Unreadable) : "") + ".";
             });
             var summary = await Task.Run(() => _service.ScanAsync(progress, _cts.Token));
             await ReloadGroupsAsync();
-            StatusText = (summary.Cancelled ? "Stopped. What was checked is remembered, so the next scan continues from here. " : "Done. ") +
-                         $"{summary.Candidates:N0} files share their size with another file; {summary.Hashed:N0} checked now, " +
-                         $"{summary.AlreadyHashed:N0} already known" +
-                         (summary.Unreadable > 0 ? $", {summary.Unreadable:N0} could not be read (moved, changed or locked)." : ".");
+            StatusText = (summary.Cancelled ? Loc.T("Stopped. What was checked is remembered, so the next scan continues from here. ") : Loc.T("Done. ")) +
+                         Loc.T("{0:N0} files share their size with another file; {1:N0} checked now, {2:N0} already known", summary.Candidates, summary.Hashed, summary.AlreadyHashed) +
+                         (summary.Unreadable > 0 ? Loc.T(", {0:N0} could not be read (moved, changed or locked).", summary.Unreadable) : ".");
         }
         catch (Exception ex)
         {
-            StatusText = "The scan failed: " + ex.Message;
+            StatusText = Loc.T("The scan failed: ") + ex.Message;
         }
         finally
         {

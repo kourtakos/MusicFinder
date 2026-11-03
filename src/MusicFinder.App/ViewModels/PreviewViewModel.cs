@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using MusicFinder.Application.Preview;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -16,7 +17,7 @@ public sealed record PreviewDeviceOption(string? Id, string Label);
 /// </summary>
 public sealed partial class PreviewViewModel : ObservableObject, IDisposable
 {
-    public const string DefaultDeviceLabel = "Windows default output";
+    public static string DefaultDeviceLabel => Loc.T("Windows default output");
 
     private readonly IPreviewPlayer _player;
     private readonly IPreviewOutputDevices _devices;
@@ -38,7 +39,7 @@ public sealed partial class PreviewViewModel : ObservableObject, IDisposable
         var settings = store.Load();
         _volume = Math.Clamp(settings.PreviewVolume, 0, 1);
         _savedDeviceId = string.IsNullOrWhiteSpace(settings.PreviewDeviceId) ? null : settings.PreviewDeviceId;
-        _selectedDevice = new PreviewDeviceOption(_savedDeviceId, _savedDeviceId is null ? DefaultDeviceLabel : "Selected output");
+        _selectedDevice = new PreviewDeviceOption(_savedDeviceId, _savedDeviceId is null ? DefaultDeviceLabel : Loc.T("Selected output"));
         Devices.Add(_selectedDevice);
         _loading = false;
 
@@ -79,7 +80,7 @@ public sealed partial class PreviewViewModel : ObservableObject, IDisposable
 
     /// <summary>Segoe MDL2 glyph for the first button: pause while playing, play otherwise.</summary>
     public string PlayGlyph => IsPlaying ? "" : "";
-    public string PlayToolTip => IsPlaying ? "Pause" : "Play";
+    public string PlayToolTip => IsPlaying ? Loc.T("Pause") : Loc.T("Play");
 
     /// <summary>The caption scrolls only while playing, so a paused or finished preview costs nothing.</summary>
     public bool IsScrolling => IsPlaying;
@@ -188,16 +189,16 @@ public sealed partial class PreviewViewModel : ObservableObject, IDisposable
         _loading = true;
         Devices.Clear();
         Devices.Add(new PreviewDeviceOption(null, DefaultDeviceLabel));
-        foreach (var d in list) Devices.Add(new PreviewDeviceOption(d.Id, d.IsDefault ? d.Name + " (Windows default)" : d.Name));
+        foreach (var d in list) Devices.Add(new PreviewDeviceOption(d.Id, d.IsDefault ? Loc.T("{0} (Windows default)", d.Name) : d.Name));
         var match = Devices.FirstOrDefault(d => d.Id == chosen);
         if (match is null && chosen is not null)
         {
-            match = new PreviewDeviceOption(chosen, "The chosen output is not connected");
+            match = new PreviewDeviceOption(chosen, Loc.T("The chosen output is not connected"));
             Devices.Add(match);
         }
         SelectedDevice = match ?? Devices[0];
         _loading = false;
-        DevicesStatus = list.Count == 0 ? "No audio outputs were found." : "";
+        DevicesStatus = list.Count == 0 ? Loc.T("No audio outputs were found.") : "";
         UpdateDeviceText();
     }
 
@@ -210,7 +211,7 @@ public sealed partial class PreviewViewModel : ObservableObject, IDisposable
             if (_savedDeviceId is null) { UpdateDeviceText(); return; }
             var list = await _devices.ListAsync(default);
             var name = list.FirstOrDefault(d => d.Id == _savedDeviceId)?.Name;
-            DeviceText = name is null ? "Chosen output not connected" : name;
+            DeviceText = name is null ? Loc.T("Chosen output not connected") : name;
             DeviceIsDefault = false;
         }
         catch (Exception) { /* the bar just keeps its previous text */ }
@@ -221,7 +222,7 @@ public sealed partial class PreviewViewModel : ObservableObject, IDisposable
         DeviceIsDefault = _savedDeviceId is null;
         DeviceText = _savedDeviceId is null
             ? DefaultDeviceLabel
-            : SelectedDevice.Id == _savedDeviceId && SelectedDevice.Label != "Selected output" ? SelectedDevice.Label : "Chosen output";
+            : SelectedDevice.Id == _savedDeviceId && SelectedDevice.Label != Loc.T("Selected output") ? SelectedDevice.Label : Loc.T("Chosen output");
     }
 
     private void Apply(PreviewStatus status)

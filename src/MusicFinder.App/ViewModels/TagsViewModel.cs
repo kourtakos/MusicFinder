@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -15,7 +16,7 @@ public sealed partial class TagItemViewModel : ObservableObject
 
     public long Id { get; }
     public int TrackCount { get; }
-    public string CountText => TrackCount == 1 ? "1 track" : $"{TrackCount:N0} tracks";
+    public string CountText => TrackCount == 1 ? Loc.T("1 track") : Loc.T("{0:N0} tracks", TrackCount);
     public string OriginalName { get; private set; }
 
     [ObservableProperty] private string _name;
@@ -130,8 +131,8 @@ public sealed partial class TagsViewModel : ObservableObject
     public string SelectedGenreSubtitle => SelectedGenre switch
     {
         null => "",
-        { IsBuiltIn: true } => "Built-in genre · you can still rename, move or remove it",
-        _ => "Your own genre"
+        { IsBuiltIn: true } => Loc.T("Built-in genre · you can still rename, move or remove it"),
+        _ => Loc.T("Your own genre")
     };
     public bool CanMap => SelectedGenre is not null && SelectedUnmapped is not null;
     public bool CanCreateFromUnmapped => SelectedUnmapped is not null;
@@ -194,7 +195,7 @@ public sealed partial class TagsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Say("Could not load: " + ex.Message, error: true);
+            Say(Loc.T("Could not load: {0}", ex.Message), error: true);
         }
         finally
         {
@@ -225,7 +226,7 @@ public sealed partial class TagsViewModel : ObservableObject
 
         // Where it can move: anywhere except itself and its own sub-genres (that would make a loop).
         var blocked = genre.SelfAndDescendants().Select(n => n.Id).ToHashSet();
-        ParentChoices.Add(new ParentChoice(null, "(top level)", 0));
+        ParentChoices.Add(new ParentChoice(null, Loc.T("(top level)"), 0));
         void Walk(GenreNodeItem n, int depth)
         {
             if (blocked.Contains(n.Id)) return;
@@ -268,7 +269,7 @@ public sealed partial class TagsViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Say("That did not work: " + ex.Message, error: true);
+            Say(Loc.T("That did not work: {0}", ex.Message), error: true);
             return false;
         }
     }
@@ -279,14 +280,14 @@ public sealed partial class TagsViewModel : ObservableObject
     private async Task AddTagAsync()
     {
         var name = NewTagName;
-        if (await TryAsync(() => _tags.AddAsync(name), $"Added the tag '{name.Trim()}'.")) NewTagName = "";
+        if (await TryAsync(() => _tags.AddAsync(name), Loc.T("Added the tag '{0}'.", name.Trim()))) NewTagName = "";
     }
 
     private async Task RenameTagAsync(TagItemViewModel item, string name)
     {
         _renamingTag = true;
         bool ok;
-        try { ok = await TryAsync(() => _tags.RenameAsync(item.Id, name), $"Renamed to '{name.Trim()}'."); }
+        try { ok = await TryAsync(() => _tags.RenameAsync(item.Id, name), Loc.T("Renamed to '{0}'.", name.Trim())); }
         finally { _renamingTag = false; }
 
         if (ok) item.Commit(name.Trim());
@@ -297,9 +298,9 @@ public sealed partial class TagsViewModel : ObservableObject
     private async Task DeleteTagAsync(TagItemViewModel? item)
     {
         if (item is null) return;
-        var used = item.TrackCount > 0 ? $"\n\nIt is on {item.CountText}; the tag is removed from them. The tracks and files are not changed." : "";
-        if (!_dialogs.Confirm("Delete tag", $"Delete the tag '{item.OriginalName}'?{used}")) return;
-        await TryAsync(() => _tags.DeleteAsync(item.Id), $"Deleted the tag '{item.OriginalName}'.");
+        var used = item.TrackCount > 0 ? "\n\n" + Loc.T("It is on {0}; the tag is removed from them. The tracks and files are not changed.", item.CountText) : "";
+        if (!_dialogs.Confirm(Loc.T("Delete tag"), Loc.T("Delete the tag '{0}'?", item.OriginalName) + used)) return;
+        await TryAsync(() => _tags.DeleteAsync(item.Id), Loc.T("Deleted the tag '{0}'.", item.OriginalName));
     }
 
     // ===== genres =====
@@ -308,7 +309,7 @@ public sealed partial class TagsViewModel : ObservableObject
     private async Task AddTopGenreAsync()
     {
         var name = NewTopGenre;
-        if (await TryAsync(() => _genres.AddGenreAsync(name, null), $"Added the genre '{name.Trim()}'.")) NewTopGenre = "";
+        if (await TryAsync(() => _genres.AddGenreAsync(name, null), Loc.T("Added the genre '{0}'.", name.Trim()))) NewTopGenre = "";
     }
 
     [RelayCommand]
@@ -316,7 +317,7 @@ public sealed partial class TagsViewModel : ObservableObject
     {
         if (SelectedGenre is not { } parent) return;
         var name = NewSubGenre;
-        if (await TryAsync(() => _genres.AddGenreAsync(name, parent.Id), $"Added '{name.Trim()}' under {parent.Name}."))
+        if (await TryAsync(() => _genres.AddGenreAsync(name, parent.Id), Loc.T("Added '{0}' under {1}.", name.Trim(), parent.Name)))
         {
             NewSubGenre = "";
             parent.IsExpanded = true;
@@ -329,7 +330,7 @@ public sealed partial class TagsViewModel : ObservableObject
         if (SelectedGenre is not { } genre) return;
         var name = EditName;
         await TryAsync(() => _genres.RenameGenreAsync(genre.Id, name),
-            $"Renamed to '{name.Trim()}'. Files tagged with the old name still map to it.");
+            Loc.T("Renamed to '{0}'. Files tagged with the old name still map to it.", name.Trim()));
     }
 
     [RelayCommand]
@@ -337,7 +338,7 @@ public sealed partial class TagsViewModel : ObservableObject
     {
         if (SelectedGenre is not { } genre || SelectedParent is not { } target) return;
         await TryAsync(() => _genres.MoveGenreAsync(genre.Id, target.Id),
-            target.Id is null ? $"Moved '{genre.Name}' to the top level." : $"Moved '{genre.Name}' under {target.Label}.");
+            target.Id is null ? Loc.T("Moved '{0}' to the top level.", genre.Name) : Loc.T("Moved '{0}' under {1}.", genre.Name, target.Label));
     }
 
     [RelayCommand]
@@ -346,17 +347,19 @@ public sealed partial class TagsViewModel : ObservableObject
         if (SelectedGenre is not { } genre) return;
         if (genre.Children.Count > 0)
         {
-            Say($"'{genre.Name}' still has sub-genres. Move or delete them first.", error: true);
+            Say(Loc.T("'{0}' still has sub-genres. Move or delete them first.", genre.Name), error: true);
             return;
         }
-        var used = genre.TrackCount > 0
-            ? $"\n\n{genre.TrackCount:N0} track(s) are in it; they stay in your library and keep their embedded genre text, but lose this grouping."
-            : "";
-        if (!_dialogs.Confirm("Delete genre", $"Delete the genre '{genre.Name}' and its aliases?{used}")) return;
+        var used = genre.TrackCount == 1
+            ? "\n\n" + Loc.T("1 track is in it; it stays in your library and keeps its embedded genre text, but loses this grouping.")
+            : genre.TrackCount > 1
+                ? "\n\n" + Loc.T("{0:N0} tracks are in it; they stay in your library and keep their embedded genre text, but lose this grouping.", genre.TrackCount)
+                : "";
+        if (!_dialogs.Confirm(Loc.T("Delete genre"), Loc.T("Delete the genre '{0}' and its aliases?", genre.Name) + used)) return;
 
         var name = genre.Name;
         SelectedGenre = null;
-        await TryAsync(() => _genres.DeleteGenreAsync(genre.Id), $"Deleted the genre '{name}'.");
+        await TryAsync(() => _genres.DeleteGenreAsync(genre.Id), Loc.T("Deleted the genre '{0}'.", name));
     }
 
     // ===== aliases =====
@@ -366,14 +369,14 @@ public sealed partial class TagsViewModel : ObservableObject
     {
         if (SelectedGenre is not { } genre) return;
         var alias = NewAlias;
-        if (await TryAsync(() => _genres.AddAliasAsync(alias, genre.Id), $"'{alias.Trim()}' now maps to {genre.Name}.")) NewAlias = "";
+        if (await TryAsync(() => _genres.AddAliasAsync(alias, genre.Id), Loc.T("'{0}' now maps to {1}.", alias.Trim(), genre.Name))) NewAlias = "";
     }
 
     [RelayCommand]
     private async Task RemoveAliasAsync(AliasItem? alias)
     {
         if (alias is null) return;
-        await TryAsync(() => _genres.RemoveAliasAsync(alias.Alias), $"Removed the alias '{alias.Alias}'.");
+        await TryAsync(() => _genres.RemoveAliasAsync(alias.Alias), Loc.T("Removed the alias '{0}'.", alias.Alias));
     }
 
     // ===== values found in files that match nothing =====
@@ -383,7 +386,9 @@ public sealed partial class TagsViewModel : ObservableObject
     {
         if (SelectedUnmapped is not { } value || SelectedGenre is not { } genre) return;
         await TryAsync(() => _genres.AddAliasAsync(value.Value, genre.Id),
-            $"'{value.Value}' now maps to {genre.Name} ({value.TrackCount:N0} track(s) updated).");
+            value.TrackCount == 1
+                ? Loc.T("'{0}' now maps to {1} (1 track updated).", value.Value, genre.Name)
+                : Loc.T("'{0}' now maps to {1} ({2:N0} tracks updated).", value.Value, genre.Name, value.TrackCount));
     }
 
     [RelayCommand]
@@ -392,6 +397,6 @@ public sealed partial class TagsViewModel : ObservableObject
         if (SelectedUnmapped is not { } value) return;
         var parent = SelectedGenre?.Id; // creates it under the selected genre when one is selected, else top level
         await TryAsync(() => _genres.AddGenreAsync(value.Value, parent),
-            parent is null ? $"Created the genre '{value.Value}'." : $"Created '{value.Value}' under {SelectedGenre!.Name}.");
+            parent is null ? Loc.T("Created the genre '{0}'.", value.Value) : Loc.T("Created '{0}' under {1}.", value.Value, SelectedGenre!.Name));
     }
 }

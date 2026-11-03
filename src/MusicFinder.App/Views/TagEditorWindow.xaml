@@ -1,6 +1,7 @@
 <Window x:Class="MusicFinder.App.Views.TagEditorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:MusicFinder.App.Localization"
         Title="Edit tags" Style="{StaticResource MF.Window}"
         Width="860" Height="700" MinWidth="680" MinHeight="520"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
@@ -98,8 +99,8 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="File" Binding="{Binding FileName}" Width="1.4*"/>
                         <DataGridTextColumn Header="Field" Binding="{Binding Field}" Width="110"/>
-                        <DataGridTextColumn Header="Before" Binding="{Binding Before, TargetNullValue='(empty)'}" Width="*"/>
-                        <DataGridTextColumn Header="After" Binding="{Binding After, TargetNullValue='(will be cleared)'}" Width="*"/>
+                        <DataGridTextColumn Header="Before" Binding="{Binding Before, TargetNullValue={loc:T '(empty)'}}" Width="*"/>
+                        <DataGridTextColumn Header="After" Binding="{Binding After, TargetNullValue={loc:T '(will be cleared)'}}" Width="*"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Border>

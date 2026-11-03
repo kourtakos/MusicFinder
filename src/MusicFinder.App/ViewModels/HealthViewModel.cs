@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Application.Health;
 using MusicFinder.Domain.Contracts;
@@ -32,8 +33,8 @@ public sealed partial class HealthCardViewModel : ObservableObject
     public HealthCardViewModel(HealthIssueKind kind, Action<HealthCardViewModel> show)
     {
         Kind = kind;
-        Title = HealthIssues.Title(kind);
-        Explanation = HealthIssues.Explain(kind);
+        Title = Loc.T(HealthIssues.Title(kind));
+        Explanation = Loc.T(HealthIssues.Explain(kind));
         Query = HealthIssues.SearchFor(kind);
         _show = show;
     }
@@ -58,7 +59,7 @@ public sealed partial class HealthViewModel : ObservableObject
 
     public IReadOnlyList<HealthGroupViewModel> Groups { get; }
 
-    [ObservableProperty] private string _summaryText = "Counting…";
+    [ObservableProperty] private string _summaryText = Loc.T("Counting…");
     [ObservableProperty] private string _unsupportedText = "";
     [ObservableProperty] private bool _hasUnsupported;
     [ObservableProperty] private bool _isLoading;
@@ -75,16 +76,16 @@ public sealed partial class HealthViewModel : ObservableObject
         HealthCardViewModel Card(HealthIssueKind k) => new(k, OnShow);
         Groups =
         [
-            new("Files", "What the library knows about the files themselves.",
+            new(Loc.T("Files"), Loc.T("What the library knows about the files themselves."),
                 [Card(HealthIssueKind.MissingFiles), Card(HealthIssueKind.NotChecked)]),
-            new("Tags", "Fields that are empty in the files. Fix them in the tag editor, or let Identify and Analyze fill them in.",
+            new(Loc.T("Tags"), Loc.T("Fields that are empty in the files. Fix them in the tag editor, or let Identify and Analyze fill them in."),
                 [Card(HealthIssueKind.MissingTitle), Card(HealthIssueKind.MissingArtist), Card(HealthIssueKind.MissingAlbum),
                  Card(HealthIssueKind.MissingGenre), Card(HealthIssueKind.MissingYear), Card(HealthIssueKind.MissingBpm),
                  Card(HealthIssueKind.MissingKey), Card(HealthIssueKind.MissingArtwork), Card(HealthIssueKind.Mojibake)]),
-            new("Quality", "Hints from the file's own properties. They are suspicions to look at, never proof, and nothing is changed because of them.",
+            new(Loc.T("Quality"), Loc.T("Hints from the file's own properties. They are suspicions to look at, never proof, and nothing is changed because of them."),
                 [Card(HealthIssueKind.Unreadable), Card(HealthIssueKind.LowBitrate), Card(HealthIssueKind.OddSampleRate),
                  Card(HealthIssueKind.CodecMismatch), Card(HealthIssueKind.SizeMismatch), Card(HealthIssueKind.ZeroDuration)]),
-            new("Duplicates", "Files with identical content. Found by a scan you start yourself; the scan only reads files.",
+            new(Loc.T("Duplicates"), Loc.T("Files with identical content. Found by a scan you start yourself; the scan only reads files."),
                 [Card(HealthIssueKind.ExactDuplicates)])
         ];
     }
@@ -122,17 +123,17 @@ public sealed partial class HealthViewModel : ObservableObject
                 card.ShowCommand.NotifyCanExecuteChanged();
             }
             SummaryText = summary.TotalTracks == 0
-                ? "The library is empty. Add a music folder in the Library tab."
-                : $"{summary.TotalTracks:N0} tracks. Counts come from what the library already knows; nothing is re-read from disk.";
+                ? Loc.T("The library is empty. Add a music folder in the Library tab.")
+                : Loc.T("{0:N0} tracks. Counts come from what the library already knows; nothing is re-read from disk.", summary.TotalTracks);
             HasUnsupported = summary.UnsupportedTotal > 0;
             UnsupportedText = HasUnsupported
-                ? $"{summary.UnsupportedTotal:N0} audio-like files are not in the library because their format is not supported: " +
-                  string.Join(", ", summary.Unsupported.Select(u => $"{u.Count:N0} × {u.Extension}")) + "."
+                ? Loc.T("{0:N0} audio-like files are not in the library because their format is not supported: {1}.",
+                    summary.UnsupportedTotal, string.Join(", ", summary.Unsupported.Select(u => $"{u.Count:N0} × {u.Extension}")))
                 : "";
         }
         catch (Exception ex)
         {
-            SummaryText = "Library Health could not be counted: " + ex.Message;
+            SummaryText = Loc.T("Library Health could not be counted: {0}", ex.Message);
         }
         finally { IsLoading = false; }
     }

@@ -3,6 +3,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.Application.Identification;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -41,7 +42,7 @@ public sealed class ItemPlan
         get
         {
             var parts = Proposals.Where(p => p.Selected).Select(p => p.FieldLabel).ToList();
-            if (UseCover && Cover is not null && (!TrackHasCover || ReplaceCover)) parts.Add("Cover");
+            if (UseCover && Cover is not null && (!TrackHasCover || ReplaceCover)) parts.Add(Loc.T("Cover"));
             return string.Join(", ", parts);
         }
     }
@@ -56,7 +57,7 @@ public sealed partial class IdentifyQueueItem : ObservableObject
     public string Label { get; }
     public IdentificationResult? Result { get; set; }
 
-    [ObservableProperty] private string _status = "Waiting";
+    [ObservableProperty] private string _status = Loc.T("Waiting");
     [ObservableProperty] private bool _resolved;
     /// <summary>Whether Write on the list includes this track.</summary>
     [ObservableProperty] private bool _include;
@@ -106,7 +107,7 @@ public sealed partial class ProposalRow : ObservableObject
     {
         Field = p.Field;
         FieldLabel = FieldLabels.For(p.Field);
-        Current = string.IsNullOrWhiteSpace(p.Current) ? "(empty)" : p.Current;
+        Current = string.IsNullOrWhiteSpace(p.Current) ? Loc.T("(empty)") : p.Current;
         Proposed = p.Proposed ?? "";
         Source = p.Source;
         _selected = p.Selected;
@@ -122,10 +123,10 @@ public static class FieldLabels
 {
     public static string For(TagField field) => field switch
     {
-        TagField.AlbumArtist => "Album artist",
-        TagField.TrackNumber => "Track no.",
-        TagField.MusicBrainzRecordingId => "MusicBrainz id",
-        _ => field.ToString()
+        TagField.AlbumArtist => Loc.T("Album artist"),
+        TagField.TrackNumber => Loc.T("Track no."),
+        TagField.MusicBrainzRecordingId => Loc.T("MusicBrainz id"),
+        _ => Loc.T(field.ToString())
     };
 }
 
@@ -164,10 +165,10 @@ public sealed partial class IdentifyViewModel : ObservableObject
     public ObservableCollection<string> Failures { get; } = [];
     public IReadOnlyList<MethodOption> Methods { get; } =
     [
-        new(IdentificationMethod.Auto, "Best available"),
-        new(IdentificationMethod.AcoustIdFingerprint, "Audio fingerprint"),
-        new(IdentificationMethod.MusicBrainzTagSearch, "Search by tags"),
-        new(IdentificationMethod.ExistingRecordingId, "Use the file's MusicBrainz id")
+        new(IdentificationMethod.Auto, Loc.T("Best available")),
+        new(IdentificationMethod.AcoustIdFingerprint, Loc.T("Audio fingerprint")),
+        new(IdentificationMethod.MusicBrainzTagSearch, Loc.T("Search by tags")),
+        new(IdentificationMethod.ExistingRecordingId, Loc.T("Use the file's MusicBrainz id"))
     ];
 
     [ObservableProperty] private IdentifyStep _step;
@@ -210,7 +211,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
     public event EventHandler? CloseRequested;
 
     /// <summary>What Write would change for the track on screen, in words (the table above it shows the values).</summary>
-    public string ChangeSummary => Current?.Plan is { HasChanges: true } p ? "Will write: " + p.Summary : "Nothing is ticked to write.";
+    public string ChangeSummary => Current?.Plan is { HasChanges: true } p ? Loc.T("Will write: ") + p.Summary : Loc.T("Nothing is ticked to write.");
 
     /// <summary>The tracks Write applies to: the ticked ones of the list, or the one track on screen.</summary>
     private IReadOnlyList<IdentifyQueueItem> Targets() =>
@@ -219,7 +220,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
             : Current?.Plan is { HasChanges: true } ? [Current] : [];
 
     public int WriteCount => Targets().Count;
-    public string WriteButtonText => !IsMany ? "Write changes" : WriteCount == 1 ? "Write 1 file" : $"Write {WriteCount} files";
+    public string WriteButtonText => !IsMany ? Loc.T("Write changes") : WriteCount == 1 ? Loc.T("Write 1 file") : Loc.T("Write {0} files", WriteCount);
     public bool CanWrite => WriteCount > 0 && !IsLookingUp;
     public string OverviewSummary
     {
@@ -228,9 +229,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
             var ready = Queue.Count(q => q.Include);
             var attention = Queue.Count(q => q.Plan is not null && !q.Include && !q.Resolved);
             var none = Queue.Count(q => q.Result is { } r && r.Outcome != IdentificationOutcome.Found);
-            var parts = new List<string> { $"{ready} of {Queue.Count} ready to write" };
-            if (attention > 0) parts.Add($"{attention} need your decision");
-            if (none > 0) parts.Add($"{none} with no match or a problem");
+            var parts = new List<string> { Loc.T("{0} of {1} ready to write", ready, Queue.Count) };
+            if (attention > 0) parts.Add(attention == 1 ? Loc.T("1 needs your decision") : Loc.T("{0} need your decision", attention));
+            if (none > 0) parts.Add(Loc.T("{0} with no match or a problem", none));
             return string.Join(" · ", parts);
         }
     }
@@ -247,7 +248,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         _keepBackup = settings.Load().KeepTagBackups;
         _method = Methods[0];
         foreach (var t in tracks) Queue.Add(new IdentifyQueueItem(t));
-        Heading = tracks.Count == 1 ? "Identify online" : $"Identify {tracks.Count} tracks online";
+        Heading = tracks.Count == 1 ? Loc.T("Identify online") : Loc.T("Identify {0} tracks online", tracks.Count);
         _step = tracks.Count > 1 ? IdentifyStep.Overview : IdentifyStep.Choose;
         _current = Queue.FirstOrDefault();
         UpdateMethodNote();
@@ -262,9 +263,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
         if (!readiness.CanTagSearch)
         {
             Message = readiness.Enabled && readiness.Consented
-                ? "MusicBrainz asks every program to say who is calling. Add a contact address in Settings → Online identification."
-                : "Online identification is off. Turn it on in Settings → Online identification; you will see exactly what is sent first.";
-            foreach (var q in Queue) q.Status = "Not looked up";
+                ? Loc.T("MusicBrainz asks every program to say who is calling. Add a contact address in Settings → Online identification.")
+                : Loc.T("Online identification is off. Turn it on in Settings → Online identification; you will see exactly what is sent first.");
+            foreach (var q in Queue) q.Status = Loc.T("Not looked up");
             return;
         }
         await LookupAsync(Queue.ToList(), force: false);
@@ -282,8 +283,8 @@ public sealed partial class IdentifyViewModel : ObservableObject
             foreach (var item in items)
             {
                 if (cts.IsCancellationRequested) break;
-                item.Status = "Looking up…";
-                ProgressText = items.Count > 1 ? $"{done} of {items.Count} looked up" : "Looking up…";
+                item.Status = Loc.T("Looking up…");
+                ProgressText = items.Count > 1 ? Loc.T("{0} of {1} looked up", done, items.Count) : Loc.T("Looking up…");
                 var result = await _service.IdentifyAsync(new IdentificationRequest(item.TrackId, Method.Method, force), cts.Token);
                 item.Result = result;
                 item.Status = StatusFor(result);
@@ -293,7 +294,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
                 if (IsMany)
                 {
                     // Many tracks: choose and tick what is clear, so the list is ready to read. The detail view is filled only when asked for.
-                    item.Status = item.Status + " · planning…";
+                    item.Status = item.Status + Loc.T(" · planning…");
                     await PlanItemAsync(item, cts.Token);
                     item.Status = StatusFor(result);
                     if (ReferenceEquals(item, Current) && Step == IdentifyStep.Choose) await ShowCurrentAsync();
@@ -301,9 +302,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
                 else if (ReferenceEquals(item, Current)) await ShowCurrentAsync();
                 else if (Current is null) Current = item;
             }
-            ProgressText = items.Count > 1 ? $"{done} of {items.Count} looked up" : "";
+            ProgressText = items.Count > 1 ? Loc.T("{0} of {1} looked up", done, items.Count) : "";
             if (cts.IsCancellationRequested)
-                foreach (var item in items.Where(i => i.Result is null || i.Status == "Looking up…")) item.Status = "Not looked up";
+                foreach (var item in items.Where(i => i.Result is null || i.Status == Loc.T("Looking up…"))) item.Status = Loc.T("Not looked up");
         }
         finally
         {
@@ -316,10 +317,10 @@ public sealed partial class IdentifyViewModel : ObservableObject
 
     private static string StatusFor(IdentificationResult r) => r.Outcome switch
     {
-        IdentificationOutcome.Found => r.Candidates.Count == 1 ? "1 candidate" : $"{r.Candidates.Count} candidates",
-        IdentificationOutcome.NoMatch => "No match",
-        IdentificationOutcome.Cancelled => "Cancelled",
-        _ => "Problem"
+        IdentificationOutcome.Found => r.Candidates.Count == 1 ? Loc.T("1 candidate") : Loc.T("{0} candidates", r.Candidates.Count),
+        IdentificationOutcome.NoMatch => Loc.T("No match"),
+        IdentificationOutcome.Cancelled => Loc.T("Cancelled"),
+        _ => Loc.T("Problem")
     };
 
     [RelayCommand]
@@ -340,12 +341,12 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var r = _service.GetReadiness();
         MethodNote = Method.Method switch
         {
-            IdentificationMethod.AcoustIdFingerprint when !r.HasApiKey => "Needs an AcoustID key (Settings).",
-            IdentificationMethod.AcoustIdFingerprint when r.Fingerprinter is null => "Needs fpcalc.exe (Settings shows where to get it).",
-            IdentificationMethod.AcoustIdFingerprint => "Sends a fingerprint of the first seconds of audio to AcoustID, then asks MusicBrainz about the recordings it names.",
-            IdentificationMethod.MusicBrainzTagSearch => "Sends the title, artist and album text of the tags (or the file name when there is no title) to MusicBrainz.",
-            IdentificationMethod.ExistingRecordingId => "Looks up the MusicBrainz id already stored in the file.",
-            _ => r.CanFingerprint ? "Uses the audio fingerprint." : "Uses the id in the file if it has one, otherwise a search by tags."
+            IdentificationMethod.AcoustIdFingerprint when !r.HasApiKey => Loc.T("Needs an AcoustID key (Settings)."),
+            IdentificationMethod.AcoustIdFingerprint when r.Fingerprinter is null => Loc.T("Needs fpcalc.exe (Settings shows where to get it)."),
+            IdentificationMethod.AcoustIdFingerprint => Loc.T("Sends a fingerprint of the first seconds of audio to AcoustID, then asks MusicBrainz about the recordings it names."),
+            IdentificationMethod.MusicBrainzTagSearch => Loc.T("Sends the title, artist and album text of the tags (or the file name when there is no title) to MusicBrainz."),
+            IdentificationMethod.ExistingRecordingId => Loc.T("Looks up the MusicBrainz id already stored in the file."),
+            _ => r.CanFingerprint ? Loc.T("Uses the audio fingerprint.") : Loc.T("Uses the id in the file if it has one, otherwise a search by tags.")
         };
     }
 
@@ -364,11 +365,11 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var result = item.Result;
         if (result is null || result.Outcome != IdentificationOutcome.Found || result.Candidates.Count == 0)
         {
-            item.Attention = result?.Message ?? "no result";
+            item.Attention = result?.Message ?? Loc.T("no result");
             return;
         }
         var track = await _tracks.GetAsync(item.TrackId, ct);
-        if (track is null) { item.Attention = "the track is no longer in the library"; return; }
+        if (track is null) { item.Attention = Loc.T("the track is no longer in the library"); return; }
 
         var decision = AutoChoice.Decide(track, result.Candidates);
         var candidate = await _service.EnrichAsync(decision.Candidate ?? result.Candidates[0], ct);   // genres, for hits that came from a search
@@ -393,7 +394,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         };
         AttachPlan(item, plan);
         item.Include = plan.Confident && plan.HasChanges;
-        item.Attention = plan.Confident ? "" : "Needs your decision: " + plan.Reason;
+        item.Attention = plan.Confident ? "" : Loc.T("Needs your decision: ") + plan.Reason;
     }
 
     /// <summary>Stores a plan on its item and keeps the list line (match, release, changes) in step with it.</summary>
@@ -409,8 +410,8 @@ public sealed partial class IdentifyViewModel : ObservableObject
     {
         if (item.Plan is not { } plan) return;
         item.MatchText = $"{plan.Candidate.Title} — {plan.Candidate.ArtistCredit} ({plan.Candidate.ScoreText})";
-        item.ReleaseText = plan.Release?.Title ?? "(no release)";
-        item.ChangesText = plan.HasChanges ? plan.Summary : "nothing to change";
+        item.ReleaseText = plan.Release?.Title ?? Loc.T("(no release)");
+        item.ChangesText = plan.HasChanges ? plan.Summary : Loc.T("nothing to change");
         item.CanInclude = plan.HasChanges;
         if (!plan.HasChanges) item.Include = false;
         RefreshSummaries();
@@ -441,12 +442,12 @@ public sealed partial class IdentifyViewModel : ObservableObject
         if (!_covers.TryGetValue(release.ReleaseId, out var cover))
         {
             try { cover = await _coverArt.GetFrontAsync(release.ReleaseId, ct); }
-            catch (IdentificationHttpException) { return (null, null, "Could not reach the Cover Art Archive."); }
+            catch (IdentificationHttpException) { return (null, null, Loc.T("Could not reach the Cover Art Archive.")); }
             _covers[release.ReleaseId] = cover;
         }
-        if (cover is null) return (null, null, "No cover is on file for this release.");
+        if (cover is null) return (null, null, Loc.T("No cover is on file for this release."));
         var picture = Decode(cover.Data);
-        return picture is null ? (null, null, "The cover could not be displayed, so it is not offered.") : (cover, picture, cover.Description);
+        return picture is null ? (null, null, Loc.T("The cover could not be displayed, so it is not offered.")) : (cover, picture, cover.Description);
     }
 
     // ===== showing one track's result =====
@@ -519,7 +520,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
     private void FillReleases(CandidateItem candidate)
     {
         Releases.Clear();
-        Releases.Add(new ReleaseChoice(null, "No release (title, artist and id only)"));
+        Releases.Add(new ReleaseChoice(null, Loc.T("No release (title, artist and id only)")));
         foreach (var r in AutoChoice.OrderReleases(candidate.Candidate.Releases))
             Releases.Add(new ReleaseChoice(r, DescribeRelease(r)));
     }
@@ -575,9 +576,9 @@ public sealed partial class IdentifyViewModel : ObservableObject
             try { details = await _service.GetReleaseDetailsAsync(choice.Release.ReleaseId, default); }
             catch (IdentificationHttpException ex)
             {
-                Message = "Could not load that release: " + ex.Message;
+                Message = Loc.T("Could not load that release: ") + ex.Message;
             }
-            if (details is null && Message is null) Message = "MusicBrainz has no details for that release.";
+            if (details is null && Message is null) Message = Loc.T("MusicBrainz has no details for that release.");
         }
         var track = await _tracks.GetAsync(item.TrackId);
         if (track is null || version != _showVersion) return;
@@ -592,7 +593,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
         Proposals.Clear();
         foreach (var row in rows) Proposals.Add(row);
         TrackHasCover = hasCover;
-        SetCover(null, choice.Release is null ? "" : "Looking for the cover…");
+        SetCover(null, choice.Release is null ? "" : Loc.T("Looking for the cover…"));
         UseCover = false;
         ReplaceCover = false;
         _suppress = false;
@@ -717,7 +718,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
     private void Skip()
     {
         if (Current is null) return;
-        Current.Status = "Skipped";
+        Current.Status = Loc.T("Skipped");
         Current.Resolved = true;
         Current.Include = false;
         MoveToNext();
@@ -745,10 +746,10 @@ public sealed partial class IdentifyViewModel : ObservableObject
         var targets = Targets();
         if (targets.Count == 0)
         {
-            Message = IsMany ? "Tick at least one track to write."
+            Message = IsMany ? Loc.T("Tick at least one track to write.")
                 : Current?.Plan is { UseCover: true, TrackHasCover: true, ReplaceCover: false }
-                    ? "The file already has a cover, and the cover is all that is ticked. Tick \"Replace the cover the file has\" to swap it."
-                    : "Tick at least one field to apply.";
+                    ? Loc.T("The file already has a cover, and the cover is all that is ticked. Tick \"Replace the cover the file has\" to swap it.")
+                    : Loc.T("Tick at least one field to apply.");
             return;
         }
 
@@ -761,8 +762,8 @@ public sealed partial class IdentifyViewModel : ObservableObject
             {
                 var p = targets[0].Plan!;
                 Message = p.UseCover && p.TrackHasCover && !p.ReplaceCover
-                    ? "The file already has a cover and these values, so nothing would change. Tick \"Replace the cover the file has\" to swap the cover."
-                    : "The file already has these values, so nothing would change.";
+                    ? Loc.T("The file already has a cover and these values, so nothing would change. Tick \"Replace the cover the file has\" to swap the cover.")
+                    : Loc.T("The file already has these values, so nothing would change.");
                 return;
             }
         }
@@ -784,7 +785,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
             {
                 if (_writeCts.IsCancellationRequested) { cancelled = true; break; }
                 var item = targets[i];
-                ProgressText = $"Writing {i + 1} of {targets.Count}: {item.Label}";
+                ProgressText = Loc.T("Writing {0} of {1}: {2}", i + 1, targets.Count, item.Label);
                 var changes = item.Plan!.ToChangeSet();
                 TagEditSummary summary;
                 try { summary = await Task.Run(() => _editing.ApplyAsync([item.TrackId], changes, options, null, _writeCts.Token)); }
@@ -795,7 +796,7 @@ public sealed partial class IdentifyViewModel : ObservableObject
                 if (file?.Outcome == TagEditOutcome.Written)
                 {
                     written++;
-                    item.Status = "Written";
+                    item.Status = Loc.T("Written");
                     item.Resolved = true;
                     item.Include = false;
                     item.Plan = null;            // the file changed: a new look at it starts from what it holds now
@@ -803,14 +804,14 @@ public sealed partial class IdentifyViewModel : ObservableObject
                     item.CanInclude = false;
                     if (file.Warning is not null) Failures.Add($"{item.Label}: {file.Warning}");
                 }
-                else if (file?.Outcome == TagEditOutcome.Unchanged) { unchanged++; item.Status = "Already up to date"; item.Resolved = true; item.Include = false; }
-                else Failures.Add($"{item.Label}: {file?.Error ?? "not written"} The file was left untouched.");
+                else if (file?.Outcome == TagEditOutcome.Unchanged) { unchanged++; item.Status = Loc.T("Already up to date"); item.Resolved = true; item.Include = false; }
+                else Failures.Add($"{item.Label}: {file?.Error ?? Loc.T("not written")} {Loc.T("The file was left untouched.")}");
                 ProgressDone = i + 1;
             }
         }
         catch (Exception ex)
         {
-            Failures.Add("The write stopped: " + ex.Message);
+            Failures.Add(Loc.T("The write stopped: ") + ex.Message);
         }
         finally
         {
@@ -818,10 +819,10 @@ public sealed partial class IdentifyViewModel : ObservableObject
             _writeCts = null;
         }
 
-        var parts = new List<string> { written == 1 ? "1 file written" : $"{written} files written" };
-        if (unchanged > 0) parts.Add($"{unchanged} already up to date");
-        if (Failures.Count > 0) parts.Add($"{Failures.Count} problem(s): those files were left untouched");
-        if (cancelled) parts.Add("stopped before the remaining files");
+        var parts = new List<string> { written == 1 ? Loc.T("1 file written") : Loc.T("{0} files written", written) };
+        if (unchanged > 0) parts.Add(Loc.T("{0} already up to date", unchanged));
+        if (Failures.Count > 0) parts.Add(Failures.Count == 1 ? Loc.T("1 problem: that file was left untouched") : Loc.T("{0} problems: those files were left untouched", Failures.Count));
+        if (cancelled) parts.Add(Loc.T("stopped before the remaining files"));
         ResultSummary = string.Join(" · ", parts) + ".";
         OnPropertyChanged(nameof(HasFailures));
         OnPropertyChanged(nameof(HasNext));

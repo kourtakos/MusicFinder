@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text.Json;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -19,7 +20,7 @@ public sealed partial class BackupSettingsViewModel : ObservableObject
     private readonly IAppRestarter _restarter;
     private readonly AppPaths _paths;
 
-    public string NotTheMusicText => RestoreViewModel.NotTheMusicText;
+    public string NotTheMusicText => Loc.T(RestoreViewModel.NotTheMusicText);
 
     [ObservableProperty] private bool _includeSecrets;
     [ObservableProperty] private bool _includeArtwork;
@@ -63,20 +64,20 @@ public sealed partial class BackupSettingsViewModel : ObservableObject
     private async Task BackupNowAsync()
     {
         var suggested = $"MusicFinder-{DateTime.Now:yyyy-MM-dd}{LibraryBackupService.FileExtension}";
-        var target = _dialogs.PickSaveFile("Save a backup of the library", "MusicFinder backup|*" + LibraryBackupService.FileExtension, suggested);
+        var target = _dialogs.PickSaveFile(Loc.T("Save a backup of the library"), "MusicFinder backup|*" + LibraryBackupService.FileExtension, suggested);
         if (target is null) return;
 
         IsBusy = true;
-        StatusText = "Making the backup…";
+        StatusText = Loc.T("Making the backup…");
         try
         {
             var result = await _backup.BackupAsync(new BackupRequest(target, IncludeSecrets, IncludeArtwork), CancellationToken.None);
-            StatusText = $"Backup saved and verified: {Path.GetFileName(result.Path)} ({result.Bytes / 1024.0 / 1024.0:0.0} MB, {result.Manifest.Counts.GetValueOrDefault("Tracks"):N0} tracks). " +
-                         NotTheMusicText;
+            StatusText = Loc.T("Backup saved and verified: {0} ({1:0.0} MB, {2:N0} tracks).", Path.GetFileName(result.Path), result.Bytes / 1024.0 / 1024.0, result.Manifest.Counts.GetValueOrDefault("Tracks")) +
+                         " " + NotTheMusicText;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            StatusText = "The backup failed and nothing was saved: " + ex.Message;
+            StatusText = Loc.T("The backup failed and nothing was saved: {0}", ex.Message);
         }
         finally { IsBusy = false; BackupNowCommand.NotifyCanExecuteChanged(); }
     }
@@ -84,7 +85,7 @@ public sealed partial class BackupSettingsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanAct))]
     private async Task RestoreAsync()
     {
-        var file = _dialogs.PickFile("Choose a backup to restore", "MusicFinder backup|*.zip");
+        var file = _dialogs.PickFile(Loc.T("Choose a backup to restore"), "MusicFinder backup|*.zip");
         if (file is null) return;
         await OpenRestoreAsync(file, isUndo: false);
     }
@@ -93,14 +94,14 @@ public sealed partial class BackupSettingsViewModel : ObservableObject
     private async Task UndoLastRestoreAsync()
     {
         var safety = LastSafetyBackup();
-        if (safety is null) { StatusText = "There is no earlier library to go back to."; return; }
+        if (safety is null) { StatusText = Loc.T("There is no earlier library to go back to."); return; }
         await OpenRestoreAsync(safety, isUndo: true);
     }
 
     private async Task OpenRestoreAsync(string archive, bool isUndo)
     {
         IsBusy = true;
-        StatusText = "Checking the backup…";
+        StatusText = Loc.T("Checking the backup…");
         try
         {
             var preview = await _restore.PreviewAsync(archive, CancellationToken.None);
@@ -108,8 +109,8 @@ public sealed partial class BackupSettingsViewModel : ObservableObject
             _dialogs.ShowRestore(new RestoreViewModel(archive, preview, _restore, _dialogs, _restarter, isUndo));
             RefreshState();
         }
-        catch (BackupFormatException ex) { StatusText = "This backup cannot be used: " + ex.Message; }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { StatusText = "The backup could not be read: " + ex.Message; }
+        catch (BackupFormatException ex) { StatusText = Loc.T("This backup cannot be used: {0}", ex.Message); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { StatusText = Loc.T("The backup could not be read: {0}", ex.Message); }
         finally { IsBusy = false; RestoreCommand.NotifyCanExecuteChanged(); UndoLastRestoreCommand.NotifyCanExecuteChanged(); BackupNowCommand.NotifyCanExecuteChanged(); }
     }
 
@@ -118,7 +119,7 @@ public sealed partial class BackupSettingsViewModel : ObservableObject
     {
         _restore.CancelPendingRestore();
         RefreshState();
-        StatusText = "The prepared restore was cancelled.";
+        StatusText = Loc.T("The prepared restore was cancelled.");
     }
 
     [RelayCommand]

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Application.Tags;
 using MusicFinder.Domain.Contracts;
@@ -35,13 +36,13 @@ public sealed partial class TagFieldEditor : ObservableObject
         _initializing = false;
     }
 
-    public string MixedText => IsMixed ? $"{Originals.Count} different values" : "";
+    public string MixedText => IsMixed ? Loc.T("{0} different values", Originals.Count) : "";
 
     /// <summary>Shown inside an empty box so every state is explicit, including "this will clear the field".</summary>
     public string Placeholder =>
-        Apply && string.IsNullOrWhiteSpace(Text) ? "(will be cleared)" :
-        IsMixed ? "(multiple values — type to replace)" :
-        "(empty)";
+        Apply && string.IsNullOrWhiteSpace(Text) ? Loc.T("(will be cleared)") :
+        IsMixed ? Loc.T("(multiple values — type to replace)") :
+        Loc.T("(empty)");
 
     partial void OnTextChanged(string value)
     {
@@ -101,7 +102,7 @@ public sealed partial class TagEditorViewModel : ObservableObject
     public bool HasMessage => !string.IsNullOrEmpty(Message);
     public bool HasFailures => Failures.Count > 0;
     public int TracksToWrite { get; private set; }
-    public string WriteButtonText => TracksToWrite == 1 ? "Write 1 file" : $"Write {TracksToWrite} files";
+    public string WriteButtonText => TracksToWrite == 1 ? Loc.T("Write 1 file") : Loc.T("Write {0} files", TracksToWrite);
 
     public TagEditorViewModel(IReadOnlyList<TrackRowViewModel> tracks, ITagEditingService service, IUserDialogs dialogs,
         ISettingsStore settings, AppPaths paths)
@@ -113,10 +114,10 @@ public sealed partial class TagEditorViewModel : ObservableObject
         _trackIds = tracks.Select(t => t.Id).ToList();
         _keepBackup = settings.Load().KeepTagBackups;
 
-        Heading = tracks.Count == 1 ? "Edit tags" : $"Edit tags of {tracks.Count} tracks";
+        Heading = tracks.Count == 1 ? Loc.T("Edit tags") : Loc.T("Edit tags of {0} tracks", tracks.Count);
         SubHeading = tracks.Count == 1
             ? tracks[0].FullPath
-            : "Only the fields you change are written. Fields where the tracks differ are left alone unless you type a new value.";
+            : Loc.T("Only the fields you change are written. Fields where the tracks differ are left alone unless you type a new value.");
     }
 
     /// <summary>Loads the current values (and detects mixed fields). Call once before showing the dialog.</summary>
@@ -126,15 +127,15 @@ public sealed partial class TagEditorViewModel : ObservableObject
         Fields.Clear();
         foreach (var (field, label, hint) in new[]
                  {
-                     (TagField.Title, "Title", ""),
-                     (TagField.Artist, "Artist", ""),
-                     (TagField.AlbumArtist, "Album artist", ""),
-                     (TagField.Album, "Album", ""),
-                     (TagField.Genre, "Genre", "Separate several genres with ;"),
-                     (TagField.Year, "Year", "1900 – 2100"),
-                     (TagField.TrackNumber, "Track no.", "e.g. 3 or 3/12"),
+                     (TagField.Title, Loc.T("Title"), ""),
+                     (TagField.Artist, Loc.T("Artist"), ""),
+                     (TagField.AlbumArtist, Loc.T("Album artist"), ""),
+                     (TagField.Album, Loc.T("Album"), ""),
+                     (TagField.Genre, Loc.T("Genre"), Loc.T("Separate several genres with ;")),
+                     (TagField.Year, Loc.T("Year"), "1900 – 2100"),
+                     (TagField.TrackNumber, Loc.T("Track no."), Loc.T("e.g. 3 or 3/12")),
                      (TagField.Bpm, "BPM", "40 – 300"),
-                     (TagField.Key, "Key", "e.g. 8A or Am")
+                     (TagField.Key, Loc.T("Key"), Loc.T("e.g. 8A or Am"))
                  })
             Fields.Add(new TagFieldEditor(field, label, hint, values[field]));
     }
@@ -166,12 +167,12 @@ public sealed partial class TagEditorViewModel : ObservableObject
         var selected = Fields.Where(f => f.Apply).ToList();
         if (selected.Count == 0)
         {
-            Message = "Nothing to change yet. Type a new value into a field first.";
+            Message = Loc.T("Nothing to change yet. Type a new value into a field first.");
             return;
         }
         if (selected.Any(f => f.Error is not null))
         {
-            Message = "Fix the highlighted fields first.";
+            Message = Loc.T("Fix the highlighted fields first.");
             return;
         }
 
@@ -183,7 +184,7 @@ public sealed partial class TagEditorViewModel : ObservableObject
         }
         if (plan.Changes.Count == 0)
         {
-            Message = "Every selected file already has these values, so nothing would change.";
+            Message = Loc.T("Every selected file already has these values, so nothing would change.");
             return;
         }
 
@@ -192,9 +193,13 @@ public sealed partial class TagEditorViewModel : ObservableObject
         TracksToWrite = plan.TracksWithChanges;
         OnPropertyChanged(nameof(TracksToWrite));
         OnPropertyChanged(nameof(WriteButtonText));
+        var changesText = plan.Changes.Count == 1 ? Loc.T("1 change") : Loc.T("{0} changes", plan.Changes.Count);
+        var filesText = plan.TracksWithChanges == 1 ? Loc.T("1 file") : Loc.T("{0} files", plan.TracksWithChanges);
         PreviewSummary = plan.TracksUnchanged == 0
-            ? $"{plan.Changes.Count} change(s) in {plan.TracksWithChanges} file(s). Nothing is written until you confirm."
-            : $"{plan.Changes.Count} change(s) in {plan.TracksWithChanges} file(s); {plan.TracksUnchanged} file(s) already match and will not be touched.";
+            ? Loc.T("{0} in {1}. Nothing is written until you confirm.", changesText, filesText)
+            : plan.TracksUnchanged == 1
+                ? Loc.T("{0} in {1}; 1 file already matches and will not be touched.", changesText, filesText)
+                : Loc.T("{0} in {1}; {2} files already match and will not be touched.", changesText, filesText, plan.TracksUnchanged);
         Step = TagEditorStep.Preview;
     }
 
@@ -231,7 +236,7 @@ public sealed partial class TagEditorViewModel : ObservableObject
         catch (Exception ex)
         {
             Failures.Clear();
-            ResultSummary = "The edit stopped: " + ex.Message;
+            ResultSummary = Loc.T("The edit stopped: {0}", ex.Message);
             AnyWritten = false;
             Step = TagEditorStep.Done;
         }
@@ -250,10 +255,10 @@ public sealed partial class TagEditorViewModel : ObservableObject
         OnPropertyChanged(nameof(HasFailures));
 
         AnyWritten = summary.Written > 0;
-        var parts = new List<string> { $"{summary.Written} file(s) written" };
-        if (summary.Unchanged > 0) parts.Add($"{summary.Unchanged} already matched");
-        if (summary.Failed > 0) parts.Add($"{summary.Failed} failed — those files were left untouched");
-        if (summary.Cancelled) parts.Add("cancelled before the remaining files");
+        var parts = new List<string> { Loc.T("{0} file(s) written", summary.Written) };
+        if (summary.Unchanged > 0) parts.Add(Loc.T("{0} already matched", summary.Unchanged));
+        if (summary.Failed > 0) parts.Add(Loc.T("{0} failed — those files were left untouched", summary.Failed));
+        if (summary.Cancelled) parts.Add(Loc.T("cancelled before the remaining files"));
         ResultSummary = string.Join(" · ", parts);
         Step = TagEditorStep.Done;
     }

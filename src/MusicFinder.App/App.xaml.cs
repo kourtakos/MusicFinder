@@ -51,7 +51,7 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             Log.Error(ex, "Applying the pending restore failed");
-            restoreMessage = "The pending restore could not be applied: " + ex.Message;
+            restoreMessage = Localization.Loc.T("The pending restore could not be applied: {0}", ex.Message);
         }
 
         try
@@ -61,6 +61,12 @@ public partial class App : System.Windows.Application
             builder.Logging.AddSerilog(Log.Logger, dispose: true);
             ConfigureServices(builder.Services, paths);
             _host = builder.Build();
+
+            // The language is chosen once, before any window or view model produces text.
+            Localization.Loc.Initialize(_host.Services.GetRequiredService<ISettingsStore>().Load().Language);
+            Localization.UiTranslator.Install();
+            MusicFinder.Application.Dj.RelativeTime.Texts = new(Localization.Loc.T("just now"), Localization.Loc.T("{0} min ago"), Localization.Loc.T("{0} h ago"),
+                Localization.Loc.T("{0} h {1:00} min ago"), Localization.Loc.T("yesterday {0}"));
 
             // Schema + FTS5 check before anything touches the database.
             _host.Services.GetRequiredService<MigrationRunner>().Migrate();
@@ -74,7 +80,7 @@ public partial class App : System.Windows.Application
 
             var window = _host.Services.GetRequiredService<MainWindow>();
             window.Show();
-            if (restoreMessage is not null) MessageBox.Show(window, restoreMessage, "Restore", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (restoreMessage is not null) MessageBox.Show(window, restoreMessage, Localization.Loc.T("Restore"), MessageBoxButton.OK, MessageBoxImage.Information);
             _host.Services.GetRequiredService<Services.Hotkeys.QuickSearchService>().Start(); // global shortcut for the quick-search window
             _host.Services.GetRequiredService<SearchIndexCoordinator>().Start();            // smart Greek search index, built in the background
 
@@ -97,7 +103,7 @@ public partial class App : System.Windows.Application
         catch (Exception ex)
         {
             Log.Fatal(ex, "Startup failed");
-            MessageBox.Show($"MusicFinder could not start:\n\n{ex.Message}\n\nLogs: {paths.LogDir}",
+            MessageBox.Show(Localization.Loc.T("MusicFinder could not start:\n\n{0}\n\nLogs: {1}", ex.Message, paths.LogDir),
                 "MusicFinder", MessageBoxButton.OK, MessageBoxImage.Error);
             Shutdown(1);
         }

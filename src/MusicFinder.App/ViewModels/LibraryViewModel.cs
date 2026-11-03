@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using MusicFinder.App.Services;
 using MusicFinder.Application.Genres;
 using MusicFinder.Domain.Contracts;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -137,7 +138,7 @@ public partial class LibraryViewModel : ObservableObject
         if (selected.Count == 0) return;
         if (_scans.IsScanning)
         {
-            _dialogs.ShowInfo("Edit tags", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            _dialogs.ShowInfo(Loc.T("Edit tags"), Loc.T("MusicFinder is still indexing your library. Please wait until it finishes, then try again."));
             return;
         }
 
@@ -157,7 +158,7 @@ public partial class LibraryViewModel : ObservableObject
         if (selected.Count == 0) return;
         if (_scans.IsScanning)
         {
-            _dialogs.ShowInfo("Identify online", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            _dialogs.ShowInfo(Loc.T("Identify online"), Loc.T("MusicFinder is still indexing your library. Please wait until it finishes, then try again."));
             return;
         }
 
@@ -195,7 +196,7 @@ public partial class LibraryViewModel : ObservableObject
         if (ids.Count == 0) return;
         if (_scans.IsScanning)
         {
-            _dialogs.ShowInfo("Rename files", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            _dialogs.ShowInfo(Loc.T("Rename files"), Loc.T("MusicFinder is still indexing your library. Please wait until it finishes, then try again."));
             return;
         }
         var vm = _renameFactory.Create(ids);
@@ -209,14 +210,14 @@ public partial class LibraryViewModel : ObservableObject
     {
         if (_scans.IsScanning)
         {
-            _dialogs.ShowInfo("Analyze BPM and key", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            _dialogs.ShowInfo(Loc.T("Analyze BPM and key"), Loc.T("MusicFinder is still indexing your library. Please wait until it finishes, then try again."));
             return;
         }
         var folder = Tree.GlobalSearch ? null : Tree.SelectedFolderId;
         var ids = await _analysis.FindTracksNeedingAnalysisAsync(new Domain.Models.AnalysisScope(folder, Tree.IncludeSubfolders), default);
         if (ids.Count == 0)
         {
-            _dialogs.ShowInfo("Analyze BPM and key", folder is null ? "Every track in the library already has a BPM and a key." : "Every track in this folder already has a BPM and a key.");
+            _dialogs.ShowInfo(Loc.T("Analyze BPM and key"), folder is null ? Loc.T("Every track in the library already has a BPM and a key.") : Loc.T("Every track in this folder already has a BPM and a key."));
             return;
         }
         OpenAnalysis(ids);
@@ -226,7 +227,7 @@ public partial class LibraryViewModel : ObservableObject
     {
         if (_scans.IsScanning)
         {
-            _dialogs.ShowInfo("Analyze BPM and key", "MusicFinder is still indexing your library. Please wait until it finishes, then try again.");
+            _dialogs.ShowInfo(Loc.T("Analyze BPM and key"), Loc.T("MusicFinder is still indexing your library. Please wait until it finishes, then try again."));
             return;
         }
         _dialogs.ShowAnalyze(new AnalyzeViewModel(ids, _analysis, _analysisRunner, _tagEditing, _tracks, _settings, _paths));
@@ -263,7 +264,7 @@ public partial class LibraryViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Search.Warning = "Genre mapping failed: " + ex.Message;
+            Search.Warning = Loc.T("Genre mapping failed: {0}", ex.Message);
         }
     }
 
@@ -290,7 +291,8 @@ public partial class LibraryViewModel : ObservableObject
 
         var p = _scans.Current;
         ScanText = p is null
-            ? $"Indexing {_scans.CurrentRootPath}…"
-            : $"Indexing {_scans.CurrentRootPath} — {p.FilesProcessed:N0} of {p.FilesFound:N0} files" + (p.Errors > 0 ? $", {p.Errors:N0} errors" : "");
+            ? Loc.T("Indexing {0}…", _scans.CurrentRootPath)
+            : Loc.T("Indexing {0} — {1:N0} of {2:N0} files", _scans.CurrentRootPath, p.FilesProcessed, p.FilesFound)
+              + (p.Errors > 0 ? Loc.T(", {0:N0} errors", p.Errors) : "");
     }
 }

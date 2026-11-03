@@ -10,7 +10,8 @@ public sealed class AppSettings
     public bool IncludeSubfolders { get; set; } = true;
     public bool GlobalSearch { get; set; }
     public int ReaderConcurrency { get; set; } = 3;
-    public string Language { get; set; } = "en";
+    /// <summary>"auto" (follow Windows), "en" or "el". Applies at the next start.</summary>
+    public string Language { get; set; } = "auto";
     /// <summary>
     /// Seconds of quiet after a drag before it counts as a possible play. Weak evidence only; clamped to 15 - 20.
     /// A change applies to the next drag, not to windows already open.

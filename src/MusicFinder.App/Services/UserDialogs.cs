@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using Microsoft.Win32;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Services;
 
@@ -42,7 +43,7 @@ public sealed class UserDialogs : IUserDialogs
 {
     public string? PickFolder()
     {
-        var dialog = new OpenFolderDialog { Title = "Choose a music folder to index" };
+        var dialog = new OpenFolderDialog { Title = Loc.T("Choose a music folder to index") };
         return dialog.ShowDialog() == true ? dialog.FolderName : null;
     }
 
@@ -64,7 +65,7 @@ public sealed class UserDialogs : IUserDialogs
         }
         catch (Exception ex)
         {
-            ShowError("Open in Explorer", ex.Message);
+            ShowError(Loc.T("Open in Explorer"), ex.Message);
         }
     }
 
@@ -109,7 +110,7 @@ public sealed class UserDialogs : IUserDialogs
         // Only web addresses: this never starts a program or opens a file.
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https")) return;
         try { Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true }); }
-        catch (Exception ex) { ShowError("Open web page", ex.Message); }
+        catch (Exception ex) { ShowError(Loc.T("Open web page"), ex.Message); }
     }
 
     public void ShowFirstRun(ViewModels.FirstRunViewModel viewModel) =>

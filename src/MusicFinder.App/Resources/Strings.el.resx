@@ -1,0 +1,2618 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Greek UI texts. The key is the English text used in the code and XAML. Edit with care: keep {0} placeholders. -->
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="'{0}' contains the already indexed folder '{1}'." xml:space="preserve">
+    <value>Το '{0}' περιέχει τον ήδη ευρετηριασμένο φάκελο '{1}'.</value>
+  </data>
+  <data name="'{0}' is inside the already indexed folder '{1}'." xml:space="preserve">
+    <value>Το '{0}' βρίσκεται μέσα στον ήδη ευρετηριασμένο φάκελο '{1}'.</value>
+  </data>
+  <data name="'{0}' is not a valid folder path." xml:space="preserve">
+    <value>Το '{0}' δεν είναι έγκυρη διαδρομή φακέλου.</value>
+  </data>
+  <data name="'{0}' is the same as the already indexed folder '{1}'." xml:space="preserve">
+    <value>Το '{0}' είναι ο ίδιος φάκελος με τον ήδη ευρετηριασμένο '{1}'.</value>
+  </data>
+  <data name="'{0}' now maps to {1} (1 track updated)." xml:space="preserve">
+    <value>Το «{0}» αντιστοιχεί πλέον στο {1} (ενημερώθηκε 1 κομμάτι).</value>
+  </data>
+  <data name="'{0}' now maps to {1} ({2:N0} tracks updated)." xml:space="preserve">
+    <value>Το «{0}» αντιστοιχεί πλέον στο {1} (ενημερώθηκαν {2:N0} κομμάτια).</value>
+  </data>
+  <data name="'{0}' now maps to {1}." xml:space="preserve">
+    <value>Το «{0}» αντιστοιχεί πλέον στο {1}.</value>
+  </data>
+  <data name="'{0}' still has sub-genres. Move or delete them first." xml:space="preserve">
+    <value>Το «{0}» έχει ακόμη υποείδη. Μετακίνησέ τα ή διέγραψέ τα πρώτα.</value>
+  </data>
+  <data name="(empty)" xml:space="preserve">
+    <value>(κενό)</value>
+  </data>
+  <data name="(multiple values — type to replace)" xml:space="preserve">
+    <value>(πολλαπλές τιμές — πληκτρολόγησε για αντικατάσταση)</value>
+  </data>
+  <data name="(no release)" xml:space="preserve">
+    <value>(χωρίς κυκλοφορία)</value>
+  </data>
+  <data name="(path or genre only)" xml:space="preserve">
+    <value>(μόνο διαδρομή ή είδος)</value>
+  </data>
+  <data name="(top level)" xml:space="preserve">
+    <value>(ανώτατο επίπεδο)</value>
+  </data>
+  <data name="(track {0})" xml:space="preserve">
+    <value>(κομμάτι {0})</value>
+  </data>
+  <data name="(version {0})" xml:space="preserve">
+    <value>(έκδοση {0})</value>
+  </data>
+  <data name="(will be cleared)" xml:space="preserve">
+    <value>(θα καθαριστεί)</value>
+  </data>
+  <data name=", {0:N0} could not be read" xml:space="preserve">
+    <value>, {0:N0} δεν μπόρεσαν να διαβαστούν</value>
+  </data>
+  <data name=", {0:N0} could not be read (moved, changed or locked)." xml:space="preserve">
+    <value>, {0:N0} δεν μπόρεσαν να διαβαστούν (μετακινήθηκαν, άλλαξαν ή είναι κλειδωμένα).</value>
+  </data>
+  <data name=", {0:N0} errors" xml:space="preserve">
+    <value>, {0:N0} σφάλματα</value>
+  </data>
+  <data name="0 of {0} analysed" xml:space="preserve">
+    <value>0 από {0} αναλύθηκαν</value>
+  </data>
+  <data name="1 BPM" xml:space="preserve">
+    <value>1 BPM</value>
+  </data>
+  <data name="1 candidate" xml:space="preserve">
+    <value>1 υποψήφιο</value>
+  </data>
+  <data name="1 change" xml:space="preserve">
+    <value>1 αλλαγή</value>
+  </data>
+  <data name="1 file" xml:space="preserve">
+    <value>1 αρχείο</value>
+  </data>
+  <data name="1 file written" xml:space="preserve">
+    <value>1 αρχείο γράφτηκε</value>
+  </data>
+  <data name="1 key" xml:space="preserve">
+    <value>1 τονικότητα</value>
+  </data>
+  <data name="1 match" xml:space="preserve">
+    <value>1 αποτέλεσμα</value>
+  </data>
+  <data name="1 missing file was left out." xml:space="preserve">
+    <value>1 αρχείο που λείπει παραλείφθηκε.</value>
+  </data>
+  <data name="1 needs your decision" xml:space="preserve">
+    <value>1 χρειάζεται την απόφασή σου</value>
+  </data>
+  <data name="1 or 2; the work runs at low priority" xml:space="preserve">
+    <value>1 ή 2· η εργασία τρέχει με χαμηλή προτεραιότητα</value>
+  </data>
+  <data name="1 play" xml:space="preserve">
+    <value>1 αναπαραγωγή</value>
+  </data>
+  <data name="1 play from your DJ software could not be matched to a track in the library." xml:space="preserve">
+    <value>1 αναπαραγωγή από το λογισμικό DJ δεν αντιστοιχίστηκε με κομμάτι της βιβλιοθήκης.</value>
+  </data>
+  <data name="1 problem: that file was left untouched" xml:space="preserve">
+    <value>1 πρόβλημα: αυτό το αρχείο έμεινε ανέγγιχτο</value>
+  </data>
+  <data name="1 selected" xml:space="preserve">
+    <value>1 επιλεγμένο</value>
+  </data>
+  <data name="1 track" xml:space="preserve">
+    <value>1 κομμάτι</value>
+  </data>
+  <data name="1 track is in it; it stays in your library and keeps its embedded genre text, but loses this grouping." xml:space="preserve">
+    <value>Υπάρχει 1 κομμάτι σε αυτό· μένει στη βιβλιοθήκη σου και κρατά το ενσωματωμένο κείμενο είδους, αλλά χάνει αυτή την ομαδοποίηση.</value>
+  </data>
+  <data name="1. Save fpcalc.exe" xml:space="preserve">
+    <value>1. Αποθήκευση του fpcalc.exe</value>
+  </data>
+  <data name="15–20 seconds" xml:space="preserve">
+    <value>15–20 δευτερόλεπτα</value>
+  </data>
+  <data name="1–8 · applies after restart" xml:space="preserve">
+    <value>1–8 · ισχύει μετά από επανεκκίνηση</value>
+  </data>
+  <data name="2. Get your free AcoustID key" xml:space="preserve">
+    <value>2. Απόκτηση του δωρεάν κλειδιού AcoustID</value>
+  </data>
+  <data name="3. Your contact address and the switch" xml:space="preserve">
+    <value>3. Η διεύθυνση επικοινωνίας σου και ο διακόπτης</value>
+  </data>
+  <data name="30 – 240, from the middle of each track" xml:space="preserve">
+    <value>30 – 240, από τη μέση κάθε κομματιού</value>
+  </data>
+  <data name="A DJ session is running. Click to see what was dragged out." xml:space="preserve">
+    <value>Μια συνεδρία DJ είναι σε εξέλιξη. Πάτησε για να δεις τι σύρθηκε προς τα έξω.</value>
+  </data>
+  <data name="A backup holds your index, tags, genres, history and settings. It does not contain your music files." xml:space="preserve">
+    <value>Ένα αντίγραφο ασφαλείας περιέχει το ευρετήριο, τις ετικέτες, τα είδη, το ιστορικό και τις ρυθμίσεις σου. Δεν περιέχει τα αρχεία μουσικής σου.</value>
+  </data>
+  <data name="A backup is one file. It is checked after it is written. Restoring makes a safety backup of your current library first, and takes effect when MusicFinder restarts." xml:space="preserve">
+    <value>Ένα αντίγραφο ασφαλείας είναι ένα αρχείο. Ελέγχεται αφού γραφτεί. Η επαναφορά δημιουργεί πρώτα αντίγραφο ασφαλείας της τρέχουσας βιβλιοθήκης σου και ισχύει όταν γίνει επανεκκίνηση του MusicFinder.</value>
+  </data>
+  <data name="A free key for your own copy of MusicFinder: register it at acoustid.org/new-application. Without a key you can still search by tags. Audio fingerprints also need Chromaprint's fpcalc.exe." xml:space="preserve">
+    <value>Ένα δωρεάν κλειδί για το δικό σου αντίγραφο του MusicFinder: δήλωσέ το στο acoustid.org/new-application. Χωρίς κλειδί μπορείς να αναζητάς με ετικέτες. Τα ηχητικά αποτυπώματα χρειάζονται επίσης το fpcalc.exe του Chromaprint.</value>
+  </data>
+  <data name="A match of genre, BPM, key and DJ tags. It says nothing about how the music sounds." xml:space="preserve">
+    <value>Ταίριασμα είδους, BPM, τονικότητας και ετικετών DJ. Δεν λέει τίποτα για το πώς ακούγεται η μουσική.</value>
+  </data>
+  <data name="A one-minute tour of the main things, and the guided setup for song recognition: saving fpcalc.exe, getting your free AcoustID key and testing it." xml:space="preserve">
+    <value>Μια ξενάγηση ενός λεπτού στα βασικά και η καθοδηγούμενη ρύθμιση για την αναγνώριση τραγουδιών: αποθήκευση του fpcalc.exe, απόκτηση του δωρεάν κλειδιού AcoustID και έλεγχός του.</value>
+  </data>
+  <data name="A rename was interrupted and these files could not be settled automatically:" xml:space="preserve">
+    <value>Μια μετονομασία διακόπηκε και αυτά τα αρχεία δεν μπόρεσαν να τακτοποιηθούν αυτόματα:</value>
+  </data>
+  <data name="A restore is prepared and waits for the next start." xml:space="preserve">
+    <value>Μια επαναφορά είναι έτοιμη και περιμένει την επόμενη εκκίνηση.</value>
+  </data>
+  <data name="A sample rate that is not one of the usual ones; worth a look, not necessarily wrong." xml:space="preserve">
+    <value>Ρυθμός δειγματοληψίας που δεν είναι από τους συνηθισμένους· αξίζει έλεγχο, όχι απαραίτητα λάθος.</value>
+  </data>
+  <data name="AcoustID application key (optional)" xml:space="preserve">
+    <value>Κλειδί εφαρμογής AcoustID (προαιρετικό)</value>
+  </data>
+  <data name="AcoustID asks every program to have its own key. It is free for personal, non-commercial use. On the page, sign in (or register), give the application any name (for example MusicFinder) and any version, then copy the short key it shows and paste it here." xml:space="preserve">
+    <value>Το AcoustID ζητά από κάθε πρόγραμμα να έχει δικό του κλειδί. Είναι δωρεάν για προσωπική, μη εμπορική χρήση. Στη σελίδα, συνδέσου (ή εγγράψου), δώσε στην εφαρμογή οποιοδήποτε όνομα (για παράδειγμα MusicFinder) και οποιαδήποτε έκδοση, και μετά αντίγραψε το σύντομο κλειδί που εμφανίζεται και επικόλλησέ το εδώ.</value>
+  </data>
+  <data name="AcoustID key" xml:space="preserve">
+    <value>Κλειδί AcoustID</value>
+  </data>
+  <data name="AcoustID receives an acoustic fingerprint of the first 120 seconds of the audio (not the audio itself), the length of the file in seconds and your AcoustID application key." xml:space="preserve">
+    <value>Το AcoustID λαμβάνει ένα ηχητικό αποτύπωμα των πρώτων 120 δευτερολέπτων του ήχου (όχι τον ίδιο τον ήχο), τη διάρκεια του αρχείου σε δευτερόλεπτα και το κλειδί εφαρμογής AcoustID σου.</value>
+  </data>
+  <data name="Active. Press {0} in any program to open the quick search; press it again (or Esc) to close it." xml:space="preserve">
+    <value>Ενεργή. Πάτησε {0} σε οποιοδήποτε πρόγραμμα για να ανοίξει η γρήγορη αναζήτηση· πάτησέ το ξανά (ή Esc) για να κλείσει.</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Προσθήκη</value>
+  </data>
+  <data name="Add a contact address: MusicBrainz requires it." xml:space="preserve">
+    <value>Πρόσθεσε μια διεύθυνση επικοινωνίας: την απαιτεί το MusicBrainz.</value>
+  </data>
+  <data name="Add a folder with the + button to start indexing your music." xml:space="preserve">
+    <value>Πρόσθεσε έναν φάκελο με το κουμπί + για να ξεκινήσει η ευρετηρίαση της μουσικής σου.</value>
+  </data>
+  <data name="Add a folder, or change the search and filters." xml:space="preserve">
+    <value>Πρόσθεσε έναν φάκελο ή άλλαξε την αναζήτηση και τα φίλτρα.</value>
+  </data>
+  <data name="Add folder…" xml:space="preserve">
+    <value>Προσθήκη φακέλου…</value>
+  </data>
+  <data name="Add fpcalc first (step 1): the test looks up a real song, and that needs a fingerprint." xml:space="preserve">
+    <value>Πρόσθεσε πρώτα το fpcalc (βήμα 1): ο έλεγχος αναζητά ένα πραγματικό τραγούδι, και αυτό χρειάζεται αποτύπωμα.</value>
+  </data>
+  <data name="Add genre" xml:space="preserve">
+    <value>Προσθήκη είδους</value>
+  </data>
+  <data name="Add them to the genres the file already has (ticked)" xml:space="preserve">
+    <value>Προσθήκη στα είδη που έχει ήδη το αρχείο (επιλεγμένο)</value>
+  </data>
+  <data name="Add your music" xml:space="preserve">
+    <value>Πρόσθεσε τη μουσική σου</value>
+  </data>
+  <data name="Added '{0}' under {1}." xml:space="preserve">
+    <value>Προστέθηκε το «{0}» κάτω από το {1}.</value>
+  </data>
+  <data name="Added the genre '{0}'." xml:space="preserve">
+    <value>Προστέθηκε το είδος «{0}».</value>
+  </data>
+  <data name="Added the tag '{0}'." xml:space="preserve">
+    <value>Προστέθηκε η ετικέτα «{0}».</value>
+  </data>
+  <data name="After" xml:space="preserve">
+    <value>Μετά</value>
+  </data>
+  <data name="After you drag a track out, MusicFinder waits this long. If you did not search, filter or change folder in the meantime, it is marked 'possibly played'. That is weak evidence, not proof. Only you (or, later, your DJ software's own history) can confirm a play. A new search leaves the track as 'exported', never as 'not played'." xml:space="preserve">
+    <value>Αφού σύρεις ένα κομμάτι προς τα έξω, το MusicFinder περιμένει τόσο χρόνο. Αν στο μεταξύ δεν έκανες αναζήτηση, φιλτράρισμα ή αλλαγή φακέλου, το κομμάτι σημειώνεται ως «πιθανώς παίχτηκε». Αυτή είναι αδύναμη ένδειξη, όχι απόδειξη. Μόνο εσύ (ή, αργότερα, το ιστορικό του ίδιου του λογισμικού DJ) μπορείς να επιβεβαιώσεις μια αναπαραγωγή. Μια νέα αναζήτηση αφήνει το κομμάτι ως «εξαγμένο», ποτέ ως «δεν παίχτηκε».</value>
+  </data>
+  <data name="Album" xml:space="preserve">
+    <value>Άλμπουμ</value>
+  </data>
+  <data name="Album artist" xml:space="preserve">
+    <value>Καλλιτέχνης άλμπουμ</value>
+  </data>
+  <data name="Aliases" xml:space="preserve">
+    <value>Ψευδώνυμα</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Όλα</value>
+  </data>
+  <data name="Already named so" xml:space="preserve">
+    <value>Έχει ήδη αυτό το όνομα</value>
+  </data>
+  <data name="Already up to date" xml:space="preserve">
+    <value>Ήδη ενημερωμένο</value>
+  </data>
+  <data name="Also finds text typed with the wrong keyboard layout, and ignores accents, case and final sigma. This is automatic; there is no mode to switch while typing. Matching between Greek and Greeklish is a best guess, so exact matches are always listed first." xml:space="preserve">
+    <value>Βρίσκει επίσης κείμενο που πληκτρολογήθηκε με λάθος διάταξη πληκτρολογίου και αγνοεί τόνους, κεφαλαία/πεζά και το τελικό σίγμα. Είναι αυτόματο· δεν υπάρχει λειτουργία που να αλλάζεις την ώρα που γράφεις. Η αντιστοίχιση ελληνικών και Greeklish είναι εκτίμηση, γι' αυτό τα ακριβή αποτελέσματα εμφανίζονται πάντα πρώτα.</value>
+  </data>
+  <data name="Also match double and half the tempo (70 and 140 mix well). These matches are labelled." xml:space="preserve">
+    <value>Ταίριαξε και το διπλάσιο και το μισό τέμπο (τα 70 και 140 μιξάρονται καλά). Αυτά τα ταιριάσματα επισημαίνονται.</value>
+  </data>
+  <data name="Also search as" xml:space="preserve">
+    <value>Αναζήτηση και ως</value>
+  </data>
+  <data name="Analysed" xml:space="preserve">
+    <value>Αναλύθηκε</value>
+  </data>
+  <data name="Analysed before" xml:space="preserve">
+    <value>Αναλύθηκε ξανά νωρίτερα</value>
+  </data>
+  <data name="Analyze BPM and key" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας</value>
+  </data>
+  <data name="Analyze BPM and key of selection…" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας της επιλογής…</value>
+  </data>
+  <data name="Analyze BPM and key of {0} tracks" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας για {0} κομμάτια</value>
+  </data>
+  <data name="Analyze BPM and key…" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας…</value>
+  </data>
+  <data name="Analyze BPM and key…  (Ctrl+B)" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας…  (Ctrl+B)</value>
+  </data>
+  <data name="Analyze again" xml:space="preserve">
+    <value>Νέα ανάλυση</value>
+  </data>
+  <data name="Analyze missing BPM and key…" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας που λείπουν…</value>
+  </data>
+  <data name="Apply" xml:space="preserve">
+    <value>Εφαρμογή</value>
+  </data>
+  <data name="Artist" xml:space="preserve">
+    <value>Καλλιτέχνης</value>
+  </data>
+  <data name="Artwork" xml:space="preserve">
+    <value>Εξώφυλλα</value>
+  </data>
+  <data name="Ask the service again, ignoring remembered answers" xml:space="preserve">
+    <value>Νέο ερώτημα στην υπηρεσία, αγνοώντας τις αποθηκευμένες απαντήσεις</value>
+  </data>
+  <data name="Audio" xml:space="preserve">
+    <value>Ήχος</value>
+  </data>
+  <data name="Audio fingerprint" xml:space="preserve">
+    <value>Αποτύπωμα ήχου</value>
+  </data>
+  <data name="Audio is not the kind the extension suggests" xml:space="preserve">
+    <value>Ο ήχος δεν είναι του είδους που υποδεικνύει η επέκταση</value>
+  </data>
+  <data name="Automatic (Windows language)" xml:space="preserve">
+    <value>Αυτόματα (γλώσσα των Windows)</value>
+  </data>
+  <data name="BPM" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="BPM and key analysis" xml:space="preserve">
+    <value>Ανάλυση BPM και τονικότητας</value>
+  </data>
+  <data name="BPM and key are never looked up online; analyse them from the audio or type them in the tag editor." xml:space="preserve">
+    <value>Το BPM και η τονικότητα δεν αναζητούνται ποτέ στο διαδίκτυο· ανάλυσέ τα από τον ήχο ή πληκτρολόγησέ τα στον επεξεργαστή ετικετών.</value>
+  </data>
+  <data name="BPM estimate" xml:space="preserve">
+    <value>Εκτίμηση BPM</value>
+  </data>
+  <data name="BPM now" xml:space="preserve">
+    <value>BPM τώρα</value>
+  </data>
+  <data name="BPM ±" xml:space="preserve">
+    <value>BPM ±</value>
+  </data>
+  <data name="Back" xml:space="preserve">
+    <value>Πίσω</value>
+  </data>
+  <data name="Back to the list" xml:space="preserve">
+    <value>Πίσω στη λίστα</value>
+  </data>
+  <data name="Back to your search" xml:space="preserve">
+    <value>Πίσω στην αναζήτησή σου</value>
+  </data>
+  <data name="Back up now…" xml:space="preserve">
+    <value>Δημιουργία αντιγράφου τώρα…</value>
+  </data>
+  <data name="Backup and restore" xml:space="preserve">
+    <value>Αντίγραφο ασφαλείας και επαναφορά</value>
+  </data>
+  <data name="Backup saved and verified: {0} ({1:0.0} MB, {2:N0} tracks)." xml:space="preserve">
+    <value>Το αντίγραφο ασφαλείας αποθηκεύτηκε και επαληθεύτηκε: {0} ({1:0.0} MB, {2:N0} κομμάτια).</value>
+  </data>
+  <data name="Backups are stored in MusicFinder's data folder, never next to your music. Each file is written through a verified temporary copy, so a failure leaves the original untouched." xml:space="preserve">
+    <value>Τα αντίγραφα ασφαλείας αποθηκεύονται στον φάκελο δεδομένων του MusicFinder, ποτέ δίπλα στη μουσική σου. Κάθε αρχείο γράφεται μέσω επαληθευμένου προσωρινού αντιγράφου, οπότε μια αποτυχία αφήνει το πρωτότυπο άθικτο.</value>
+  </data>
+  <data name="Backups go to MusicFinder's data folder, never next to your music. Every file is written through a verified temporary copy: a failure leaves the original untouched." xml:space="preserve">
+    <value>Τα αντίγραφα ασφαλείας πηγαίνουν στον φάκελο δεδομένων του MusicFinder, ποτέ δίπλα στη μουσική σου. Κάθε αρχείο γράφεται μέσω επαληθευμένου προσωρινού αντιγράφου: αν αποτύχει, το αρχικό μένει ανέγγιχτο.</value>
+  </data>
+  <data name="Before" xml:space="preserve">
+    <value>Πριν</value>
+  </data>
+  <data name="Before you rename files" xml:space="preserve">
+    <value>Πριν μετονομάσεις αρχεία</value>
+  </data>
+  <data name="Best available" xml:space="preserve">
+    <value>Καλύτερη διαθέσιμη</value>
+  </data>
+  <data name="Bpm" xml:space="preserve">
+    <value>BPM</value>
+  </data>
+  <data name="Browse…" xml:space="preserve">
+    <value>Αναζήτηση…</value>
+  </data>
+  <data name="Built-in genre · you can still rename, move or remove it" xml:space="preserve">
+    <value>Ενσωματωμένο είδος · μπορείς ακόμη να το μετονομάσεις, να το μετακινήσεις ή να το αφαιρέσεις</value>
+  </data>
+  <data name="CSV file" xml:space="preserve">
+    <value>Αρχείο CSV</value>
+  </data>
+  <data name="Camelot, like 8A (default)" xml:space="preserve">
+    <value>Camelot, όπως 8A (προεπιλογή)</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Άκυρο</value>
+  </data>
+  <data name="Cancel it" xml:space="preserve">
+    <value>Ακύρωσή της</value>
+  </data>
+  <data name="Cancelled" xml:space="preserve">
+    <value>Ακυρώθηκε</value>
+  </data>
+  <data name="Candidates come from MusicBrainz. What is ticked below is exactly what Write will change; nothing is written before you press it." xml:space="preserve">
+    <value>Τα υποψήφια προέρχονται από το MusicBrainz. Ό,τι είναι επιλεγμένο παρακάτω είναι ακριβώς αυτό που θα αλλάξει η εγγραφή· τίποτα δεν γράφεται πριν το πατήσεις.</value>
+  </data>
+  <data name="Cannot add folder" xml:space="preserve">
+    <value>Δεν είναι δυνατή η προσθήκη του φακέλου</value>
+  </data>
+  <data name="Cannot be read" xml:space="preserve">
+    <value>Δεν διαβάζεται</value>
+  </data>
+  <data name="Change case" xml:space="preserve">
+    <value>Αλλαγή πεζών/κεφαλαίων</value>
+  </data>
+  <data name="Changing the language restarts MusicFinder. Your music, library and settings are not affected. Track titles, artists and tags are shown as they are written in the files." xml:space="preserve">
+    <value>Η αλλαγή γλώσσας επανεκκινεί το MusicFinder. Η μουσική, η βιβλιοθήκη και οι ρυθμίσεις σου δεν επηρεάζονται. Οι τίτλοι, οι καλλιτέχνες και οι ετικέτες εμφανίζονται όπως είναι γραμμένοι στα αρχεία.</value>
+  </data>
+  <data name="Check" xml:space="preserve">
+    <value>Έλεγχος</value>
+  </data>
+  <data name="Checked {0:N0} of {1:N0} files ({2} read)" xml:space="preserve">
+    <value>Ελέγχθηκαν {0:N0} από {1:N0} αρχεία (διαβάστηκαν {2})</value>
+  </data>
+  <data name="Checking the backup…" xml:space="preserve">
+    <value>Έλεγχος του αντιγράφου ασφαλείας…</value>
+  </data>
+  <data name="Choose a backup to restore" xml:space="preserve">
+    <value>Επιλογή αντιγράφου ασφαλείας για επαναφορά</value>
+  </data>
+  <data name="Choose a file…" xml:space="preserve">
+    <value>Επιλογή αρχείου…</value>
+  </data>
+  <data name="Choose a music folder to index" xml:space="preserve">
+    <value>Επίλεξε έναν φάκελο μουσικής για ευρετηρίαση</value>
+  </data>
+  <data name="Choose any song for the test" xml:space="preserve">
+    <value>Επίλεξε ένα οποιοδήποτε τραγούδι για τον έλεγχο</value>
+  </data>
+  <data name="Choose fpcalc.exe" xml:space="preserve">
+    <value>Επιλογή του fpcalc.exe</value>
+  </data>
+  <data name="Choose fpcalc.exe or the zip you downloaded" xml:space="preserve">
+    <value>Επιλογή του fpcalc.exe ή του zip που κατέβασες</value>
+  </data>
+  <data name="Choose the history folder" xml:space="preserve">
+    <value>Επιλογή του φακέλου ιστορικού</value>
+  </data>
+  <data name="Chosen output" xml:space="preserve">
+    <value>Επιλεγμένη έξοδος</value>
+  </data>
+  <data name="Chosen output not connected" xml:space="preserve">
+    <value>Η επιλεγμένη έξοδος δεν είναι συνδεδεμένη</value>
+  </data>
+  <data name="Clear (Esc)" xml:space="preserve">
+    <value>Καθαρισμός (Esc)</value>
+  </data>
+  <data name="Clear matches are ticked for you. Tracks that need your decision are left unticked, with the reason: open them with Review. The column “Will change” is what Write does to each file; empty fields are filled, values you already have are kept." xml:space="preserve">
+    <value>Οι σαφείς αντιστοιχίσεις επιλέγονται για σένα. Τα κομμάτια που χρειάζονται απόφασή σου μένουν χωρίς επιλογή, με τον λόγο: άνοιξέ τα με το Έλεγχος. Η στήλη «Θα αλλάξει» δείχνει τι κάνει η εγγραφή σε κάθε αρχείο· τα κενά πεδία συμπληρώνονται, οι τιμές που ήδη έχεις διατηρούνται.</value>
+  </data>
+  <data name="Click here, then press the keys you want to use" xml:space="preserve">
+    <value>Κάνε κλικ εδώ και μετά πάτησε τα πλήκτρα που θέλεις να χρησιμοποιήσεις</value>
+  </data>
+  <data name="Click the shortcut box and press the keys you want, for example Ctrl+Alt+Space. The shortcut must include Ctrl, Alt or Win, and some combinations belong to Windows or to other programs. The pop-up window can be dragged anywhere on screen and remembers its position. The shortcut works while MusicFinder is running (also when its window is minimized)." xml:space="preserve">
+    <value>Κάνε κλικ στο πλαίσιο συντόμευσης και πάτησε τα πλήκτρα που θέλεις, για παράδειγμα Ctrl+Alt+Space. Η συντόμευση πρέπει να περιλαμβάνει Ctrl, Alt ή Win, και ορισμένοι συνδυασμοί ανήκουν στα Windows ή σε άλλα προγράμματα. Το αναδυόμενο παράθυρο μπορεί να σύρεται οπουδήποτε στην οθόνη και θυμάται τη θέση του. Η συντόμευση λειτουργεί όσο εκτελείται το MusicFinder (ακόμη και όταν το παράθυρό του είναι ελαχιστοποιημένο).</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Κλείσιμο</value>
+  </data>
+  <data name="Close (Esc)" xml:space="preserve">
+    <value>Κλείσιμο (Esc)</value>
+  </data>
+  <data name="Close the player" xml:space="preserve">
+    <value>Κλείσιμο του προγράμματος αναπαραγωγής</value>
+  </data>
+  <data name="Close this. You can open it again from Settings." xml:space="preserve">
+    <value>Κλείσιμο. Μπορείς να το ανοίξεις ξανά από τις Ρυθμίσεις.</value>
+  </data>
+  <data name="Codec differs from extension" xml:space="preserve">
+    <value>Ο κωδικοποιητής διαφέρει από την επέκταση</value>
+  </data>
+  <data name="Confirmed" xml:space="preserve">
+    <value>Επιβεβαιωμένο</value>
+  </data>
+  <data name="Confirmed played" xml:space="preserve">
+    <value>Επιβεβαιωμένα παιγμένο</value>
+  </data>
+  <data name="Contact address" xml:space="preserve">
+    <value>Διεύθυνση επικοινωνίας</value>
+  </data>
+  <data name="Continue" xml:space="preserve">
+    <value>Συνέχεια</value>
+  </data>
+  <data name="Continue?" xml:space="preserve">
+    <value>Συνέχεια;</value>
+  </data>
+  <data name="Copy" xml:space="preserve">
+    <value>Αντιγραφή</value>
+  </data>
+  <data name="Copy path" xml:space="preserve">
+    <value>Αντιγραφή διαδρομής</value>
+  </data>
+  <data name="Copy path  (Ctrl+C)" xml:space="preserve">
+    <value>Αντιγραφή διαδρομής  (Ctrl+C)</value>
+  </data>
+  <data name="Could not explain this search: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η εξήγηση αυτής της αναζήτησης: {0}</value>
+  </data>
+  <data name="Could not load that release:" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η φόρτωση αυτής της κυκλοφορίας:</value>
+  </data>
+  <data name="Could not load the play history: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η φόρτωση του ιστορικού αναπαραγωγών: {0}</value>
+  </data>
+  <data name="Could not load the session: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η φόρτωση της συνεδρίας: {0}</value>
+  </data>
+  <data name="Could not load: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η φόρτωση: {0}</value>
+  </data>
+  <data name="Could not mark as not played: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η σήμανση ως μη παιγμένο: {0}</value>
+  </data>
+  <data name="Could not mark as played: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η σήμανση ως παιγμένο: {0}</value>
+  </data>
+  <data name="Could not reach the Cover Art Archive." xml:space="preserve">
+    <value>Δεν ήταν δυνατή η σύνδεση με το Cover Art Archive.</value>
+  </data>
+  <data name="Could not refresh after editing: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανανέωση μετά την επεξεργασία: {0}</value>
+  </data>
+  <data name="Could not refresh after the session changed: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανανέωση μετά την αλλαγή της συνεδρίας: {0}</value>
+  </data>
+  <data name="Could not refresh play status: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανανέωση της κατάστασης αναπαραγωγής: {0}</value>
+  </data>
+  <data name="Could not refresh: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανανέωση: {0}</value>
+  </data>
+  <data name="Could not save: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η αποθήκευση: {0}</value>
+  </data>
+  <data name="Could not start the session: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η έναρξη της συνεδρίας: {0}</value>
+  </data>
+  <data name="Could not stop the session: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η λήξη της συνεδρίας: {0}</value>
+  </data>
+  <data name="Could not undo: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η αναίρεση: {0}</value>
+  </data>
+  <data name="Could not update genres: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ενημέρωση των ειδών: {0}</value>
+  </data>
+  <data name="Could not update tags: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ενημέρωση των ετικετών: {0}</value>
+  </data>
+  <data name="Counting…" xml:space="preserve">
+    <value>Καταμέτρηση…</value>
+  </data>
+  <data name="Cover" xml:space="preserve">
+    <value>Εξώφυλλο</value>
+  </data>
+  <data name="Covers are read from your files and cached as small thumbnails; nothing is downloaded and your files are never modified." xml:space="preserve">
+    <value>Τα εξώφυλλα διαβάζονται από τα αρχεία σου και αποθηκεύονται προσωρινά ως μικρές εικόνες· τίποτα δεν κατεβαίνει και τα αρχεία σου δεν τροποποιούνται ποτέ.</value>
+  </data>
+  <data name="Create it as a new genre" xml:space="preserve">
+    <value>Δημιουργία ως νέο είδος</value>
+  </data>
+  <data name="Created '{0}' under {1}." xml:space="preserve">
+    <value>Δημιουργήθηκε το «{0}» κάτω από το {1}.</value>
+  </data>
+  <data name="Created the genre '{0}'." xml:space="preserve">
+    <value>Δημιουργήθηκε το είδος «{0}».</value>
+  </data>
+  <data name="Created under the selected genre, or at the top level when none is selected" xml:space="preserve">
+    <value>Δημιουργείται κάτω από το επιλεγμένο είδος ή στο ανώτατο επίπεδο αν δεν έχει επιλεγεί κανένα</value>
+  </data>
+  <data name="DJ Music Organizer" xml:space="preserve">
+    <value>Οργάνωση μουσικής για DJ</value>
+  </data>
+  <data name="DJ history" xml:space="preserve">
+    <value>Ιστορικό DJ</value>
+  </data>
+  <data name="DJ session" xml:space="preserve">
+    <value>Συνεδρία DJ</value>
+  </data>
+  <data name="DJ sessions" xml:space="preserve">
+    <value>Συνεδρίες DJ</value>
+  </data>
+  <data name="DJ tags" xml:space="preserve">
+    <value>Ετικέτες DJ</value>
+  </data>
+  <data name="Data locations" xml:space="preserve">
+    <value>Θέσεις δεδομένων</value>
+  </data>
+  <data name="Decade" xml:space="preserve">
+    <value>Δεκαετία</value>
+  </data>
+  <data name="Delete genre" xml:space="preserve">
+    <value>Διαγραφή είδους</value>
+  </data>
+  <data name="Delete genre…" xml:space="preserve">
+    <value>Διαγραφή είδους…</value>
+  </data>
+  <data name="Delete tag" xml:space="preserve">
+    <value>Διαγραφή ετικέτας</value>
+  </data>
+  <data name="Delete the genre '{0}' and its aliases?" xml:space="preserve">
+    <value>Διαγραφή του είδους «{0}» και των ψευδωνύμων του;</value>
+  </data>
+  <data name="Delete the tag '{0}'?" xml:space="preserve">
+    <value>Διαγραφή της ετικέτας «{0}»;</value>
+  </data>
+  <data name="Delete this tag" xml:space="preserve">
+    <value>Διαγραφή αυτής της ετικέτας</value>
+  </data>
+  <data name="Deleted the genre '{0}'." xml:space="preserve">
+    <value>Διαγράφηκε το είδος «{0}».</value>
+  </data>
+  <data name="Deleted the tag '{0}'." xml:space="preserve">
+    <value>Διαγράφηκε η ετικέτα «{0}».</value>
+  </data>
+  <data name="Done" xml:space="preserve">
+    <value>Τέλος</value>
+  </data>
+  <data name="Done." xml:space="preserve">
+    <value>Ολοκληρώθηκε.</value>
+  </data>
+  <data name="Double-click a track to hear it in the bar at the top of the window. A preview is only a listen: it is not a drag, it does not count as a play in a DJ session, and your files are opened read-only. Choose the output so a preview never goes to the main speakers by accident, for example your headphone card." xml:space="preserve">
+    <value>Κάνε διπλό κλικ σε ένα κομμάτι για να το ακούσεις στη γραμμή πάνω στο παράθυρο. Η προεπισκόπηση είναι μόνο ακρόαση: δεν είναι σύρσιμο, δεν μετράει ως αναπαραγωγή σε συνεδρία DJ και τα αρχεία σου ανοίγουν μόνο για ανάγνωση. Διάλεξε την έξοδο ώστε η προεπισκόπηση να μην πηγαίνει ποτέ κατά λάθος στα κεντρικά ηχεία, για παράδειγμα στην κάρτα των ακουστικών σου.</value>
+  </data>
+  <data name="Double-click a track to hear it in the bar at the top; Space pauses. A preview is only a listen and does not count as played. Choose which sound card it uses in Settings so it never reaches the main speakers by accident." xml:space="preserve">
+    <value>Κάνε διπλό κλικ σε ένα κομμάτι για να το ακούσεις στη γραμμή στο πάνω μέρος· το Space κάνει παύση. Η προεπισκόπηση είναι μόνο ακρόαση και δεν μετράει ως παίχτηκε. Διάλεξε στις Ρυθμίσεις ποια κάρτα ήχου χρησιμοποιεί ώστε να μη φτάνει ποτέ κατά λάθος στα κεντρικά ηχεία.</value>
+  </data>
+  <data name="Drag tracks from the Library into your DJ software. Each drop is listed here. If you do not search or change anything for the quiet period, it is marked 'possibly played'. That is weak evidence, never proof; you decide what really played." xml:space="preserve">
+    <value>Σύρε κομμάτια από τη Βιβλιοθήκη στο πρόγραμμα DJ σου. Κάθε απόθεση εμφανίζεται εδώ. Αν δεν κάνεις αναζήτηση ή αλλαγή για το διάστημα ησυχίας, σημαίνεται ως «πιθανώς παιγμένο». Αυτό είναι αδύναμη ένδειξη, ποτέ απόδειξη· εσύ αποφασίζεις τι παίχτηκε πραγματικά.</value>
+  </data>
+  <data name="Drag tracks from the list into your DJ program. The Session tab shows what you dragged and what was probably played. In Settings, DJ history lets MusicFinder read VirtualDJ's own history so a probable play becomes a confirmed one." xml:space="preserve">
+    <value>Σύρε κομμάτια από τη λίστα στο πρόγραμμα DJ σου. Η καρτέλα Συνεδρία δείχνει τι έσυρες και τι παίχτηκε πιθανώς. Στις Ρυθμίσεις, το Ιστορικό DJ επιτρέπει στο MusicFinder να διαβάσει το ίδιο το ιστορικό του VirtualDJ ώστε μια πιθανή αναπαραγωγή να γίνει επιβεβαιωμένη.</value>
+  </data>
+  <data name="Drag tracks into your player  ·  Enter opens the library  ·  Esc closes" xml:space="preserve">
+    <value>Σύρε κομμάτια στο πρόγραμμά σου  ·  Το Enter ανοίγει τη βιβλιοθήκη  ·  Το Esc κλείνει</value>
+  </data>
+  <data name="Dragged out, then nothing else happened for the quiet period: probably played, but this is a guess, not proof." xml:space="preserve">
+    <value>Σύρθηκε προς τα έξω και μετά δεν έγινε τίποτα άλλο στο διάστημα ηρεμίας: πιθανότατα παίχτηκε, αλλά είναι εικασία, όχι απόδειξη.</value>
+  </data>
+  <data name="Dragged this session" xml:space="preserve">
+    <value>Σύρθηκε σε αυτή τη συνεδρία</value>
+  </data>
+  <data name="Duplicate files" xml:space="preserve">
+    <value>Διπλότυπα αρχεία</value>
+  </data>
+  <data name="Duplicates" xml:space="preserve">
+    <value>Διπλότυπα</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Διάρκεια</value>
+  </data>
+  <data name="Earlier renames" xml:space="preserve">
+    <value>Προηγούμενες μετονομασίες</value>
+  </data>
+  <data name="Edit tags" xml:space="preserve">
+    <value>Επεξεργασία ετικετών</value>
+  </data>
+  <data name="Edit tags of selection…" xml:space="preserve">
+    <value>Επεξεργασία ετικετών της επιλογής…</value>
+  </data>
+  <data name="Edit tags of the selected track (F2)" xml:space="preserve">
+    <value>Επεξεργασία ετικετών του επιλεγμένου κομματιού (F2)</value>
+  </data>
+  <data name="Edit tags of {0} tracks" xml:space="preserve">
+    <value>Επεξεργασία ετικετών {0} κομματιών</value>
+  </data>
+  <data name="Edit tags…" xml:space="preserve">
+    <value>Επεξεργασία ετικετών…</value>
+  </data>
+  <data name="Edit tags…  (F2)" xml:space="preserve">
+    <value>Επεξεργασία ετικετών…  (F2)</value>
+  </data>
+  <data name="Elapsed / total" xml:space="preserve">
+    <value>Διανυθέν / συνολικό</value>
+  </data>
+  <data name="Embed this cover" xml:space="preserve">
+    <value>Ενσωμάτωση αυτού του εξωφύλλου</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Σφάλμα</value>
+  </data>
+  <data name="Every genre value in your files maps to the taxonomy." xml:space="preserve">
+    <value>Κάθε τιμή είδους στα αρχεία σου αντιστοιχεί στην ταξινομία.</value>
+  </data>
+  <data name="Every selected file already has these values, so nothing would change." xml:space="preserve">
+    <value>Όλα τα επιλεγμένα αρχεία έχουν ήδη αυτές τις τιμές, οπότε δεν θα άλλαζε τίποτα.</value>
+  </data>
+  <data name="Every track in the library already has a BPM and a key." xml:space="preserve">
+    <value>Όλα τα κομμάτια της βιβλιοθήκης έχουν ήδη BPM και τονικότητα.</value>
+  </data>
+  <data name="Every track in this folder already has a BPM and a key." xml:space="preserve">
+    <value>Όλα τα κομμάτια αυτού του φακέλου έχουν ήδη BPM και τονικότητα.</value>
+  </data>
+  <data name="Everything is stored locally. MusicFinder sends no telemetry. The only network connections are the online identification lookups above, and only if you turn them on." xml:space="preserve">
+    <value>Όλα αποθηκεύονται τοπικά. Το MusicFinder δεν στέλνει τηλεμετρία. Οι μόνες συνδέσεις δικτύου είναι οι διαδικτυακές αναζητήσεις αναγνώρισης παραπάνω, και μόνο αν τις ενεργοποιήσεις.</value>
+  </data>
+  <data name="Exact duplicates" xml:space="preserve">
+    <value>Ακριβή διπλότυπα</value>
+  </data>
+  <data name="Exclude folder" xml:space="preserve">
+    <value>Εξαίρεση φακέλου</value>
+  </data>
+  <data name="Exclude from index…" xml:space="preserve">
+    <value>Εξαίρεση από το ευρετήριο…</value>
+  </data>
+  <data name="Explain" xml:space="preserve">
+    <value>Εξήγηση</value>
+  </data>
+  <data name="Explain a search" xml:space="preserve">
+    <value>Εξήγηση αναζήτησης</value>
+  </data>
+  <data name="Exported" xml:space="preserve">
+    <value>Εξήχθη</value>
+  </data>
+  <data name="Field" xml:space="preserve">
+    <value>Πεδίο</value>
+  </data>
+  <data name="Fields that are empty in the files. Fix them in the tag editor, or let Identify and Analyze fill them in." xml:space="preserve">
+    <value>Πεδία που είναι κενά στα αρχεία. Διόρθωσέ τα στον επεξεργαστή ετικετών ή άφησε την Αναγνώριση και την Ανάλυση να τα συμπληρώσουν.</value>
+  </data>
+  <data name="File" xml:space="preserve">
+    <value>Αρχείο</value>
+  </data>
+  <data name="File not found" xml:space="preserve">
+    <value>Το αρχείο δεν βρέθηκε</value>
+  </data>
+  <data name="Files" xml:space="preserve">
+    <value>Αρχεία</value>
+  </data>
+  <data name="Files are compared by their content (SHA-256), not by name or tags, so a group here really is the same bytes. MusicFinder never deletes, moves or renames anything: open a file in Explorer or list it in the Library and decide there. The suggested copy only weighs play history and names, because identical files have identical audio and tags. If your DJ software has these files in playlists or crates, removing one of them there breaks that entry." xml:space="preserve">
+    <value>Τα αρχεία συγκρίνονται με βάση το περιεχόμενό τους (SHA-256), όχι το όνομα ή τις ετικέτες, οπότε μια ομάδα εδώ έχει πραγματικά τα ίδια byte. Το MusicFinder δεν διαγράφει, μετακινεί ή μετονομάζει τίποτα: άνοιξε ένα αρχείο στην Εξερεύνηση ή εμφάνισέ το στη Βιβλιοθήκη και αποφάσισε εκεί. Το προτεινόμενο αντίγραφο λαμβάνει υπόψη μόνο το ιστορικό αναπαραγωγών και τα ονόματα, επειδή τα ίδια αρχεία έχουν ίδιο ήχο και ίδιες ετικέτες. Αν το λογισμικό DJ σου έχει αυτά τα αρχεία σε λίστες ή crates, η αφαίρεση ενός από αυτά εκεί χαλάει την αντίστοιχη εγγραφή.</value>
+  </data>
+  <data name="Files need a look" xml:space="preserve">
+    <value>Αρχεία που χρειάζονται έλεγχο</value>
+  </data>
+  <data name="Files not found" xml:space="preserve">
+    <value>Αρχεία που δεν βρέθηκαν</value>
+  </data>
+  <data name="Files whose bytes are identical to another file (files, not groups). Only found once you scan for duplicates; nothing is deleted or changed." xml:space="preserve">
+    <value>Αρχεία με byte πανομοιότυπα με άλλο αρχείο (αρχεία, όχι ομάδες). Βρίσκονται μόνο αφού σαρώσεις για διπλότυπα· τίποτα δεν διαγράφεται ούτε αλλάζει.</value>
+  </data>
+  <data name="Files with identical content. Found by a scan you start yourself; the scan only reads files." xml:space="preserve">
+    <value>Αρχεία με πανομοιότυπο περιεχόμενο. Βρίσκονται με σάρωση που ξεκινάς εσύ· η σάρωση μόνο διαβάζει αρχεία.</value>
+  </data>
+  <data name="Filter list…" xml:space="preserve">
+    <value>Φιλτράρισμα λίστας…</value>
+  </data>
+  <data name="Find BPM and key" xml:space="preserve">
+    <value>Βρες BPM και τονικότητα</value>
+  </data>
+  <data name="Find duplicate files…" xml:space="preserve">
+    <value>Εύρεση διπλότυπων αρχείων…</value>
+  </data>
+  <data name="Find probable duplicates and other versions…" xml:space="preserve">
+    <value>Εύρεση πιθανών διπλότυπων και άλλων εκδόσεων…</value>
+  </data>
+  <data name="Find similar" xml:space="preserve">
+    <value>Εύρεση παρόμοιων</value>
+  </data>
+  <data name="Find similar failed: {0}" xml:space="preserve">
+    <value>Η εύρεση παρόμοιων απέτυχε: {0}</value>
+  </data>
+  <data name="Find similar tracks" xml:space="preserve">
+    <value>Βρες παρόμοια κομμάτια</value>
+  </data>
+  <data name="Find the right track fast. Everything works on this computer, without an account and without the internet. Your music files are never changed unless you confirm it." xml:space="preserve">
+    <value>Βρες γρήγορα το κομμάτι που θέλεις. Όλα λειτουργούν σε αυτόν τον υπολογιστή, χωρίς λογαριασμό και χωρίς διαδίκτυο. Τα αρχεία μουσικής σου δεν αλλάζουν ποτέ αν δεν το επιβεβαιώσεις.</value>
+  </data>
+  <data name="First {0} results, best first:" xml:space="preserve">
+    <value>Τα πρώτα {0} αποτελέσματα, τα καλύτερα πρώτα:</value>
+  </data>
+  <data name="Fix the highlighted fields first." xml:space="preserve">
+    <value>Διόρθωσε πρώτα τα επισημασμένα πεδία.</value>
+  </data>
+  <data name="Fix the template to see the new names." xml:space="preserve">
+    <value>Διόρθωσε το πρότυπο για να δεις τα νέα ονόματα.</value>
+  </data>
+  <data name="Folders" xml:space="preserve">
+    <value>Φάκελοι</value>
+  </data>
+  <data name="For names the automatic rules cannot connect, for example Daft Punk and ντάφτ πανκ. Searching either spelling then finds the tracks tagged with the first one." xml:space="preserve">
+    <value>Για ονόματα που οι αυτόματοι κανόνες δεν μπορούν να συνδέσουν, για παράδειγμα Daft Punk και ντάφτ πανκ. Η αναζήτηση με οποιαδήποτε γραφή βρίσκει τότε τα κομμάτια που έχουν την πρώτη ως ετικέτα.</value>
+  </data>
+  <data name="Forget estimates" xml:space="preserve">
+    <value>Διαγραφή εκτιμήσεων</value>
+  </data>
+  <data name="Forget remembered answers" xml:space="preserve">
+    <value>Διαγραφή αποθηκευμένων απαντήσεων</value>
+  </data>
+  <data name="Forget the remembered estimates of these tracks and listen again" xml:space="preserve">
+    <value>Διαγραφή των αποθηκευμένων εκτιμήσεων αυτών των κομματιών και νέα ακρόαση</value>
+  </data>
+  <data name="Found" xml:space="preserve">
+    <value>Βρέθηκε</value>
+  </data>
+  <data name="Found automatically." xml:space="preserve">
+    <value>Βρέθηκε αυτόματα.</value>
+  </data>
+  <data name="Found from the artist, title and length in your tags, not from the audio, so these are suspicions to look at. A remix, an edit or a live version is a different version, not a duplicate, and is listed separately. MusicFinder never merges, moves, renames or deletes anything here." xml:space="preserve">
+    <value>Βρέθηκαν από τον καλλιτέχνη, τον τίτλο και τη διάρκεια στις ετικέτες σου, όχι από τον ήχο, άρα είναι υποψίες προς έλεγχο. Ένα remix, μια επεξεργασία ή μια ζωντανή εκτέλεση είναι διαφορετική εκδοχή, όχι διπλότυπο, και εμφανίζεται ξεχωριστά. Το MusicFinder δεν συγχωνεύει, μετακινεί, μετονομάζει ή διαγράφει τίποτα εδώ.</value>
+  </data>
+  <data name="Found in your Downloads:" xml:space="preserve">
+    <value>Βρέθηκε στις Λήψεις σου:</value>
+  </data>
+  <data name="Found on this PC" xml:space="preserve">
+    <value>Βρέθηκε σε αυτόν τον υπολογιστή</value>
+  </data>
+  <data name="Found: {0}" xml:space="preserve">
+    <value>Βρέθηκε: {0}</value>
+  </data>
+  <data name="Found: {0} ({1})" xml:space="preserve">
+    <value>Βρέθηκε: {0} ({1})</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>Από</value>
+  </data>
+  <data name="From the Cover Art Archive. Written to the file only after you preview and confirm." xml:space="preserve">
+    <value>Από το Cover Art Archive. Γράφεται στο αρχείο μόνο αφού δεις την προεπισκόπηση και επιβεβαιώσεις.</value>
+  </data>
+  <data name="Garbled text" xml:space="preserve">
+    <value>Παραμορφωμένο κείμενο</value>
+  </data>
+  <data name="Garbled text in the tags" xml:space="preserve">
+    <value>Μπερδεμένοι χαρακτήρες στις ετικέτες</value>
+  </data>
+  <data name="Genre" xml:space="preserve">
+    <value>Είδος</value>
+  </data>
+  <data name="Genre aliases" xml:space="preserve">
+    <value>Ψευδώνυμα ειδών</value>
+  </data>
+  <data name="Genre mapping failed: {0}" xml:space="preserve">
+    <value>Η αντιστοίχιση ειδών απέτυχε: {0}</value>
+  </data>
+  <data name="Genre taxonomy" xml:space="preserve">
+    <value>Ταξινομία ειδών</value>
+  </data>
+  <data name="Genre text found in your files that matches no genre or alias. Pick one, then map it to a genre or create a new genre." xml:space="preserve">
+    <value>Κείμενα ειδών στα αρχεία σου που δεν ταιριάζουν με κανένα είδος ή ψευδώνυμο. Διάλεξε ένα και αντιστοίχισέ το σε είδος ή δημιούργησε νέο είδος.</value>
+  </data>
+  <data name="Genres" xml:space="preserve">
+    <value>Είδη</value>
+  </data>
+  <data name="Genres not in the taxonomy" xml:space="preserve">
+    <value>Είδη εκτός ταξινομίας</value>
+  </data>
+  <data name="Global search (ignore folder)" xml:space="preserve">
+    <value>Καθολική αναζήτηση</value>
+  </data>
+  <data name="Go back to the library from before the last restore" xml:space="preserve">
+    <value>Επιστροφή στη βιβλιοθήκη πριν από την τελευταία επαναφορά</value>
+  </data>
+  <data name="Go back to the library from before the last restore…" xml:space="preserve">
+    <value>Επιστροφή στη βιβλιοθήκη πριν από την τελευταία επαναφορά…</value>
+  </data>
+  <data name="Half/double tempo" xml:space="preserve">
+    <value>Μισό/διπλό τέμπο</value>
+  </data>
+  <data name="Health" xml:space="preserve">
+    <value>Υγεία</value>
+  </data>
+  <data name="Hide confirmed in session" xml:space="preserve">
+    <value>Απόκρυψη επιβεβαιωμένων στη συνεδρία</value>
+  </data>
+  <data name="Hide played in last 24 h" xml:space="preserve">
+    <value>Απόκρυψη όσων παίχτηκαν τις τελευταίες 24 ώρες</value>
+  </data>
+  <data name="Hide possible in session" xml:space="preserve">
+    <value>Απόκρυψη πιθανών στη συνεδρία</value>
+  </data>
+  <data name="Hide this group. It stays hidden on later scans." xml:space="preserve">
+    <value>Απόκρυψη αυτής της ομάδας. Παραμένει κρυμμένη και στις επόμενες σαρώσεις.</value>
+  </data>
+  <data name="Hide this group. It stays hidden." xml:space="preserve">
+    <value>Απόκρυψη αυτής της ομάδας. Παραμένει κρυμμένη.</value>
+  </data>
+  <data name="Highlighted: the file that looks best to keep ({0}). This is a suggestion from the tags and file facts, not a check of the audio." xml:space="preserve">
+    <value>Επισημασμένο: το αρχείο που φαίνεται καλύτερο για να κρατηθεί ({0}). Είναι πρόταση βάσει ετικετών και στοιχείων αρχείου, όχι έλεγχος του ήχου.</value>
+  </data>
+  <data name="Hints from the file's own properties. They are suspicions to look at, never proof, and nothing is changed because of them." xml:space="preserve">
+    <value>Ενδείξεις από τις ιδιότητες του ίδιου του αρχείου. Είναι υποψίες που αξίζει να ελέγξεις, ποτέ απόδειξη, και τίποτα δεν αλλάζει εξαιτίας τους.</value>
+  </data>
+  <data name="Hints from the file's own properties. They are suspicions, not proof." xml:space="preserve">
+    <value>Ενδείξεις από τις ιδιότητες του ίδιου του αρχείου. Είναι υποψίες, όχι απόδειξη.</value>
+  </data>
+  <data name="History" xml:space="preserve">
+    <value>Ιστορικό</value>
+  </data>
+  <data name="How far apart in BPM still counts as a match" xml:space="preserve">
+    <value>Πόσο μακριά στα BPM θεωρείται ακόμη ταίριασμα</value>
+  </data>
+  <data name="How your genres are grouped. Counts are tracks in the genre or any sub-genre." xml:space="preserve">
+    <value>Πώς ομαδοποιούνται τα είδη σου. Οι αριθμοί είναι κομμάτια στο είδος ή σε οποιοδήποτε υποείδος.</value>
+  </data>
+  <data name="I understand that this replaces my current library with the one in this backup" xml:space="preserve">
+    <value>Καταλαβαίνω ότι αυτό αντικαθιστά την τρέχουσα βιβλιοθήκη μου με αυτήν του αντιγράφου</value>
+  </data>
+  <data name="Identification lookups" xml:space="preserve">
+    <value>Αναζητήσεις αναγνώρισης</value>
+  </data>
+  <data name="Identify online" xml:space="preserve">
+    <value>Αναγνώριση μέσω διαδικτύου</value>
+  </data>
+  <data name="Identify online…" xml:space="preserve">
+    <value>Αναγνώριση στο διαδίκτυο…</value>
+  </data>
+  <data name="Identify online…  (Ctrl+I)" xml:space="preserve">
+    <value>Αναγνώριση στο διαδίκτυο…  (Ctrl+I)</value>
+  </data>
+  <data name="Identify selection online…" xml:space="preserve">
+    <value>Αναγνώριση της επιλογής στο διαδίκτυο…</value>
+  </data>
+  <data name="Identify {0} tracks online" xml:space="preserve">
+    <value>Αναγνώριση {0} κομματιών μέσω διαδικτύου</value>
+  </data>
+  <data name="If a folder is on another drive or share on this PC, choose its new location. Tracks keep their history; only their paths change." xml:space="preserve">
+    <value>Αν ένας φάκελος βρίσκεται σε άλλον δίσκο ή κοινόχρηστο φάκελο σε αυτόν τον υπολογιστή, επίλεξε τη νέα του θέση. Τα κομμάτια κρατούν το ιστορικό τους· αλλάζουν μόνο οι διαδρομές.</value>
+  </data>
+  <data name="If the chosen output is not connected the preview says so and stays silent; it never falls back to the Windows default. The volume starts at half and is remembered." xml:space="preserve">
+    <value>Αν η επιλεγμένη έξοδος δεν είναι συνδεδεμένη, η προεπισκόπηση το αναφέρει και μένει σιωπηλή· δεν γυρίζει ποτέ στην προεπιλογή των Windows. Η ένταση ξεκινά στη μέση και αποθηκεύεται.</value>
+  </data>
+  <data name="Import now" xml:space="preserve">
+    <value>Εισαγωγή τώρα</value>
+  </data>
+  <data name="Include subfolders" xml:space="preserve">
+    <value>Συμπερίληψη υποφακέλων</value>
+  </data>
+  <data name="Include the AcoustID key and MusicBrainz contact (off: the backup file holds no secrets)" xml:space="preserve">
+    <value>Συμπερίληψη του κλειδιού AcoustID και της επαφής MusicBrainz (απενεργοποιημένο: το αρχείο αντιγράφου δεν περιέχει μυστικά)</value>
+  </data>
+  <data name="Include the cover thumbnail cache (it can be rebuilt; makes the file larger)" xml:space="preserve">
+    <value>Συμπερίληψη της προσωρινής μνήμης μικρογραφιών εξώφυλλων (μπορεί να ξαναδημιουργηθεί· κάνει το αρχείο μεγαλύτερο)</value>
+  </data>
+  <data name="Include this folder in the index" xml:space="preserve">
+    <value>Να συμπεριληφθεί ο φάκελος στο ευρετήριο</value>
+  </data>
+  <data name="Indexed" xml:space="preserve">
+    <value>Στο ευρετήριο</value>
+  </data>
+  <data name="Indexed Folders" xml:space="preserve">
+    <value>Φάκελοι στο ευρετήριο</value>
+  </data>
+  <data name="Indexed by an older version; the next scan reads them again and fills in the newer facts." xml:space="preserve">
+    <value>Καταχωρήθηκαν από παλαιότερη έκδοση· η επόμενη σάρωση τα διαβάζει ξανά και συμπληρώνει τα νεότερα στοιχεία.</value>
+  </data>
+  <data name="Indexed folders" xml:space="preserve">
+    <value>Φάκελοι στο ευρετήριο</value>
+  </data>
+  <data name="Indexing" xml:space="preserve">
+    <value>Ευρετηρίαση</value>
+  </data>
+  <data name="Indexing {0} — {1:N0} of {2:N0} files" xml:space="preserve">
+    <value>Ευρετηρίαση {0} — {1:N0} από {2:N0} αρχεία</value>
+  </data>
+  <data name="Indexing {0}…" xml:space="preserve">
+    <value>Ευρετηρίαση {0}…</value>
+  </data>
+  <data name="It is on {0}; the tag is removed from them. The tracks and files are not changed." xml:space="preserve">
+    <value>Βρίσκεται σε: {0}· η ετικέτα αφαιρείται από αυτά. Τα κομμάτια και τα αρχεία δεν αλλάζουν.</value>
+  </data>
+  <data name="Keep a backup copy of each file before changing it" xml:space="preserve">
+    <value>Κράτα αντίγραφο ασφαλείας κάθε αρχείου πριν από την αλλαγή</value>
+  </data>
+  <data name="Key" xml:space="preserve">
+    <value>Κλειδί</value>
+  </data>
+  <data name="Key estimate" xml:space="preserve">
+    <value>Εκτίμηση τονικότητας</value>
+  </data>
+  <data name="Key now" xml:space="preserve">
+    <value>Τονικότητα τώρα</value>
+  </data>
+  <data name="Keys are never ticked for you: they are the least reliable part of the analysis" xml:space="preserve">
+    <value>Οι τονικότητες δεν επιλέγονται ποτέ για σένα: είναι το λιγότερο αξιόπιστο μέρος της ανάλυσης</value>
+  </data>
+  <data name="LIVE" xml:space="preserve">
+    <value>LIVE</value>
+  </data>
+  <data name="LIVE · {0}" xml:space="preserve">
+    <value>LIVE · {0}</value>
+  </data>
+  <data name="Language" xml:space="preserve">
+    <value>Γλώσσα</value>
+  </data>
+  <data name="Last Played" xml:space="preserve">
+    <value>Τελευταία αναπαραγωγή</value>
+  </data>
+  <data name="Last Scan" xml:space="preserve">
+    <value>Σάρωση</value>
+  </data>
+  <data name="Library" xml:space="preserve">
+    <value>Βιβλιοθήκη</value>
+  </data>
+  <data name="Library Health" xml:space="preserve">
+    <value>Υγεία βιβλιοθήκης</value>
+  </data>
+  <data name="Library Health could not be counted: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η καταμέτρηση της υγείας της βιβλιοθήκης: {0}</value>
+  </data>
+  <data name="Library database" xml:space="preserve">
+    <value>Βάση δεδομένων βιβλιοθήκης</value>
+  </data>
+  <data name="Link" xml:space="preserve">
+    <value>Σύνδεσμος</value>
+  </data>
+  <data name="List in Library" xml:space="preserve">
+    <value>Εμφάνιση στη Βιβλιοθήκη</value>
+  </data>
+  <data name="List tracks that fit well next to this one (by genre, BPM, key and DJ tags)" xml:space="preserve">
+    <value>Εμφάνιση κομματιών που ταιριάζουν καλά με αυτό (βάσει είδους, BPM, τονικότητας και ετικετών DJ)</value>
+  </data>
+  <data name="Listen" xml:space="preserve">
+    <value>Άκουσε</value>
+  </data>
+  <data name="Listen to the selected tracks and estimate their BPM and key (Ctrl+B)" xml:space="preserve">
+    <value>Ακούει τα επιλεγμένα κομμάτια και εκτιμά το BPM και την τονικότητά τους (Ctrl+B)</value>
+  </data>
+  <data name="Listen to the tracks (in the selected folder, or the whole library) that have no BPM or no key and estimate them. Nothing is written until you confirm." xml:space="preserve">
+    <value>Ακούει τα κομμάτια (στον επιλεγμένο φάκελο ή σε ολόκληρη τη βιβλιοθήκη) που δεν έχουν BPM ή τονικότητα και τα εκτιμά. Δεν γράφεται τίποτα μέχρι να επιβεβαιώσεις.</value>
+  </data>
+  <data name="Listen to this track and estimate its BPM and key (Ctrl+B)" xml:space="preserve">
+    <value>Ακούει αυτό το κομμάτι και εκτιμά το BPM και την τονικότητά του (Ctrl+B)</value>
+  </data>
+  <data name="Loading more results failed: {0}" xml:space="preserve">
+    <value>Η φόρτωση περισσότερων αποτελεσμάτων απέτυχε: {0}</value>
+  </data>
+  <data name="Logs" xml:space="preserve">
+    <value>Αρχεία καταγραφής</value>
+  </data>
+  <data name="Look for files with identical content. Nothing is deleted or changed." xml:space="preserve">
+    <value>Αναζήτηση αρχείων με πανομοιότυπο περιεχόμενο. Τίποτα δεν διαγράφεται ούτε αλλάζει.</value>
+  </data>
+  <data name="Look for outputs again, for example after plugging in headphones." xml:space="preserve">
+    <value>Αναζήτηση εξόδων ξανά, για παράδειγμα αφού συνδέσεις ακουστικά.</value>
+  </data>
+  <data name="Look the selected tracks up on MusicBrainz (Ctrl+I)" xml:space="preserve">
+    <value>Αναζήτηση των επιλεγμένων κομματιών στο MusicBrainz (Ctrl+I)</value>
+  </data>
+  <data name="Look this track up on MusicBrainz and fill in missing tags (Ctrl+I)" xml:space="preserve">
+    <value>Αναζήτηση αυτού του κομματιού στο MusicBrainz και συμπλήρωση των ετικετών που λείπουν (Ctrl+I)</value>
+  </data>
+  <data name="Look tracks up on MusicBrainz (and AcoustID) to fill in missing tags" xml:space="preserve">
+    <value>Αναζήτηση κομματιών στο MusicBrainz (και στο AcoustID) για συμπλήρωση ετικετών που λείπουν</value>
+  </data>
+  <data name="Look up by" xml:space="preserve">
+    <value>Αναζήτηση με</value>
+  </data>
+  <data name="Looking for files that could be identical…" xml:space="preserve">
+    <value>Αναζήτηση αρχείων που μπορεί να είναι πανομοιότυπα…</value>
+  </data>
+  <data name="Looking for the cover…" xml:space="preserve">
+    <value>Αναζήτηση εξωφύλλου…</value>
+  </data>
+  <data name="Looking up…" xml:space="preserve">
+    <value>Αναζήτηση…</value>
+  </data>
+  <data name="Looking…" xml:space="preserve">
+    <value>Αναζήτηση…</value>
+  </data>
+  <data name="Looks up the MusicBrainz id already stored in the file." xml:space="preserve">
+    <value>Αναζητά το αναγνωριστικό MusicBrainz που είναι ήδη αποθηκευμένο στο αρχείο.</value>
+  </data>
+  <data name="Lossy files below 128 kbps. Bitrate alone says nothing about where a recording came from." xml:space="preserve">
+    <value>Αρχεία με απώλειες κάτω από 128 kbps. Το bitrate από μόνο του δεν λέει από πού προέρχεται μια ηχογράφηση.</value>
+  </data>
+  <data name="Low bitrate" xml:space="preserve">
+    <value>Χαμηλό bitrate</value>
+  </data>
+  <data name="Made {0} by MusicFinder {1}" xml:space="preserve">
+    <value>Δημιουργήθηκε {0} από το MusicFinder {1}</value>
+  </data>
+  <data name="Make everything bigger" xml:space="preserve">
+    <value>Μεγέθυνση όλων</value>
+  </data>
+  <data name="Makes one lookup at AcoustID with a song you choose. You see exactly what is sent before it happens." xml:space="preserve">
+    <value>Κάνει μία αναζήτηση στο AcoustID με ένα τραγούδι που επιλέγεις. Βλέπεις ακριβώς τι αποστέλλεται πριν γίνει.</value>
+  </data>
+  <data name="Making a safety backup of your current library and preparing the restore…" xml:space="preserve">
+    <value>Δημιουργία αντιγράφου ασφαλείας της τρέχουσας βιβλιοθήκης και προετοιμασία της επαναφοράς…</value>
+  </data>
+  <data name="Making the backup…" xml:space="preserve">
+    <value>Δημιουργία αντιγράφου ασφαλείας…</value>
+  </data>
+  <data name="Map to the selected genre" xml:space="preserve">
+    <value>Αντιστοίχιση στο επιλεγμένο είδος</value>
+  </data>
+  <data name="Mark as not played" xml:space="preserve">
+    <value>Σήμανση ως μη παιγμένο</value>
+  </data>
+  <data name="Mark as played" xml:space="preserve">
+    <value>Σήμανση ως παιγμένο</value>
+  </data>
+  <data name="Mark this one as not played" xml:space="preserve">
+    <value>Σήμανση ως μη παιγμένο</value>
+  </data>
+  <data name="Mark this one as played (confirmed by you)" xml:space="preserve">
+    <value>Σήμανση ως παιγμένο (επιβεβαιωμένο από εσένα)</value>
+  </data>
+  <data name="Marked as played in the current session (by you or by your DJ software's history)." xml:space="preserve">
+    <value>Σημειώθηκε ως παιγμένο στην τρέχουσα συνεδρία (από εσένα ή από το ιστορικό του προγράμματος DJ σου).</value>
+  </data>
+  <data name="Match" xml:space="preserve">
+    <value>Ταίριασμα</value>
+  </data>
+  <data name="Metadata from MusicBrainz. Audio identification by the AcoustID web service." xml:space="preserve">
+    <value>Μεταδεδομένα από το MusicBrainz. Αναγνώριση ήχου από την υπηρεσία AcoustID.</value>
+  </data>
+  <data name="Move" xml:space="preserve">
+    <value>Μετακίνηση</value>
+  </data>
+  <data name="Move 1 file" xml:space="preserve">
+    <value>Μετακίνηση 1 αρχείου</value>
+  </data>
+  <data name="Move files into folders" xml:space="preserve">
+    <value>Μετακίνηση αρχείων σε φακέλους</value>
+  </data>
+  <data name="Move into folders below the library folder (use / in the name)" xml:space="preserve">
+    <value>Μετακίνηση σε φακέλους κάτω από τον φάκελο της βιβλιοθήκης (χρησιμοποίησε / στο όνομα)</value>
+  </data>
+  <data name="Move under" xml:space="preserve">
+    <value>Μετακίνηση κάτω από</value>
+  </data>
+  <data name="Move {0:N0} files" xml:space="preserve">
+    <value>Μετακίνηση {0:N0} αρχείων</value>
+  </data>
+  <data name="Moved '{0}' to the top level." xml:space="preserve">
+    <value>Το «{0}» μετακινήθηκε στο ανώτατο επίπεδο.</value>
+  </data>
+  <data name="Moved '{0}' under {1}." xml:space="preserve">
+    <value>Το «{0}» μετακινήθηκε κάτω από το {1}.</value>
+  </data>
+  <data name="Moved 1 file" xml:space="preserve">
+    <value>Μετακινήθηκε 1 αρχείο</value>
+  </data>
+  <data name="Moved {0:N0} files" xml:space="preserve">
+    <value>Μετακινήθηκαν {0:N0} αρχεία</value>
+  </data>
+  <data name="MusicBrainz asks every program to say who is calling. Add a contact address in Settings → Online identification." xml:space="preserve">
+    <value>Το MusicBrainz ζητά από κάθε πρόγραμμα να δηλώνει ποιο το καλεί. Πρόσθεσε μια διεύθυνση επικοινωνίας στις Ρυθμίσεις → Αναγνώριση μέσω διαδικτύου.</value>
+  </data>
+  <data name="MusicBrainz has no details for that release." xml:space="preserve">
+    <value>Το MusicBrainz δεν έχει στοιχεία για αυτή την κυκλοφορία.</value>
+  </data>
+  <data name="MusicBrainz id" xml:space="preserve">
+    <value>Αναγνωριστικό MusicBrainz</value>
+  </data>
+  <data name="MusicBrainz receives the MusicBrainz ids already in your files, or the title, artist and album text of your tags when you search by tags, and a User-Agent header with the contact address below, as its rules require." xml:space="preserve">
+    <value>Το MusicBrainz λαμβάνει τα αναγνωριστικά MusicBrainz που υπάρχουν ήδη στα αρχεία σου, ή το κείμενο του τίτλου, του καλλιτέχνη και του άλμπουμ των ετικετών σου όταν αναζητάς με ετικέτες, και μια κεφαλίδα User-Agent με τη διεύθυνση επικοινωνίας παρακάτω, όπως απαιτούν οι κανόνες του.</value>
+  </data>
+  <data name="MusicBrainz, the music database used to fill in titles and albums, requires programs to say who is asking. Your address is only used in that request." xml:space="preserve">
+    <value>Το MusicBrainz, η βάση δεδομένων μουσικής που χρησιμοποιείται για τη συμπλήρωση τίτλων και άλμπουμ, απαιτεί από τα προγράμματα να δηλώνουν ποιος ρωτά. Η διεύθυνσή σου χρησιμοποιείται μόνο σε αυτό το αίτημα.</value>
+  </data>
+  <data name="MusicFinder can listen to your tracks and estimate their tempo and key, all on this computer. The results are estimates and are shown apart from your tags; nothing is written until you press Write. Tracks whose tempo drifts (live or folk recordings) and music that is not in a Western key give weak or wrong answers, and the window says so." xml:space="preserve">
+    <value>Το MusicFinder μπορεί να ακούσει τα κομμάτια σου και να εκτιμήσει το τέμπο και την τονικότητά τους, όλα σε αυτόν τον υπολογιστή. Τα αποτελέσματα είναι εκτιμήσεις και εμφανίζονται χωριστά από τις ετικέτες σου· τίποτα δεν εγγράφεται μέχρι να πατήσεις Εγγραφή. Κομμάτια με τέμπο που αλλάζει (ζωντανές ή λαϊκές ηχογραφήσεις) και μουσική που δεν είναι σε δυτική τονικότητα δίνουν αδύναμες ή λανθασμένες απαντήσεις, και το παράθυρο το αναφέρει.</value>
+  </data>
+  <data name="MusicFinder can look tracks up online to fill in missing tags. It is off until you agree, and your library and search never depend on it." xml:space="preserve">
+    <value>Το MusicFinder μπορεί να αναζητά κομμάτια στο διαδίκτυο για να συμπληρώνει ετικέτες που λείπουν. Είναι απενεργοποιημένο μέχρι να συμφωνήσεις, και η βιβλιοθήκη και η αναζήτησή σου δεν εξαρτώνται ποτέ από αυτό.</value>
+  </data>
+  <data name="MusicFinder could not start:&#xA;&#xA;{0}&#xA;&#xA;Logs: {1}" xml:space="preserve">
+    <value>Το MusicFinder δεν μπόρεσε να ξεκινήσει:
+
+{0}
+
+Αρχεία καταγραφής: {1}</value>
+  </data>
+  <data name="MusicFinder is still indexing your library. Please wait until it finishes, then try again." xml:space="preserve">
+    <value>Το MusicFinder ευρετηριάζει ακόμη τη βιβλιοθήκη σου. Περίμενε να ολοκληρωθεί και δοκίμασε ξανά.</value>
+  </data>
+  <data name="MusicFinder listens to the audio and estimates the tempo and the key. These are estimates, not facts: check the ones you care about, and use ½ or ×2 when the tempo is off by an octave. Confident tempos are ticked for you; keys never are (they are the least reliable part). What is ticked is exactly what Write puts in the files." xml:space="preserve">
+    <value>Το MusicFinder ακούει τον ήχο και εκτιμά το τέμπο και την τονικότητα. Είναι εκτιμήσεις, όχι γεγονότα: έλεγξε όσες σε ενδιαφέρουν και χρησιμοποίησε ½ ή ×2 όταν το τέμπο απέχει μία οκτάβα. Τα τέμπο με υψηλή βεβαιότητα επιλέγονται για σένα· οι τονικότητες ποτέ (είναι το λιγότερο αξιόπιστο μέρος). Ό,τι είναι επιλεγμένο είναι ακριβώς αυτό που γράφει η εγγραφή στα αρχεία.</value>
+  </data>
+  <data name="MusicFinder only reads your music files. Removing a folder here stops indexing it; the files are never touched." xml:space="preserve">
+    <value>Το MusicFinder μόνο διαβάζει τα αρχεία μουσικής σου. Αν αφαιρέσεις έναν φάκελο από εδώ, παύει να καταχωρίζεται στο ευρετήριο· τα αρχεία δεν πειράζονται ποτέ.</value>
+  </data>
+  <data name="MusicFinder quick search" xml:space="preserve">
+    <value>Γρήγορη αναζήτηση MusicFinder</value>
+  </data>
+  <data name="MusicFinder will make one lookup at api.acoustid.org." xml:space="preserve">
+    <value>Το MusicFinder θα κάνει μία αναζήτηση στο api.acoustid.org.</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Όνομα</value>
+  </data>
+  <data name="Name as tagged" xml:space="preserve">
+    <value>Όνομα όπως στην ετικέτα</value>
+  </data>
+  <data name="Needs an AcoustID key (Settings)." xml:space="preserve">
+    <value>Απαιτείται κλειδί AcoustID (Ρυθμίσεις).</value>
+  </data>
+  <data name="Needs fpcalc.exe (Settings shows where to get it)." xml:space="preserve">
+    <value>Απαιτείται το fpcalc.exe (οι Ρυθμίσεις δείχνουν πού να το βρεις).</value>
+  </data>
+  <data name="Needs your decision:" xml:space="preserve">
+    <value>Χρειάζεται την απόφασή σου:</value>
+  </data>
+  <data name="Never played" xml:space="preserve">
+    <value>Δεν έχει παιχτεί</value>
+  </data>
+  <data name="New alias…" xml:space="preserve">
+    <value>Νέο ψευδώνυμο…</value>
+  </data>
+  <data name="New file name" xml:space="preserve">
+    <value>Νέο όνομα αρχείου</value>
+  </data>
+  <data name="New sub-genre…" xml:space="preserve">
+    <value>Νέο υποείδος…</value>
+  </data>
+  <data name="New tag…" xml:space="preserve">
+    <value>Νέα ετικέτα…</value>
+  </data>
+  <data name="New top-level genre…" xml:space="preserve">
+    <value>Νέο είδος ανώτατου επιπέδου…</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Επόμενο</value>
+  </data>
+  <data name="No BPM" xml:space="preserve">
+    <value>Χωρίς BPM</value>
+  </data>
+  <data name="No album" xml:space="preserve">
+    <value>Χωρίς άλμπουμ</value>
+  </data>
+  <data name="No artist" xml:space="preserve">
+    <value>Χωρίς καλλιτέχνη</value>
+  </data>
+  <data name="No audio outputs were found." xml:space="preserve">
+    <value>Δεν βρέθηκαν έξοδοι ήχου.</value>
+  </data>
+  <data name="No cover is on file for this release." xml:space="preserve">
+    <value>Δεν υπάρχει εξώφυλλο για αυτή την κυκλοφορία.</value>
+  </data>
+  <data name="No duration" xml:space="preserve">
+    <value>Χωρίς διάρκεια</value>
+  </data>
+  <data name="No embedded cover" xml:space="preserve">
+    <value>Χωρίς ενσωματωμένο εξώφυλλο</value>
+  </data>
+  <data name="No estimate" xml:space="preserve">
+    <value>Καμία εκτίμηση</value>
+  </data>
+  <data name="No estimates are remembered." xml:space="preserve">
+    <value>Δεν έχουν αποθηκευτεί εκτιμήσεις.</value>
+  </data>
+  <data name="No folder found" xml:space="preserve">
+    <value>Δεν βρέθηκε φάκελος</value>
+  </data>
+  <data name="No folders yet. Add the folders that contain your music." xml:space="preserve">
+    <value>Δεν υπάρχουν φάκελοι ακόμη. Πρόσθεσε τους φακέλους που περιέχουν τη μουσική σου.</value>
+  </data>
+  <data name="No genre" xml:space="preserve">
+    <value>Χωρίς είδος</value>
+  </data>
+  <data name="No key" xml:space="preserve">
+    <value>Χωρίς τονικότητα</value>
+  </data>
+  <data name="No length could be read from the file." xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανάγνωση διάρκειας από το αρχείο.</value>
+  </data>
+  <data name="No live session" xml:space="preserve">
+    <value>Καμία ενεργή συνεδρία</value>
+  </data>
+  <data name="No match" xml:space="preserve">
+    <value>Καμία αντιστοίχιση</value>
+  </data>
+  <data name="No matches" xml:space="preserve">
+    <value>Κανένα αποτέλεσμα</value>
+  </data>
+  <data name="No release (title, artist and id only)" xml:space="preserve">
+    <value>Χωρίς κυκλοφορία (μόνο τίτλος, καλλιτέχνης και αναγνωριστικό)</value>
+  </data>
+  <data name="No results." xml:space="preserve">
+    <value>Κανένα αποτέλεσμα.</value>
+  </data>
+  <data name="No session" xml:space="preserve">
+    <value>Καμία συνεδρία</value>
+  </data>
+  <data name="No title" xml:space="preserve">
+    <value>Χωρίς τίτλο</value>
+  </data>
+  <data name="No tracks to show" xml:space="preserve">
+    <value>Δεν υπάρχουν κομμάτια για εμφάνιση</value>
+  </data>
+  <data name="No year" xml:space="preserve">
+    <value>Χωρίς έτος</value>
+  </data>
+  <data name="Not a duplicate" xml:space="preserve">
+    <value>Δεν είναι διπλότυπο</value>
+  </data>
+  <data name="Not analysed" xml:space="preserve">
+    <value>Δεν αναλύθηκε</value>
+  </data>
+  <data name="Not checked yet" xml:space="preserve">
+    <value>Δεν έχουν ελεγχθεί ακόμη</value>
+  </data>
+  <data name="Not found on this PC" xml:space="preserve">
+    <value>Δεν βρέθηκε σε αυτόν τον υπολογιστή</value>
+  </data>
+  <data name="Not found yet." xml:space="preserve">
+    <value>Δεν βρέθηκε ακόμη.</value>
+  </data>
+  <data name="Not looked up" xml:space="preserve">
+    <value>Δεν αναζητήθηκε</value>
+  </data>
+  <data name="Not now" xml:space="preserve">
+    <value>Όχι τώρα</value>
+  </data>
+  <data name="Not played" xml:space="preserve">
+    <value>Δεν παίχτηκε</value>
+  </data>
+  <data name="Not sent: the file, its name or folder, or anything else about you." xml:space="preserve">
+    <value>Δεν αποστέλλονται: το αρχείο, το όνομα ή ο φάκελός του, ή οτιδήποτε άλλο για σένα.</value>
+  </data>
+  <data name="Not specified" xml:space="preserve">
+    <value>Δεν ορίζεται</value>
+  </data>
+  <data name="Note name, like Am" xml:space="preserve">
+    <value>Όνομα νότας, όπως Am</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Σημειώσεις</value>
+  </data>
+  <data name="Nothing dragged out yet" xml:space="preserve">
+    <value>Δεν έχει συρθεί τίποτα ακόμη</value>
+  </data>
+  <data name="Nothing else is sent: no file names, no folder paths, no play history, no statistics. Answers are remembered on this computer so the same question is not asked twice." xml:space="preserve">
+    <value>Τίποτα άλλο δεν αποστέλλεται: ούτε ονόματα αρχείων, ούτε διαδρομές φακέλων, ούτε ιστορικό αναπαραγωγών, ούτε στατιστικά. Οι απαντήσεις αποθηκεύονται σε αυτόν τον υπολογιστή ώστε η ίδια ερώτηση να μη γίνεται δύο φορές.</value>
+  </data>
+  <data name="Nothing found. Probable duplicates need the same artist and title tags, so tracks without them are not compared." xml:space="preserve">
+    <value>Δεν βρέθηκε τίποτα. Τα πιθανά διπλότυπα απαιτούν ίδιες ετικέτες καλλιτέχνη και τίτλου, οπότε κομμάτια χωρίς αυτές δεν συγκρίνονται.</value>
+  </data>
+  <data name="Nothing is remembered." xml:space="preserve">
+    <value>Δεν έχει αποθηκευτεί τίποτα.</value>
+  </data>
+  <data name="Nothing is ticked to write." xml:space="preserve">
+    <value>Δεν έχει επιλεγεί τίποτα για εγγραφή.</value>
+  </data>
+  <data name="Nothing new to check." xml:space="preserve">
+    <value>Τίποτα νέο προς έλεγχο.</value>
+  </data>
+  <data name="Nothing searchable in this text." xml:space="preserve">
+    <value>Δεν υπάρχει τίποτα προς αναζήτηση σε αυτό το κείμενο.</value>
+  </data>
+  <data name="Nothing to change yet. Type a new value into a field first." xml:space="preserve">
+    <value>Δεν υπάρχει ακόμη τίποτα προς αλλαγή. Πληκτρολόγησε πρώτα μια νέα τιμή σε ένα πεδίο.</value>
+  </data>
+  <data name="Nothing to filter yet" xml:space="preserve">
+    <value>Δεν υπάρχει τίποτα για φιλτράρισμα ακόμη</value>
+  </data>
+  <data name="Now" xml:space="preserve">
+    <value>Τώρα</value>
+  </data>
+  <data name="Off. The quick search does not open from other programs." xml:space="preserve">
+    <value>Ανενεργή. Η γρήγορη αναζήτηση δεν ανοίγει από άλλα προγράμματα.</value>
+  </data>
+  <data name="Off: values already in your files are kept" xml:space="preserve">
+    <value>Ανενεργό: οι τιμές που υπάρχουν ήδη στα αρχεία σου διατηρούνται</value>
+  </data>
+  <data name="Offer MusicBrainz community genres" xml:space="preserve">
+    <value>Πρόταση ειδών από την κοινότητα του MusicBrainz</value>
+  </data>
+  <data name="Offer the release's front cover from the Cover Art Archive (only embedded if you tick it)" xml:space="preserve">
+    <value>Πρόταση του μπροστινού εξώφυλλου της κυκλοφορίας από το Cover Art Archive (ενσωματώνεται μόνο αν το επιλέξεις)</value>
+  </data>
+  <data name="Offline" xml:space="preserve">
+    <value>Εκτός σύνδεσης</value>
+  </data>
+  <data name="Offline · local library" xml:space="preserve">
+    <value>Εκτός σύνδεσης · τοπική βιβλιοθήκη</value>
+  </data>
+  <data name="Online identification" xml:space="preserve">
+    <value>Διαδικτυακή αναγνώριση</value>
+  </data>
+  <data name="Online identification is off. Nothing is sent anywhere." xml:space="preserve">
+    <value>Η διαδικτυακή αναγνώριση είναι απενεργοποιημένη. Τίποτα δεν αποστέλλεται πουθενά.</value>
+  </data>
+  <data name="Online identification is off. Turn it on in Settings → Online identification; you will see exactly what is sent first." xml:space="preserve">
+    <value>Η αναγνώριση μέσω διαδικτύου είναι απενεργοποιημένη. Ενεργοποίησέ την στις Ρυθμίσεις → Αναγνώριση μέσω διαδικτύου· θα δεις πρώτα ακριβώς τι αποστέλλεται.</value>
+  </data>
+  <data name="Only covers embedded in the file are counted; a cover.jpg beside the file is not." xml:space="preserve">
+    <value>Μετρούνται μόνο τα εξώφυλλα που είναι ενσωματωμένα στο αρχείο· ένα cover.jpg δίπλα στο αρχείο δεν μετράει.</value>
+  </data>
+  <data name="Only fill a file that has no genre" xml:space="preserve">
+    <value>Συμπλήρωση μόνο αρχείου που δεν έχει είδος</value>
+  </data>
+  <data name="Only the fields you change are written. Fields where the tracks differ are left alone unless you type a new value." xml:space="preserve">
+    <value>Εγγράφονται μόνο τα πεδία που αλλάζεις. Τα πεδία στα οποία τα κομμάτια διαφέρουν μένουν ως έχουν, εκτός αν πληκτρολογήσεις νέα τιμή.</value>
+  </data>
+  <data name="Only the first {0} files were dragged." xml:space="preserve">
+    <value>Σύρθηκαν μόνο τα πρώτα {0} αρχεία.</value>
+  </data>
+  <data name="Open Backups folder" xml:space="preserve">
+    <value>Άνοιγμα φακέλου αντιγράφων</value>
+  </data>
+  <data name="Open Key, like 1m" xml:space="preserve">
+    <value>Open Key, όπως 1m</value>
+  </data>
+  <data name="Open a small search window over any program with a keyboard shortcut" xml:space="preserve">
+    <value>Άνοιγμα μικρού παραθύρου αναζήτησης πάνω από οποιοδήποτε πρόγραμμα με συντόμευση πληκτρολογίου</value>
+  </data>
+  <data name="Open backup folder" xml:space="preserve">
+    <value>Άνοιγμα φακέλου αντιγράφων ασφαλείας</value>
+  </data>
+  <data name="Open in Explorer" xml:space="preserve">
+    <value>Άνοιγμα στην Εξερεύνηση</value>
+  </data>
+  <data name="Open in Explorer  (Ctrl+O)" xml:space="preserve">
+    <value>Άνοιγμα στην Εξερεύνηση  (Ctrl+O)</value>
+  </data>
+  <data name="Open the AcoustID page" xml:space="preserve">
+    <value>Άνοιγμα της σελίδας του AcoustID</value>
+  </data>
+  <data name="Open the download page" xml:space="preserve">
+    <value>Άνοιγμα της σελίδας λήψης</value>
+  </data>
+  <data name="Open the download page, download the Windows version of fpcalc (a zip), then drop that zip onto this window, or use Choose a file. MusicFinder keeps its own copy and does not change your download." xml:space="preserve">
+    <value>Άνοιξε τη σελίδα λήψης, κατέβασε την έκδοση του fpcalc για Windows (ένα zip) και μετά σύρε αυτό το zip πάνω σε αυτό το παράθυρο, ή χρησιμοποίησε το «Επιλογή αρχείου…». Το MusicFinder κρατά δικό του αντίγραφο και δεν αλλάζει αυτό που κατέβασες.</value>
+  </data>
+  <data name="Open web page" xml:space="preserve">
+    <value>Άνοιγμα ιστοσελίδας</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Άλλο</value>
+  </data>
+  <data name="Other spellings in your files that mean this genre, like Nu-Disco or λαϊκά." xml:space="preserve">
+    <value>Άλλες γραφές στα αρχεία σου που σημαίνουν αυτό το είδος, όπως Nu-Disco ή λαϊκά.</value>
+  </data>
+  <data name="Output used by the preview (change it in Settings)" xml:space="preserve">
+    <value>Έξοδος που χρησιμοποιεί η προεπισκόπηση (άλλαξέ την στις Ρυθμίσεις)</value>
+  </data>
+  <data name="Parallel disk readers" xml:space="preserve">
+    <value>Παράλληλες αναγνώσεις δίσκου</value>
+  </data>
+  <data name="Path list" xml:space="preserve">
+    <value>Λίστα διαδρομών</value>
+  </data>
+  <data name="Pause" xml:space="preserve">
+    <value>Παύση</value>
+  </data>
+  <data name="Pending" xml:space="preserve">
+    <value>Σε αναμονή</value>
+  </data>
+  <data name="Pick a finding to list those tracks in the Library. From there you can edit tags (F2), identify (Ctrl+I), analyze BPM and key (Ctrl+B) or open the file in Explorer. Nothing here changes a file." xml:space="preserve">
+    <value>Διάλεξε ένα εύρημα για να εμφανιστούν αυτά τα κομμάτια στη Βιβλιοθήκη. Από εκεί μπορείς να επεξεργαστείς ετικέτες (F2), να κάνεις αναγνώριση (Ctrl+I), να αναλύσεις BPM και τονικότητα (Ctrl+B) ή να ανοίξεις το αρχείο στην Εξερεύνηση. Τίποτα εδώ δεν αλλάζει κάποιο αρχείο.</value>
+  </data>
+  <data name="Play" xml:space="preserve">
+    <value>Αναπαραγωγή</value>
+  </data>
+  <data name="Play History" xml:space="preserve">
+    <value>Ιστορικό αναπαραγωγών</value>
+  </data>
+  <data name="Play history and importers arrive in milestones M3–M4." xml:space="preserve">
+    <value>Το ιστορικό αναπαραγωγών και οι εισαγωγείς έρχονται στα ορόσημα M3–M4.</value>
+  </data>
+  <data name="Play history entries" xml:space="preserve">
+    <value>Εγγραφές ιστορικού αναπαραγωγής</value>
+  </data>
+  <data name="Play or pause the preview" xml:space="preserve">
+    <value>Αναπαραγωγή ή παύση της προεπισκόπησης</value>
+  </data>
+  <data name="Play preview  (double-click)" xml:space="preserve">
+    <value>Αναπαραγωγή προεπισκόπησης  (διπλό κλικ)</value>
+  </data>
+  <data name="Played" xml:space="preserve">
+    <value>Παίχτηκε</value>
+  </data>
+  <data name="Played in this session" xml:space="preserve">
+    <value>Παίχτηκε σε αυτή τη συνεδρία</value>
+  </data>
+  <data name="Played this session" xml:space="preserve">
+    <value>Παίχτηκε σε αυτή τη συνεδρία</value>
+  </data>
+  <data name="Plays" xml:space="preserve">
+    <value>Φορές</value>
+  </data>
+  <data name="Please enter a contact address (an e-mail or web address) that MusicBrainz can reach you at. Its rules require one." xml:space="preserve">
+    <value>Γράψε μια διεύθυνση επικοινωνίας (e-mail ή διεύθυνση ιστού) στην οποία μπορεί να σε βρει το MusicBrainz. Οι κανόνες του απαιτούν μία.</value>
+  </data>
+  <data name="Possible" xml:space="preserve">
+    <value>Πιθανό</value>
+  </data>
+  <data name="Possibly played" xml:space="preserve">
+    <value>Πιθανώς παίχτηκε</value>
+  </data>
+  <data name="Preparing Greek search… {0:N0} left" xml:space="preserve">
+    <value>Προετοιμασία ελληνικής αναζήτησης… απομένουν {0:N0}</value>
+  </data>
+  <data name="Press Scan to look for files with identical content. Files are compared by their bytes, not by name or tags." xml:space="preserve">
+    <value>Πάτησε Σάρωση για να αναζητηθούν αρχεία με πανομοιότυπο περιεχόμενο. Τα αρχεία συγκρίνονται με βάση τα byte τους, όχι το όνομα ή τις ετικέτες.</value>
+  </data>
+  <data name="Press the + button in the Folders panel (top left) and pick a folder. MusicFinder reads your files in the background and you can search while it works. Your music is never changed unless you confirm, with a preview, an edit or a rename." xml:space="preserve">
+    <value>Πάτησε το κουμπί + στον πίνακα Φακέλων (πάνω αριστερά) και διάλεξε έναν φάκελο. Το MusicFinder διαβάζει τα αρχεία σου στο παρασκήνιο και μπορείς να αναζητάς όσο δουλεύει. Η μουσική σου δεν αλλάζει ποτέ αν δεν το επιβεβαιώσεις, με προεπισκόπηση, επεξεργασία ή μετονομασία.</value>
+  </data>
+  <data name="Preview changes" xml:space="preserve">
+    <value>Προεπισκόπηση αλλαγών</value>
+  </data>
+  <data name="Preview output" xml:space="preserve">
+    <value>Έξοδος προεπισκόπησης</value>
+  </data>
+  <data name="Preview player" xml:space="preserve">
+    <value>Αναπαραγωγή προεπισκόπησης</value>
+  </data>
+  <data name="Preview volume" xml:space="preserve">
+    <value>Ένταση προεπισκόπησης</value>
+  </data>
+  <data name="Probable duplicates and other versions" xml:space="preserve">
+    <value>Πιθανά διπλότυπα και άλλες εκδοχές</value>
+  </data>
+  <data name="Probably the same recording" xml:space="preserve">
+    <value>Πιθανότατα η ίδια ηχογράφηση</value>
+  </data>
+  <data name="Problem" xml:space="preserve">
+    <value>Πρόβλημα</value>
+  </data>
+  <data name="Proposed" xml:space="preserve">
+    <value>Προτεινόμενο</value>
+  </data>
+  <data name="Quality" xml:space="preserve">
+    <value>Ποιότητα</value>
+  </data>
+  <data name="Quick search" xml:space="preserve">
+    <value>Γρήγορη αναζήτηση</value>
+  </data>
+  <data name="Quick search is not available: {0}" xml:space="preserve">
+    <value>Η γρήγορη αναζήτηση δεν είναι διαθέσιμη: {0}</value>
+  </data>
+  <data name="Quiet period after a drag" xml:space="preserve">
+    <value>Περίοδος αναμονής μετά από σύρσιμο</value>
+  </data>
+  <data name="Read the history automatically (at start, with a session, and every minute during one)" xml:space="preserve">
+    <value>Αυτόματη ανάγνωση του ιστορικού (κατά την εκκίνηση, με μια συνεδρία και κάθε λεπτό κατά τη διάρκειά της)</value>
+  </data>
+  <data name="Read while you play" xml:space="preserve">
+    <value>Ανάγνωση κατά την αναπαραγωγή</value>
+  </data>
+  <data name="Ready for searching by tags. Audio fingerprints need an AcoustID key and fpcalc.exe." xml:space="preserve">
+    <value>Έτοιμο για αναζήτηση με ετικέτες. Τα ηχητικά αποτυπώματα χρειάζονται κλειδί AcoustID και το fpcalc.exe.</value>
+  </data>
+  <data name="Ready for searching by tags. Audio fingerprints need fpcalc.exe." xml:space="preserve">
+    <value>Έτοιμο για αναζήτηση με ετικέτες. Τα ηχητικά αποτυπώματα χρειάζονται το fpcalc.exe.</value>
+  </data>
+  <data name="Ready. Your current library was saved to {0}. Restart MusicFinder to finish the restore ({1:N0} track paths will point to the new folders)." xml:space="preserve">
+    <value>Έτοιμο. Η τρέχουσα βιβλιοθήκη σου αποθηκεύτηκε στο {0}. Επανεκκίνησε το MusicFinder για να ολοκληρωθεί η επαναφορά ({1:N0} διαδρομές κομματιών θα δείχνουν στους νέους φακέλους).</value>
+  </data>
+  <data name="Ready. Your current library was saved to {0}. Restart MusicFinder to finish the restore." xml:space="preserve">
+    <value>Έτοιμο. Η τρέχουσα βιβλιοθήκη σου αποθηκεύτηκε στο {0}. Επανεκκίνησε το MusicFinder για να ολοκληρωθεί η επαναφορά.</value>
+  </data>
+  <data name="Ready: audio fingerprints and searching by tags." xml:space="preserve">
+    <value>Έτοιμο: ηχητικά αποτυπώματα και αναζήτηση με ετικέτες.</value>
+  </data>
+  <data name="Refresh" xml:space="preserve">
+    <value>Ανανέωση</value>
+  </data>
+  <data name="Release" xml:space="preserve">
+    <value>Κυκλοφορία</value>
+  </data>
+  <data name="Remove this alias" xml:space="preserve">
+    <value>Αφαίρεση αυτού του ψευδωνύμου</value>
+  </data>
+  <data name="Removed the alias '{0}'." xml:space="preserve">
+    <value>Αφαιρέθηκε το ψευδώνυμο «{0}».</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Μετονομασία</value>
+  </data>
+  <data name="Rename 1 file" xml:space="preserve">
+    <value>Μετονομασία 1 αρχείου</value>
+  </data>
+  <data name="Rename and move records" xml:space="preserve">
+    <value>Εγγραφές μετονομασίας και μετακίνησης</value>
+  </data>
+  <data name="Rename files" xml:space="preserve">
+    <value>Μετονομασία αρχείων</value>
+  </data>
+  <data name="Rename files…  (F6)" xml:space="preserve">
+    <value>Μετονομασία αρχείων…  (F6)</value>
+  </data>
+  <data name="Rename lyrics (.lrc) and cue sheets (.cue) with the track" xml:space="preserve">
+    <value>Μετονομασία στίχων (.lrc) και αρχείων cue (.cue) μαζί με το κομμάτι</value>
+  </data>
+  <data name="Rename {0:N0} files" xml:space="preserve">
+    <value>Μετονομασία {0:N0} αρχείων</value>
+  </data>
+  <data name="Renamed 1 file" xml:space="preserve">
+    <value>Μετονομάστηκε 1 αρχείο</value>
+  </data>
+  <data name="Renamed to '{0}'." xml:space="preserve">
+    <value>Μετονομάστηκε σε «{0}».</value>
+  </data>
+  <data name="Renamed to '{0}'. Files tagged with the old name still map to it." xml:space="preserve">
+    <value>Μετονομάστηκε σε «{0}». Τα αρχεία με το παλιό όνομα εξακολουθούν να αντιστοιχούν σε αυτό.</value>
+  </data>
+  <data name="Renamed {0:N0} files" xml:space="preserve">
+    <value>Μετονομάστηκαν {0:N0} αρχεία</value>
+  </data>
+  <data name="Renaming…" xml:space="preserve">
+    <value>Μετονομασία…</value>
+  </data>
+  <data name="Replace a BPM or key the file already has" xml:space="preserve">
+    <value>Αντικατάσταση BPM ή τονικότητας που έχει ήδη το αρχείο</value>
+  </data>
+  <data name="Replace the cover the file has" xml:space="preserve">
+    <value>Αντικατάσταση του εξωφύλλου που έχει το αρχείο</value>
+  </data>
+  <data name="Replace the file's genres (ticked)" xml:space="preserve">
+    <value>Αντικατάσταση των ειδών του αρχείου (επιλεγμένο)</value>
+  </data>
+  <data name="Rescan" xml:space="preserve">
+    <value>Νέα σάρωση</value>
+  </data>
+  <data name="Rescan all" xml:space="preserve">
+    <value>Νέα σάρωση όλων</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Επαναφορά</value>
+  </data>
+  <data name="Restart now" xml:space="preserve">
+    <value>Επανεκκίνηση τώρα</value>
+  </data>
+  <data name="Restore" xml:space="preserve">
+    <value>Επαναφορά</value>
+  </data>
+  <data name="Restore a backup" xml:space="preserve">
+    <value>Επαναφορά αντιγράφου ασφαλείας</value>
+  </data>
+  <data name="Restored 1 file" xml:space="preserve">
+    <value>Επαναφέρθηκε 1 αρχείο</value>
+  </data>
+  <data name="Restored {0:N0} files" xml:space="preserve">
+    <value>Επαναφέρθηκαν {0:N0} αρχεία</value>
+  </data>
+  <data name="Restore…" xml:space="preserve">
+    <value>Επαναφορά…</value>
+  </data>
+  <data name="Review…" xml:space="preserve">
+    <value>Έλεγχος…</value>
+  </data>
+  <data name="Right-click a track and choose Find similar. MusicFinder lists tracks whose genre, tempo and key mix well with it and says why each one matched. It compares tags, not how the music sounds, so tracks without BPM or key cannot be compared." xml:space="preserve">
+    <value>Κάνε δεξί κλικ σε ένα κομμάτι και διάλεξε Εύρεση παρόμοιων. Το MusicFinder εμφανίζει κομμάτια των οποίων το είδος, το τέμπο και η τονικότητα ταιριάζουν καλά μαζί του και λέει γιατί ταίριαξε το καθένα. Συγκρίνει ετικέτες, όχι το πώς ακούγεται η μουσική, οπότε κομμάτια χωρίς BPM ή τονικότητα δεν μπορούν να συγκριθούν.</value>
+  </data>
+  <data name="Same artist and title in several files, and songs that exist as a remix, edit or live version. Nothing is changed." xml:space="preserve">
+    <value>Ίδιος καλλιτέχνης και τίτλος σε περισσότερα αρχεία, καθώς και τραγούδια που υπάρχουν ως remix, edit ή live έκδοση. Τίποτα δεν αλλάζει.</value>
+  </data>
+  <data name="Same artist, title and version, and a length within 3 seconds." xml:space="preserve">
+    <value>Ίδιος καλλιτέχνης, τίτλος και εκδοχή, και διάρκεια με διαφορά έως 3 δευτερόλεπτα.</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Αποθήκευση</value>
+  </data>
+  <data name="Save a backup of the library" xml:space="preserve">
+    <value>Αποθήκευση αντιγράφου ασφαλείας της βιβλιοθήκης</value>
+  </data>
+  <data name="Save old and new paths" xml:space="preserve">
+    <value>Αποθήκευση παλιών και νέων διαδρομών</value>
+  </data>
+  <data name="Save old and new paths…" xml:space="preserve">
+    <value>Αποθήκευση παλιών και νέων διαδρομών…</value>
+  </data>
+  <data name="Saved {0:N0} old and new paths to {1}." xml:space="preserve">
+    <value>Αποθηκεύτηκαν {0:N0} παλιές και νέες διαδρομές στο {1}.</value>
+  </data>
+  <data name="Scan for duplicates" xml:space="preserve">
+    <value>Σάρωση για διπλότυπα</value>
+  </data>
+  <data name="Scanning" xml:space="preserve">
+    <value>Σε σάρωση</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Αναζήτηση</value>
+  </data>
+  <data name="Search again" xml:space="preserve">
+    <value>Νέα αναζήτηση</value>
+  </data>
+  <data name="Search artist, title, filename…" xml:space="preserve">
+    <value>Αναζήτηση καλλιτέχνη, τίτλου, ονόματος αρχείου…</value>
+  </data>
+  <data name="Search artist, title, filename…   (Ctrl+F)" xml:space="preserve">
+    <value>Αναζήτηση καλλιτέχνη, τίτλου, ονόματος αρχείου…   (Ctrl+F)</value>
+  </data>
+  <data name="Search by tags" xml:space="preserve">
+    <value>Αναζήτηση με ετικέτες</value>
+  </data>
+  <data name="Search failed: {0}" xml:space="preserve">
+    <value>Η αναζήτηση απέτυχε: {0}</value>
+  </data>
+  <data name="Seconds listened to" xml:space="preserve">
+    <value>Δευτερόλεπτα ακρόασης</value>
+  </data>
+  <data name="Select a genre in the taxonomy to rename it, move it, or manage its aliases and sub-genres." xml:space="preserve">
+    <value>Επίλεξε ένα είδος στην ταξινομία για να το μετονομάσεις, να το μετακινήσεις ή να διαχειριστείς τα ψευδώνυμα και τα υποείδη του.</value>
+  </data>
+  <data name="Select a track to see its details." xml:space="preserve">
+    <value>Επίλεξε ένα κομμάτι για να δεις τις λεπτομέρειές του.</value>
+  </data>
+  <data name="Select a value here and a genre in the taxonomy" xml:space="preserve">
+    <value>Επίλεξε μια τιμή εδώ και ένα είδος στην ταξινομία</value>
+  </data>
+  <data name="Select one track to find tracks similar to it." xml:space="preserve">
+    <value>Επίλεξε ένα κομμάτι για να βρεις παρόμοια με αυτό.</value>
+  </data>
+  <data name="Select tracks in the Library and choose Rename files to preview a rename." xml:space="preserve">
+    <value>Επίλεξε κομμάτια στη Βιβλιοθήκη και διάλεξε Μετονομασία αρχείων για προεπισκόπηση.</value>
+  </data>
+  <data name="Select tracks, right-click and choose Analyze BPM and key (Ctrl+B). The results are estimates, shown first and apart from your tags. Nothing is written to a file until you press Write." xml:space="preserve">
+    <value>Επίλεξε κομμάτια, κάνε δεξί κλικ και διάλεξε Ανάλυση BPM και τονικότητας (Ctrl+B). Τα αποτελέσματα είναι εκτιμήσεις, εμφανίζονται πρώτα και χωριστά από τις ετικέτες σου. Τίποτα δεν εγγράφεται σε αρχείο μέχρι να πατήσεις Εγγραφή.</value>
+  </data>
+  <data name="Selected output" xml:space="preserve">
+    <value>Επιλεγμένη έξοδος</value>
+  </data>
+  <data name="Sends a fingerprint of the first seconds of audio to AcoustID, then asks MusicBrainz about the recordings it names." xml:space="preserve">
+    <value>Στέλνει ένα αποτύπωμα των πρώτων δευτερολέπτων του ήχου στο AcoustID και μετά ρωτά το MusicBrainz για τις ηχογραφήσεις που αναφέρει.</value>
+  </data>
+  <data name="Sends the title, artist and album text of the tags (or the file name when there is no title) to MusicBrainz." xml:space="preserve">
+    <value>Στέλνει το κείμενο του τίτλου, του καλλιτέχνη και του άλμπουμ των ετικετών (ή το όνομα αρχείου όταν δεν υπάρχει τίτλος) στο MusicBrainz.</value>
+  </data>
+  <data name="Sent: an acoustic fingerprint of &quot;{0}&quot; (a short code made from the sound, not the audio itself), the song's length and your key." xml:space="preserve">
+    <value>Αποστέλλονται: ένα ηχητικό αποτύπωμα του «{0}» (ένας σύντομος κωδικός από τον ήχο, όχι ο ίδιος ο ήχος), η διάρκεια του τραγουδιού και το κλειδί σου.</value>
+  </data>
+  <data name="Separate several genres with ;" xml:space="preserve">
+    <value>Χώρισε πολλά είδη με ;</value>
+  </data>
+  <data name="Session" xml:space="preserve">
+    <value>Συνεδρία</value>
+  </data>
+  <data name="Session name" xml:space="preserve">
+    <value>Όνομα συνεδρίας</value>
+  </data>
+  <data name="Session · {0} exported · {1} possible · {2} played" xml:space="preserve">
+    <value>Συνεδρία · {0} εξήχθησαν · {1} πιθανά · {2} παίχτηκαν</value>
+  </data>
+  <data name="Session · {0} · {1} exported · {2} possible · {3} played" xml:space="preserve">
+    <value>Συνεδρία · {0} · {1} εξήχθησαν · {2} πιθανά · {3} παίχτηκαν</value>
+  </data>
+  <data name="Set up song recognition…" xml:space="preserve">
+    <value>Ρύθμιση αναγνώρισης τραγουδιών…</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ρυθμίσεις</value>
+  </data>
+  <data name="Settings file" xml:space="preserve">
+    <value>Αρχείο ρυθμίσεων</value>
+  </data>
+  <data name="Shortcut" xml:space="preserve">
+    <value>Συντόμευση</value>
+  </data>
+  <data name="Show MusicFinder in" xml:space="preserve">
+    <value>Γλώσσα του MusicFinder</value>
+  </data>
+  <data name="Show all in Library" xml:space="preserve">
+    <value>Εμφάνιση όλων στη Βιβλιοθήκη</value>
+  </data>
+  <data name="Show in Library" xml:space="preserve">
+    <value>Εμφάνιση στη Βιβλιοθήκη</value>
+  </data>
+  <data name="Show the tour" xml:space="preserve">
+    <value>Εμφάνιση της ξενάγησης</value>
+  </data>
+  <data name="Showing the first {0}. Press Enter to see all of them in the library." xml:space="preserve">
+    <value>Εμφανίζονται τα πρώτα {0}. Πάτησε Enter για να τα δεις όλα στη βιβλιοθήκη.</value>
+  </data>
+  <data name="Similar to" xml:space="preserve">
+    <value>Παρόμοια με</value>
+  </data>
+  <data name="Size" xml:space="preserve">
+    <value>Μέγεθος</value>
+  </data>
+  <data name="Size does not fit the bitrate" xml:space="preserve">
+    <value>Το μέγεθος δεν ταιριάζει με το bitrate</value>
+  </data>
+  <data name="Size does not fit the bitrate and length" xml:space="preserve">
+    <value>Το μέγεθος δεν ταιριάζει με το bitrate και τη διάρκεια</value>
+  </data>
+  <data name="Skip" xml:space="preserve">
+    <value>Παράλειψη</value>
+  </data>
+  <data name="Skip the tour: set up song recognition" xml:space="preserve">
+    <value>Παράλειψη ξενάγησης: ρύθμιση αναγνώρισης τραγουδιών</value>
+  </data>
+  <data name="Skipped" xml:space="preserve">
+    <value>Παραλείφθηκε</value>
+  </data>
+  <data name="Smart Greek search: find Greek names by typing Greeklish, and the reverse" xml:space="preserve">
+    <value>Έξυπνη ελληνική αναζήτηση: βρες ελληνικά ονόματα γράφοντας Greeklish, και αντίστροφα</value>
+  </data>
+  <data name="Some files were not renamed" xml:space="preserve">
+    <value>Ορισμένα αρχεία δεν μετονομάστηκαν</value>
+  </data>
+  <data name="Some files were not restored" xml:space="preserve">
+    <value>Ορισμένα αρχεία δεν επαναφέρθηκαν</value>
+  </data>
+  <data name="Song recognition (optional)" xml:space="preserve">
+    <value>Αναγνώριση τραγουδιών (προαιρετικό)</value>
+  </data>
+  <data name="Songs in more than one version" xml:space="preserve">
+    <value>Τραγούδια σε περισσότερες από μία εκδοχές</value>
+  </data>
+  <data name="Start a session automatically on the first drag" xml:space="preserve">
+    <value>Αυτόματη έναρξη συνεδρίας στο πρώτο σύρσιμο</value>
+  </data>
+  <data name="Start a session, or just drag a track to your DJ software and one starts automatically." xml:space="preserve">
+    <value>Ξεκίνα μια συνεδρία ή απλώς σύρε ένα κομμάτι στο πρόγραμμα DJ σου και θα ξεκινήσει αυτόματα.</value>
+  </data>
+  <data name="Start session" xml:space="preserve">
+    <value>Έναρξη συνεδρίας</value>
+  </data>
+  <data name="Start with “Replace a BPM or key the file already has” ticked" xml:space="preserve">
+    <value>Έναρξη με επιλεγμένο το «Αντικατάσταση BPM ή τονικότητας που έχει ήδη το αρχείο»</value>
+  </data>
+  <data name="Started {0:HH:mm}" xml:space="preserve">
+    <value>Ξεκίνησε στις {0:HH:mm}</value>
+  </data>
+  <data name="Started {0:HH:mm} (started automatically by your first drag)" xml:space="preserve">
+    <value>Ξεκίνησε στις {0:HH:mm} (ξεκίνησε αυτόματα με το πρώτο σου σύρσιμο)</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Κατάσταση</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Διακοπή</value>
+  </data>
+  <data name="Stop after this file" xml:space="preserve">
+    <value>Διακοπή μετά από αυτό το αρχείο</value>
+  </data>
+  <data name="Stop indexing '{0}'?&#xA;&#xA;Your music files are not touched. You can re-enable it in Settings." xml:space="preserve">
+    <value>Να σταματήσει η ευρετηρίαση του '{0}';
+
+Τα αρχεία μουσικής σου δεν θίγονται. Μπορείς να την ενεργοποιήσεις ξανά στις Ρυθμίσεις.</value>
+  </data>
+  <data name="Stop session" xml:space="preserve">
+    <value>Λήξη συνεδρίας</value>
+  </data>
+  <data name="Stop the preview" xml:space="preserve">
+    <value>Διακοπή της προεπισκόπησης</value>
+  </data>
+  <data name="Stopped" xml:space="preserve">
+    <value>Διακόπηκε</value>
+  </data>
+  <data name="Stopped. What was checked is remembered, so the next scan continues from here." xml:space="preserve">
+    <value>Διακόπηκε. Ό,τι ελέγχθηκε αποθηκεύεται, οπότε η επόμενη σάρωση συνεχίζει από εδώ.</value>
+  </data>
+  <data name="Sub-genres" xml:space="preserve">
+    <value>Υποείδη</value>
+  </data>
+  <data name="Suggest the closest word when nothing matches (typos)" xml:space="preserve">
+    <value>Πρότεινε την πλησιέστερη λέξη όταν δεν βρίσκεται τίποτα (τυπογραφικά λάθη)</value>
+  </data>
+  <data name="Suggested to keep: the highlighted one." xml:space="preserve">
+    <value>Προτείνεται να κρατηθεί: το επισημασμένο.</value>
+  </data>
+  <data name="Sync after export/close" xml:space="preserve">
+    <value>Συγχρονισμός μετά την εξαγωγή/το κλείσιμο</value>
+  </data>
+  <data name="Tags" xml:space="preserve">
+    <value>Ετικέτες</value>
+  </data>
+  <data name="Tags could not be read" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανάγνωση των ετικετών</value>
+  </data>
+  <data name="Tags unreadable" xml:space="preserve">
+    <value>Μη αναγνώσιμες ετικέτες</value>
+  </data>
+  <data name="Tempos are ticked for you only when the analysis was confident" xml:space="preserve">
+    <value>Τα τέμπο επιλέγονται για σένα μόνο όταν η ανάλυση ήταν βέβαιη</value>
+  </data>
+  <data name="Test the key" xml:space="preserve">
+    <value>Έλεγχος του κλειδιού</value>
+  </data>
+  <data name="Text size" xml:space="preserve">
+    <value>Μέγεθος κειμένου</value>
+  </data>
+  <data name="Text that looks like UTF-8 read as a single-byte code page (Greek turned into accented Latin letters, for example). A heuristic: look before you fix." xml:space="preserve">
+    <value>Κείμενο που μοιάζει με UTF-8 διαβασμένο ως κωδικοσελίδα ενός byte (π.χ. ελληνικά που έγιναν λατινικά γράμματα με τόνους). Είναι ευρετική ένδειξη: έλεγξε πριν διορθώσεις.</value>
+  </data>
+  <data name="Text, icons and spacing grow together, in every window. In any window you can also hold Ctrl and turn the mouse wheel, or press Ctrl and + or −; Ctrl+0 goes back to 100%. A very large size leaves less room for the lists." xml:space="preserve">
+    <value>Το κείμενο, τα εικονίδια και οι αποστάσεις μεγαλώνουν μαζί, σε κάθε παράθυρο. Σε οποιοδήποτε παράθυρο μπορείς επίσης να κρατήσεις πατημένο το Ctrl και να γυρίσεις τη ροδέλα του ποντικιού, ή να πατήσεις Ctrl και + ή −· το Ctrl+0 επαναφέρει το 100%. Ένα πολύ μεγάλο μέγεθος αφήνει λιγότερο χώρο στις λίστες.</value>
+  </data>
+  <data name="That did not work: {0}" xml:space="preserve">
+    <value>Δεν λειτούργησε: {0}</value>
+  </data>
+  <data name="The AcoustID service is free for non-commercial use only (commercial use needs a separate agreement with AcoustID)." xml:space="preserve">
+    <value>Η υπηρεσία AcoustID είναι δωρεάν μόνο για μη εμπορική χρήση (η εμπορική χρήση απαιτεί ξεχωριστή συμφωνία με το AcoustID).</value>
+  </data>
+  <data name="The audio inside is not the kind the file extension suggests." xml:space="preserve">
+    <value>Ο ήχος μέσα στο αρχείο δεν είναι του είδους που υποδηλώνει η επέκταση.</value>
+  </data>
+  <data name="The backup could not be read: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η ανάγνωση του αντιγράφου ασφαλείας: {0}</value>
+  </data>
+  <data name="The backup failed and nothing was saved: {0}" xml:space="preserve">
+    <value>Το αντίγραφο ασφαλείας απέτυχε και τίποτα δεν αποθηκεύτηκε: {0}</value>
+  </data>
+  <data name="The chosen output is not connected" xml:space="preserve">
+    <value>Η επιλεγμένη έξοδος δεν είναι συνδεδεμένη</value>
+  </data>
+  <data name="The cover could not be displayed, so it is not offered." xml:space="preserve">
+    <value>Το εξώφυλλο δεν μπόρεσε να εμφανιστεί, γι' αυτό δεν προσφέρεται.</value>
+  </data>
+  <data name="The drag could not be recorded: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η καταγραφή του σύρσιμου: {0}</value>
+  </data>
+  <data name="The edit stopped: {0}" xml:space="preserve">
+    <value>Η επεξεργασία σταμάτησε: {0}</value>
+  </data>
+  <data name="The file already has a cover and these values, so nothing would change. Tick &quot;Replace the cover the file has&quot; to swap the cover." xml:space="preserve">
+    <value>Το αρχείο έχει ήδη εξώφυλλο και αυτές τις τιμές, οπότε τίποτα δεν θα άλλαζε. Επίλεξε «Αντικατάσταση του εξωφύλλου που έχει το αρχείο» για να αλλάξεις το εξώφυλλο.</value>
+  </data>
+  <data name="The file already has a cover, and the cover is all that is ticked. Tick &quot;Replace the cover the file has&quot; to swap it." xml:space="preserve">
+    <value>Το αρχείο έχει ήδη εξώφυλλο και το εξώφυλλο είναι το μόνο που έχει επιλεγεί. Επίλεξε «Αντικατάσταση του εξωφύλλου που έχει το αρχείο» για να το αλλάξεις.</value>
+  </data>
+  <data name="The file already has these values, so nothing would change." xml:space="preserve">
+    <value>Το αρχείο έχει ήδη αυτές τις τιμές, οπότε τίποτα δεν θα άλλαζε.</value>
+  </data>
+  <data name="The file is much smaller or larger than its bitrate and length imply; a smaller file may be cut short. A hint, not proof." xml:space="preserve">
+    <value>Το αρχείο είναι πολύ μικρότερο ή μεγαλύτερο από όσο υποδηλώνουν το bitrate και η διάρκειά του· ένα μικρότερο αρχείο μπορεί να είναι κομμένο. Ένδειξη, όχι απόδειξη.</value>
+  </data>
+  <data name="The file was left untouched." xml:space="preserve">
+    <value>Το αρχείο έμεινε ανέγγιχτο.</value>
+  </data>
+  <data name="The folder '{0}' does not exist or is not accessible." xml:space="preserve">
+    <value>Ο φάκελος '{0}' δεν υπάρχει ή δεν είναι προσβάσιμος.</value>
+  </data>
+  <data name="The folder you chose does not exist on this computer, so the one found automatically is used." xml:space="preserve">
+    <value>Ο φάκελος που διάλεξες δεν υπάρχει σε αυτόν τον υπολογιστή, γι' αυτό χρησιμοποιείται αυτός που βρέθηκε αυτόματα.</value>
+  </data>
+  <data name="The folder you chose does not exist on this computer. Choose it with Browse." xml:space="preserve">
+    <value>Ο φάκελος που διάλεξες δεν υπάρχει σε αυτόν τον υπολογιστή. Διάλεξέ τον με το «Αναζήτηση…».</value>
+  </data>
+  <data name="The folder you chose." xml:space="preserve">
+    <value>Ο φάκελος που διάλεξες.</value>
+  </data>
+  <data name="The language changes the next time MusicFinder starts. Restart it now?" xml:space="preserve">
+    <value>Η γλώσσα θα αλλάξει την επόμενη φορά που θα ξεκινήσει το MusicFinder. Να γίνει επανεκκίνηση τώρα;</value>
+  </data>
+  <data name="The library is empty. Add a music folder in the Library tab." xml:space="preserve">
+    <value>Η βιβλιοθήκη είναι κενή. Πρόσθεσε έναν φάκελο μουσικής στην καρτέλα Βιβλιοθήκη.</value>
+  </data>
+  <data name="The library knows these files but they were not found at the last scan (a disconnected drive, or moved or deleted outside MusicFinder). Nothing is removed from the library." xml:space="preserve">
+    <value>Η βιβλιοθήκη γνωρίζει αυτά τα αρχεία, αλλά δεν βρέθηκαν στην τελευταία σάρωση (αποσυνδεδεμένος δίσκος ή μετακίνηση/διαγραφή εκτός MusicFinder). Τίποτα δεν αφαιρείται από τη βιβλιοθήκη.</value>
+  </data>
+  <data name="The list could not be saved: {0}" xml:space="preserve">
+    <value>Η λίστα δεν μπόρεσε να αποθηκευτεί: {0}</value>
+  </data>
+  <data name="The pending restore could not be applied: {0}" xml:space="preserve">
+    <value>Η εκκρεμής επαναφορά δεν μπόρεσε να εφαρμοστεί: {0}</value>
+  </data>
+  <data name="The prepared restore was cancelled." xml:space="preserve">
+    <value>Η προετοιμασμένη επαναφορά ακυρώθηκε.</value>
+  </data>
+  <data name="The restore could not be prepared and nothing was changed: {0}" xml:space="preserve">
+    <value>Η επαναφορά δεν μπόρεσε να προετοιμαστεί και δεν άλλαξε τίποτα: {0}</value>
+  </data>
+  <data name="The same song as a remix, edit, live version or with a clearly different length. Listed for information." xml:space="preserve">
+    <value>Το ίδιο τραγούδι ως remix, επεξεργασία, ζωντανή εκτέλεση ή με σαφώς διαφορετική διάρκεια. Εμφανίζεται ενημερωτικά.</value>
+  </data>
+  <data name="The saved shortcut '{0}' is not valid ({1}) so quick search is not available. Choose another in Settings." xml:space="preserve">
+    <value>Η αποθηκευμένη συντόμευση '{0}' δεν είναι έγκυρη ({1}), οπότε η γρήγορη αναζήτηση δεν είναι διαθέσιμη. Διάλεξε άλλη στις Ρυθμίσεις.</value>
+  </data>
+  <data name="The scan failed:" xml:space="preserve">
+    <value>Η σάρωση απέτυχε:</value>
+  </data>
+  <data name="The score is the one the service reported. Different services score differently, so two scores are never added up or compared." xml:space="preserve">
+    <value>Η βαθμολογία είναι αυτή που ανέφερε η υπηρεσία. Διαφορετικές υπηρεσίες βαθμολογούν διαφορετικά, γι' αυτό δύο βαθμολογίες δεν προστίθενται ούτε συγκρίνονται ποτέ.</value>
+  </data>
+  <data name="The shortcut could not be registered." xml:space="preserve">
+    <value>Δεν ήταν δυνατή η καταχώριση της συντόμευσης.</value>
+  </data>
+  <data name="The tags could not be read; the file is still listed by its name. It may be damaged or in an unusual format." xml:space="preserve">
+    <value>Οι ετικέτες δεν διαβάστηκαν· το αρχείο εμφανίζεται ακόμη με το όνομά του. Μπορεί να είναι κατεστραμμένο ή σε ασυνήθιστη μορφή.</value>
+  </data>
+  <data name="The write stopped:" xml:space="preserve">
+    <value>Η εγγραφή διακόπηκε:</value>
+  </data>
+  <data name="There is no earlier library to go back to." xml:space="preserve">
+    <value>Δεν υπάρχει προηγούμενη βιβλιοθήκη για επιστροφή.</value>
+  </data>
+  <data name="These are not duplicates: they differ in version (remix, edit, live…) or length. Nothing here is a reason to remove a file." xml:space="preserve">
+    <value>Αυτά δεν είναι διπλότυπα: διαφέρουν σε εκδοχή (remix, επεξεργασία, live…) ή σε διάρκεια. Τίποτα εδώ δεν αποτελεί λόγο για αφαίρεση αρχείου.</value>
+  </data>
+  <data name="These are results of earlier scans. Scan again to include new files." xml:space="preserve">
+    <value>Αυτά είναι αποτελέσματα προηγούμενων σαρώσεων. Σάρωσε ξανά για να συμπεριληφθούν νέα αρχεία.</value>
+  </data>
+  <data name="These files are not on disk right now, so there is nothing to drag. Rescan the folder or reconnect the drive." xml:space="preserve">
+    <value>Αυτά τα αρχεία δεν βρίσκονται αυτή τη στιγμή στον δίσκο, οπότε δεν υπάρχει τίποτα για σύρσιμο. Κάνε νέα σάρωση του φακέλου ή σύνδεσε ξανά τον δίσκο.</value>
+  </data>
+  <data name="This backup cannot be used: {0}" xml:space="preserve">
+    <value>Αυτό το αντίγραφο ασφαλείας δεν μπορεί να χρησιμοποιηθεί: {0}</value>
+  </data>
+  <data name="This backup is from an older version. It is brought up to date while it is prepared." xml:space="preserve">
+    <value>Αυτό το αντίγραφο είναι από παλαιότερη έκδοση. Ενημερώνεται κατά την προετοιμασία του.</value>
+  </data>
+  <data name="This backup was made by a newer MusicFinder and cannot be restored here. Update MusicFinder first." xml:space="preserve">
+    <value>Αυτό το αντίγραφο δημιουργήθηκε από νεότερο MusicFinder και δεν μπορεί να επαναφερθεί εδώ. Ενημέρωσε πρώτα το MusicFinder.</value>
+  </data>
+  <data name="This rename has nothing left to list (everything was undone or failed)." xml:space="preserve">
+    <value>Αυτή η μετονομασία δεν έχει τίποτα να εμφανίσει (όλα αναιρέθηκαν ή απέτυχαν).</value>
+  </data>
+  <data name="This short tour shows the main things in about a minute. At the end there is an optional step for song recognition (finding out what an unknown track is), which needs two small things from you." xml:space="preserve">
+    <value>Αυτή η σύντομη ξενάγηση δείχνει τα βασικά σε περίπου ένα λεπτό. Στο τέλος υπάρχει ένα προαιρετικό βήμα για την αναγνώριση τραγουδιών (το να μάθεις τι είναι ένα άγνωστο κομμάτι), που χρειάζεται δύο μικρά πράγματα από εσένα.</value>
+  </data>
+  <data name="Tick all clear matches" xml:space="preserve">
+    <value>Επιλογή όλων των σαφών αντιστοιχίσεων</value>
+  </data>
+  <data name="Tick all keys" xml:space="preserve">
+    <value>Επιλογή όλων των τονικοτήτων</value>
+  </data>
+  <data name="Tick all tempos" xml:space="preserve">
+    <value>Επιλογή όλων των τέμπο</value>
+  </data>
+  <data name="Tick at least one BPM or key to write." xml:space="preserve">
+    <value>Επίλεξε τουλάχιστον ένα BPM ή μια τονικότητα για εγγραφή.</value>
+  </data>
+  <data name="Tick at least one field to apply." xml:space="preserve">
+    <value>Επίλεξε τουλάχιστον ένα πεδίο για εφαρμογή.</value>
+  </data>
+  <data name="Tick at least one track to write." xml:space="preserve">
+    <value>Επίλεξε τουλάχιστον ένα κομμάτι για εγγραφή.</value>
+  </data>
+  <data name="Tick the cover for me when the file has none (it is still written only when you press Write)" xml:space="preserve">
+    <value>Να επιλέγεται το εξώφυλλο για μένα όταν το αρχείο δεν έχει κανένα (εγγράφεται πάλι μόνο όταν πατήσεις Εγγραφή)</value>
+  </data>
+  <data name="Tick to change this field (typing ticks it for you)" xml:space="preserve">
+    <value>Τσέκαρε για να αλλάξει αυτό το πεδίο (αν πληκτρολογήσεις, τσεκάρεται μόνο του)</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Διάρκεια</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Τίτλος</value>
+  </data>
+  <data name="To find out what an unknown track is, MusicFinder needs two things it cannot include itself: a small program called fpcalc, and a free key from AcoustID. You can skip this and come back any time from Settings." xml:space="preserve">
+    <value>Για να βρει τι είναι ένα άγνωστο κομμάτι, το MusicFinder χρειάζεται δύο πράγματα που δεν μπορεί να περιλάβει μόνο του: ένα μικρό πρόγραμμα που λέγεται fpcalc και ένα δωρεάν κλειδί από το AcoustID. Μπορείς να το παραλείψεις και να επιστρέψεις οποιαδήποτε στιγμή από τις Ρυθμίσεις.</value>
+  </data>
+  <data name="Tokens: {Artist} {Title} {Album} {AlbumArtist} {Year} {Track:00} {Genre} {Bpm} {Key} {FileName} {Extension}. Add :upper, :lower or :title to change case. The extension is kept automatically." xml:space="preserve">
+    <value>Μεταβλητές: {Artist} {Title} {Album} {AlbumArtist} {Year} {Track:00} {Genre} {Bpm} {Key} {FileName} {Extension}. Πρόσθεσε :upper, :lower ή :title για αλλαγή πεζών/κεφαλαίων. Η επέκταση διατηρείται αυτόματα.</value>
+  </data>
+  <data name="Too short" xml:space="preserve">
+    <value>Πολύ σύντομο</value>
+  </data>
+  <data name="Total Tracks" xml:space="preserve">
+    <value>Σύνολο κομματιών</value>
+  </data>
+  <data name="Track" xml:space="preserve">
+    <value>Κομμάτι</value>
+  </data>
+  <data name="Track events" xml:space="preserve">
+    <value>Συμβάντα κομματιών</value>
+  </data>
+  <data name="Track no." xml:space="preserve">
+    <value>Αρ. κομματιού</value>
+  </data>
+  <data name="Tracks" xml:space="preserve">
+    <value>Κομμάτια</value>
+  </data>
+  <data name="Tracks analysed at once" xml:space="preserve">
+    <value>Κομμάτια που αναλύονται ταυτόχρονα</value>
+  </data>
+  <data name="Traktor and VirtualDJ find files by their path. A file you rename or move that is in their library, playlists or crates is reported missing there, and its cue points, beat grids and playlist entries are lost until you relocate it inside those programs. MusicFinder cannot change their databases. Save the old and new paths as a list after the rename, and use Undo here to put everything back." xml:space="preserve">
+    <value>Το Traktor και το VirtualDJ βρίσκουν τα αρχεία από τη διαδρομή τους. Ένα αρχείο που μετονομάζεις ή μετακινείς και βρίσκεται στη βιβλιοθήκη, στις λίστες ή στα crates τους θα εμφανίζεται εκεί ως χαμένο, και τα cue points, τα beat grids και οι εγγραφές λιστών του χάνονται μέχρι να το εντοπίσεις ξανά μέσα σε αυτά τα προγράμματα. Το MusicFinder δεν μπορεί να αλλάξει τις βάσεις δεδομένων τους. Αποθήκευσε τις παλιές και νέες διαδρομές ως λίστα μετά τη μετονομασία και χρησιμοποίησε την Αναίρεση εδώ για να επανέλθουν όλα.</value>
+  </data>
+  <data name="Traktor and VirtualDJ remember your files by their path. If you rename or move a file that is in their library, they will no longer find it: cue points, beat grids and playlist entries for it are lost on their side until you relocate the file there.&#xA;&#xA;MusicFinder can save a list of old and new paths for every rename, and it can undo a whole rename. It cannot change anything inside those programs.&#xA;&#xA;Go ahead?" xml:space="preserve">
+    <value>Το Traktor και το VirtualDJ θυμούνται τα αρχεία σου από τη διαδρομή τους. Αν μετονομάσεις ή μετακινήσεις ένα αρχείο που βρίσκεται στη βιβλιοθήκη τους, δεν θα το βρίσκουν πια: τα cue points, τα beat grids και οι εγγραφές λιστών του χάνονται από τη δική τους πλευρά μέχρι να εντοπίσεις ξανά το αρχείο εκεί.
+
+Το MusicFinder μπορεί να αποθηκεύσει μια λίστα με παλιές και νέες διαδρομές για κάθε μετονομασία και μπορεί να αναιρέσει ολόκληρη τη μετονομασία. Δεν μπορεί να αλλάξει τίποτα μέσα σε αυτά τα προγράμματα.
+
+Συνέχεια;</value>
+  </data>
+  <data name="Turn on" xml:space="preserve">
+    <value>Ενεργοποίηση</value>
+  </data>
+  <data name="Turn on online identification (you will see exactly what is sent first)" xml:space="preserve">
+    <value>Ενεργοποίηση διαδικτυακής αναγνώρισης (θα δεις πρώτα ακριβώς τι αποστέλλεται)</value>
+  </data>
+  <data name="Turn on online identification?" xml:space="preserve">
+    <value>Ενεργοποίηση διαδικτυακής αναγνώρισης;</value>
+  </data>
+  <data name="Type a search to see how it is read (every spelling it is looked up under) and why each result matched. Handy when a name is not found." xml:space="preserve">
+    <value>Γράψε μια αναζήτηση για να δεις πώς διαβάζεται (όλες οι γραφές με τις οποίες αναζητείται) και γιατί ταίριαξε κάθε αποτέλεσμα. Χρήσιμο όταν δεν βρίσκεται ένα όνομα.</value>
+  </data>
+  <data name="Type an artist, a title or part of a file name in the search box. Greek and Greeklish both work (χαρις finds Χάρις), even when the keyboard was on the wrong layout. The buttons next to the box narrow the list by Genre, BPM, Decade, your own Tags and Played. Ctrl+Alt+Space opens a small search window on top of any program." xml:space="preserve">
+    <value>Γράψε έναν καλλιτέχνη, έναν τίτλο ή μέρος ενός ονόματος αρχείου στο πλαίσιο αναζήτησης. Λειτουργούν και τα ελληνικά και το Greeklish (το χαρις βρίσκει το Χάρις), ακόμη και όταν το πληκτρολόγιο ήταν σε λάθος διάταξη. Τα κουμπιά δίπλα στο πλαίσιο περιορίζουν τη λίστα ανά Είδος, BPM, Δεκαετία, δικές σου Ετικέτες και Παίχτηκε. Το Ctrl+Alt+Space ανοίγει ένα μικρό παράθυρο αναζήτησης πάνω από οποιοδήποτε πρόγραμμα.</value>
+  </data>
+  <data name="Type to search your library" xml:space="preserve">
+    <value>Πληκτρολόγησε για αναζήτηση στη βιβλιοθήκη σου</value>
+  </data>
+  <data name="Uncategorized" xml:space="preserve">
+    <value>Χωρίς κατηγορία</value>
+  </data>
+  <data name="Undo" xml:space="preserve">
+    <value>Αναίρεση</value>
+  </data>
+  <data name="Undo last play change" xml:space="preserve">
+    <value>Αναίρεση τελευταίας αλλαγής αναπαραγωγής</value>
+  </data>
+  <data name="Undo the last manual play change" xml:space="preserve">
+    <value>Αναίρεση της τελευταίας χειροκίνητης αλλαγής αναπαραγωγής</value>
+  </data>
+  <data name="Undo this rename" xml:space="preserve">
+    <value>Αναίρεση αυτής της μετονομασίας</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Άγνωστο</value>
+  </data>
+  <data name="Unknown genre" xml:space="preserve">
+    <value>Άγνωστο είδος</value>
+  </data>
+  <data name="Untick all" xml:space="preserve">
+    <value>Αποεπιλογή όλων</value>
+  </data>
+  <data name="Unusual sample rate" xml:space="preserve">
+    <value>Ασυνήθιστος ρυθμός δειγματοληψίας</value>
+  </data>
+  <data name="Use cover.jpg / folder.jpg when a file has no embedded cover" xml:space="preserve">
+    <value>Χρήση των cover.jpg / folder.jpg όταν ένα αρχείο δεν έχει ενσωματωμένο εξώφυλλο</value>
+  </data>
+  <data name="Use default" xml:space="preserve">
+    <value>Προεπιλογή</value>
+  </data>
+  <data name="Use detected" xml:space="preserve">
+    <value>Χρήση του εντοπισμένου</value>
+  </data>
+  <data name="Use double this tempo" xml:space="preserve">
+    <value>Χρήση του διπλάσιου τέμπο</value>
+  </data>
+  <data name="Use half of this tempo" xml:space="preserve">
+    <value>Χρήση του μισού τέμπο</value>
+  </data>
+  <data name="Use it with VirtualDJ or Traktor" xml:space="preserve">
+    <value>Χρήση με VirtualDJ ή Traktor</value>
+  </data>
+  <data name="Use the file's MusicBrainz id" xml:space="preserve">
+    <value>Χρήση του αναγνωριστικού MusicBrainz του αρχείου</value>
+  </data>
+  <data name="Use the zip {0}" xml:space="preserve">
+    <value>Χρήση του zip {0}</value>
+  </data>
+  <data name="Use {0}" xml:space="preserve">
+    <value>Χρήση του {0}</value>
+  </data>
+  <data name="Use “Unknown Artist/Title…” when a tag is missing (otherwise those files are skipped)" xml:space="preserve">
+    <value>Χρήση «Unknown Artist/Title…» όταν λείπει μια ετικέτα (αλλιώς τα αρχεία παραλείπονται)</value>
+  </data>
+  <data name="Uses the audio fingerprint." xml:space="preserve">
+    <value>Χρησιμοποιεί το αποτύπωμα ήχου.</value>
+  </data>
+  <data name="Uses the id in the file if it has one, otherwise a search by tags." xml:space="preserve">
+    <value>Χρησιμοποιεί το αναγνωριστικό του αρχείου αν υπάρχει, αλλιώς αναζήτηση με ετικέτες.</value>
+  </data>
+  <data name="VirtualDJ and Traktor keep a list of what you played. MusicFinder reads those files (read-only, it never changes them) and turns a 'possibly played' guess into a confirmed play when the DJ software reports the same track. If the history is not in the usual place, choose its folder here." xml:space="preserve">
+    <value>Το VirtualDJ και το Traktor κρατούν μια λίστα με ό,τι έπαιξες. Το MusicFinder διαβάζει αυτά τα αρχεία (μόνο ανάγνωση, δεν τα αλλάζει ποτέ) και μετατρέπει μια εκτίμηση «πιθανώς παίχτηκε» σε επιβεβαιωμένη αναπαραγωγή όταν το λογισμικό DJ αναφέρει το ίδιο κομμάτι. Αν το ιστορικό δεν βρίσκεται στο συνηθισμένο μέρος, διάλεξε τον φάκελό του εδώ.</value>
+  </data>
+  <data name="VirtualDJ writes an entry only after a track has played for a while, so a very short play never appears. Traktor writes its history when it is closed, so its plays arrive after you quit it. Plays that are not in your library, or fit several files, are kept aside and are never guessed." xml:space="preserve">
+    <value>Το VirtualDJ γράφει μια εγγραφή μόνο αφού ένα κομμάτι έχει παιχτεί για λίγο, οπότε μια πολύ σύντομη αναπαραγωγή δεν εμφανίζεται ποτέ. Το Traktor γράφει το ιστορικό του όταν κλείνει, οπότε οι αναπαραγωγές του φτάνουν αφού το κλείσεις. Οι αναπαραγωγές που δεν υπάρχουν στη βιβλιοθήκη σου ή ταιριάζουν με περισσότερα αρχεία μένουν στην άκρη και δεν μαντεύονται ποτέ.</value>
+  </data>
+  <data name="Waiting" xml:space="preserve">
+    <value>Σε αναμονή</value>
+  </data>
+  <data name="Warning: Traktor, VirtualDJ and other DJ software will lose these files" xml:space="preserve">
+    <value>Προσοχή: το Traktor, το VirtualDJ και άλλα προγράμματα DJ θα χάσουν αυτά τα αρχεία</value>
+  </data>
+  <data name="Warning: {0}" xml:space="preserve">
+    <value>Προειδοποίηση: {0}</value>
+  </data>
+  <data name="Welcome to MusicFinder" xml:space="preserve">
+    <value>Καλώς ήρθες στο MusicFinder</value>
+  </data>
+  <data name="Welcome tour and song recognition" xml:space="preserve">
+    <value>Ξενάγηση καλωσορίσματος και αναγνώριση τραγουδιών</value>
+  </data>
+  <data name="What happens" xml:space="preserve">
+    <value>Τι θα γίνει</value>
+  </data>
+  <data name="What is in the backup" xml:space="preserve">
+    <value>Τι περιέχει το αντίγραφο</value>
+  </data>
+  <data name="What is sent" xml:space="preserve">
+    <value>Τι αποστέλλεται</value>
+  </data>
+  <data name="What the library knows about the files themselves." xml:space="preserve">
+    <value>Τι γνωρίζει η βιβλιοθήκη για τα ίδια τα αρχεία.</value>
+  </data>
+  <data name="What would change (tick the fields to apply)" xml:space="preserve">
+    <value>Τι θα αλλάξει (επίλεξε τα πεδία προς εφαρμογή)</value>
+  </data>
+  <data name="When the file has genres" xml:space="preserve">
+    <value>Όταν το αρχείο έχει ήδη είδη</value>
+  </data>
+  <data name="When you look at a release, the Cover Art Archive (coverartarchive.org, which hands the picture over from archive.org) receives that release's MusicBrainz id so it can send its front cover; you can turn this off in Settings." xml:space="preserve">
+    <value>Όταν βλέπεις μια κυκλοφορία, το Cover Art Archive (coverartarchive.org, που παραδίδει την εικόνα από το archive.org) λαμβάνει το αναγνωριστικό MusicBrainz αυτής της κυκλοφορίας ώστε να στείλει το μπροστινό της εξώφυλλο· μπορείς να το απενεργοποιήσεις στις Ρυθμίσεις.</value>
+  </data>
+  <data name="Where are your music folders now?" xml:space="preserve">
+    <value>Πού βρίσκονται τώρα οι φάκελοι μουσικής σου;</value>
+  </data>
+  <data name="Which notation Traktor and VirtualDJ read from a tag is not verified: try one track first. The analysis window shows the exact text that will be written." xml:space="preserve">
+    <value>Δεν έχει επαληθευτεί ποια σημειογραφία διαβάζουν το Traktor και το VirtualDJ από μια ετικέτα: δοκίμασε πρώτα ένα κομμάτι. Το παράθυρο ανάλυσης δείχνει το ακριβές κείμενο που θα εγγραφεί.</value>
+  </data>
+  <data name="Which recording is it?" xml:space="preserve">
+    <value>Ποια ηχογράφηση είναι;</value>
+  </data>
+  <data name="Which release? (album, year, track no., cover)" xml:space="preserve">
+    <value>Ποια κυκλοφορία; (άλμπουμ, έτος, αρ. κομματιού, εξώφυλλο)</value>
+  </data>
+  <data name="Why" xml:space="preserve">
+    <value>Γιατί</value>
+  </data>
+  <data name="Why not" xml:space="preserve">
+    <value>Γιατί όχι</value>
+  </data>
+  <data name="Will be" xml:space="preserve">
+    <value>Θα γίνει</value>
+  </data>
+  <data name="Will change" xml:space="preserve">
+    <value>Θα αλλάξει</value>
+  </data>
+  <data name="Will move 1 file" xml:space="preserve">
+    <value>Θα μετακινηθεί 1 αρχείο</value>
+  </data>
+  <data name="Will move {0:N0} files" xml:space="preserve">
+    <value>Θα μετακινηθούν {0:N0} αρχεία</value>
+  </data>
+  <data name="Will rename 1 file" xml:space="preserve">
+    <value>Θα μετονομαστεί 1 αρχείο</value>
+  </data>
+  <data name="Will rename {0:N0} files" xml:space="preserve">
+    <value>Θα μετονομαστούν {0:N0} αρχεία</value>
+  </data>
+  <data name="Will write {0} to {1}." xml:space="preserve">
+    <value>Θα γραφτούν {0} σε {1}.</value>
+  </data>
+  <data name="Will write:" xml:space="preserve">
+    <value>Θα γραφτούν:</value>
+  </data>
+  <data name="Windows default output" xml:space="preserve">
+    <value>Προεπιλεγμένη έξοδος των Windows</value>
+  </data>
+  <data name="Windows did not accept {0} (error {1}). Choose a different shortcut." xml:space="preserve">
+    <value>Τα Windows δεν δέχτηκαν το {0} (σφάλμα {1}). Διάλεξε διαφορετική συντόμευση.</value>
+  </data>
+  <data name="Working out the new names…" xml:space="preserve">
+    <value>Υπολογισμός των νέων ονομάτων…</value>
+  </data>
+  <data name="Write" xml:space="preserve">
+    <value>Εγγραφή</value>
+  </data>
+  <data name="Write 1 file" xml:space="preserve">
+    <value>Εγγραφή 1 αρχείου</value>
+  </data>
+  <data name="Write changes" xml:space="preserve">
+    <value>Εγγραφή αλλαγών</value>
+  </data>
+  <data name="Write the key as" xml:space="preserve">
+    <value>Εγγραφή της τονικότητας ως</value>
+  </data>
+  <data name="Write this BPM" xml:space="preserve">
+    <value>Εγγραφή αυτού του BPM</value>
+  </data>
+  <data name="Write this key" xml:space="preserve">
+    <value>Εγγραφή αυτής της τονικότητας</value>
+  </data>
+  <data name="Write {0} files" xml:space="preserve">
+    <value>Εγγραφή {0} αρχείων</value>
+  </data>
+  <data name="Writing tags…" xml:space="preserve">
+    <value>Εγγραφή ετικετών…</value>
+  </data>
+  <data name="Writing {0} of {1}: {2}" xml:space="preserve">
+    <value>Εγγραφή {0} από {1}: {2}</value>
+  </data>
+  <data name="Written" xml:space="preserve">
+    <value>Γράφτηκε</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>Έτος</value>
+  </data>
+  <data name="You dragged this track out in the current session. MusicFinder cannot tell whether it was loaded or played." xml:space="preserve">
+    <value>Έσυρες αυτό το κομμάτι προς τα έξω στην τρέχουσα συνεδρία. Το MusicFinder δεν μπορεί να ξέρει αν φορτώθηκε ή παίχτηκε.</value>
+  </data>
+  <data name="Your DJ software (for your own records)" xml:space="preserve">
+    <value>Το πρόγραμμα DJ σου (για δική σου αρχειοθέτηση)</value>
+  </data>
+  <data name="Your contact address (required by MusicBrainz)" xml:space="preserve">
+    <value>Η διεύθυνση επικοινωνίας σου (απαιτείται από το MusicBrainz)</value>
+  </data>
+  <data name="Your current library (index, tags, genres and play history) will be replaced by the one in this backup. A full safety backup of it is made first and kept in the Backups folder, and the old database file is kept next to the new one. Your music files are not touched." xml:space="preserve">
+    <value>Η τρέχουσα βιβλιοθήκη σου (ευρετήριο, ετικέτες, είδη και ιστορικό αναπαραγωγής) θα αντικατασταθεί από αυτήν του αντιγράφου. Πρώτα δημιουργείται πλήρες αντίγραφο ασφαλείας της, που φυλάσσεται στον φάκελο Backups, και το παλιό αρχείο βάσης δεδομένων μένει δίπλα στο νέο. Τα αρχεία μουσικής σου δεν αγγίζονται.</value>
+  </data>
+  <data name="Your genres" xml:space="preserve">
+    <value>Τα είδη σου</value>
+  </data>
+  <data name="Your key and address stay in this computer's settings file. They are left out of backups unless you choose to include them, so after a restore you may need to enter them again." xml:space="preserve">
+    <value>Το κλειδί και η διεύθυνσή σου μένουν στο αρχείο ρυθμίσεων αυτού του υπολογιστή. Δεν περιλαμβάνονται στα αντίγραφα ασφαλείας εκτός αν το επιλέξεις, οπότε μετά από μια επαναφορά μπορεί να χρειαστεί να τα ξαναγράψεις.</value>
+  </data>
+  <data name="Your music files are never changed by a lookup. Tags are written only after you tick fields, preview and confirm, in the same safe way as the tag editor." xml:space="preserve">
+    <value>Τα αρχεία μουσικής σου δεν αλλάζουν ποτέ από μια αναζήτηση. Οι ετικέτες εγγράφονται μόνο αφού επιλέξεις πεδία, δεις την προεπισκόπηση και επιβεβαιώσεις, με τον ίδιο ασφαλή τρόπο όπως στον επεξεργαστή ετικετών.</value>
+  </data>
+  <data name="Your own aliases" xml:space="preserve">
+    <value>Δικά σου ψευδώνυμα</value>
+  </data>
+  <data name="Your own genre" xml:space="preserve">
+    <value>Δικό σου είδος</value>
+  </data>
+  <data name="Your own labels, like Warm Up or Wedding. Edit a name and press Enter to rename." xml:space="preserve">
+    <value>Δικές σου ετικέτες, όπως Warm Up ή Wedding. Άλλαξε ένα όνομα και πάτα Enter για μετονομασία.</value>
+  </data>
+  <data name="and" xml:space="preserve">
+    <value>και</value>
+  </data>
+  <data name="and 1 lyrics/cue file" xml:space="preserve">
+    <value>και 1 αρχείο στίχων/cue</value>
+  </data>
+  <data name="and {0:N0} lyrics/cue files" xml:space="preserve">
+    <value>και {0:N0} αρχεία στίχων/cue</value>
+  </data>
+  <data name="as typed" xml:space="preserve">
+    <value>όπως πληκτρολογήθηκε</value>
+  </data>
+  <data name="cancelled before the remaining files" xml:space="preserve">
+    <value>ακυρώθηκε πριν από τα υπόλοιπα αρχεία</value>
+  </data>
+  <data name="confirmed" xml:space="preserve">
+    <value>επιβεβαιωμένα</value>
+  </data>
+  <data name="e.g. 3 or 3/12" xml:space="preserve">
+    <value>π.χ. 3 ή 3/12</value>
+  </data>
+  <data name="e.g. 8A or Am" xml:space="preserve">
+    <value>π.χ. 8A ή Am</value>
+  </data>
+  <data name="exactly as typed" xml:space="preserve">
+    <value>ακριβώς όπως πληκτρολογήθηκε</value>
+  </data>
+  <data name="exported  ·" xml:space="preserve">
+    <value>εξήχθησαν  ·</value>
+  </data>
+  <data name="fpcalc {0} is ready. MusicFinder keeps its own copy; your download was not changed." xml:space="preserve">
+    <value>Το fpcalc {0} είναι έτοιμο. Το MusicFinder κρατά δικό του αντίγραφο· αυτό που κατέβασες δεν άλλαξε.</value>
+  </data>
+  <data name="fpcalc.exe" xml:space="preserve">
+    <value>fpcalc.exe</value>
+  </data>
+  <data name="fpcalc.exe not found. Audio fingerprints are unavailable; searching by tags still works." xml:space="preserve">
+    <value>Το fpcalc.exe δεν βρέθηκε. Τα ηχητικά αποτυπώματα δεν είναι διαθέσιμα· η αναζήτηση με ετικέτες εξακολουθεί να λειτουργεί.</value>
+  </data>
+  <data name="high" xml:space="preserve">
+    <value>υψηλή</value>
+  </data>
+  <data name="just now" xml:space="preserve">
+    <value>μόλις τώρα</value>
+  </data>
+  <data name="low" xml:space="preserve">
+    <value>χαμηλή</value>
+  </data>
+  <data name="medium" xml:space="preserve">
+    <value>μέτρια</value>
+  </data>
+  <data name="mono" xml:space="preserve">
+    <value>μονοφωνικό</value>
+  </data>
+  <data name="never" xml:space="preserve">
+    <value>ποτέ</value>
+  </data>
+  <data name="no estimate" xml:space="preserve">
+    <value>καμία εκτίμηση</value>
+  </data>
+  <data name="no result" xml:space="preserve">
+    <value>κανένα αποτέλεσμα</value>
+  </data>
+  <data name="none" xml:space="preserve">
+    <value>καμία</value>
+  </data>
+  <data name="normalized" xml:space="preserve">
+    <value>κανονικοποιημένο</value>
+  </data>
+  <data name="normalized (case, accents)" xml:space="preserve">
+    <value>κανονικοποιημένο (κεφαλαία/πεζά, τόνοι)</value>
+  </data>
+  <data name="not written" xml:space="preserve">
+    <value>δεν γράφτηκε</value>
+  </data>
+  <data name="nothing to change" xml:space="preserve">
+    <value>τίποτα προς αλλαγή</value>
+  </data>
+  <data name="other keyboard layout" xml:space="preserve">
+    <value>άλλη διάταξη πληκτρολογίου</value>
+  </data>
+  <data name="phonetic key" xml:space="preserve">
+    <value>φωνητικό κλειδί</value>
+  </data>
+  <data name="phonetic key (Greek/Greeklish)" xml:space="preserve">
+    <value>φωνητικό κλειδί (ελληνικά/Greeklish)</value>
+  </data>
+  <data name="phonetic key of the other layout" xml:space="preserve">
+    <value>φωνητικό κλειδί της άλλης διάταξης</value>
+  </data>
+  <data name="phrase" xml:space="preserve">
+    <value>φράση</value>
+  </data>
+  <data name="possibly played  ·" xml:space="preserve">
+    <value>πιθανώς παίχτηκαν  ·</value>
+  </data>
+  <data name="replaced by a confirmed play" xml:space="preserve">
+    <value>αντικαταστάθηκε από επιβεβαιωμένη αναπαραγωγή</value>
+  </data>
+  <data name="stereo" xml:space="preserve">
+    <value>στερεοφωνικό</value>
+  </data>
+  <data name="stopped before the remaining files" xml:space="preserve">
+    <value>διακόπηκε πριν από τα υπόλοιπα αρχεία</value>
+  </data>
+  <data name="stopped before the rest" xml:space="preserve">
+    <value>σταμάτησε πριν από τα υπόλοιπα</value>
+  </data>
+  <data name="suggested to keep" xml:space="preserve">
+    <value>προτείνεται να διατηρηθεί</value>
+  </data>
+  <data name="the track is no longer in the library" xml:space="preserve">
+    <value>το κομμάτι δεν υπάρχει πια στη βιβλιοθήκη</value>
+  </data>
+  <data name="typo candidate" xml:space="preserve">
+    <value>υποψήφιο για τυπογραφικό λάθος</value>
+  </data>
+  <data name="typo correction" xml:space="preserve">
+    <value>διόρθωση τυπογραφικού λάθους</value>
+  </data>
+  <data name="word" xml:space="preserve">
+    <value>λέξη</value>
+  </data>
+  <data name="yesterday {0}" xml:space="preserve">
+    <value>χθες {0}</value>
+  </data>
+  <data name="{0:N0} already have this name" xml:space="preserve">
+    <value>{0:N0} έχουν ήδη αυτό το όνομα</value>
+  </data>
+  <data name="{0:N0} audio-like files are not in the library because their format is not supported: {1}." xml:space="preserve">
+    <value>{0:N0} αρχεία που μοιάζουν με ήχο δεν είναι στη βιβλιοθήκη επειδή η μορφή τους δεν υποστηρίζεται: {1}.</value>
+  </data>
+  <data name="{0:N0} could not be renamed" xml:space="preserve">
+    <value>{0:N0} δεν μπόρεσαν να μετονομαστούν</value>
+  </data>
+  <data name="{0:N0} could not be restored" xml:space="preserve">
+    <value>{0:N0} δεν μπόρεσαν να επαναφερθούν</value>
+  </data>
+  <data name="{0:N0} files share their size with another file; {1:N0} checked now, {2:N0} already known" xml:space="preserve">
+    <value>{0:N0} αρχεία έχουν το ίδιο μέγεθος με άλλο αρχείο· {1:N0} ελέγχθηκαν τώρα, {2:N0} ήταν ήδη γνωστά</value>
+  </data>
+  <data name="{0:N0} groups of probable duplicates, {1:N0} songs in more than one version." xml:space="preserve">
+    <value>{0:N0} ομάδες πιθανών διπλότυπων, {1:N0} τραγούδια σε περισσότερες από μία εκδοχές.</value>
+  </data>
+  <data name="{0:N0} groups, {1:N0} files, {2} taken by the extra copies." xml:space="preserve">
+    <value>{0:N0} ομάδες, {1:N0} αρχεία, {2} καταλαμβάνονται από τα επιπλέον αντίγραφα.</value>
+  </data>
+  <data name="{0:N0} remembered answers on this computer." xml:space="preserve">
+    <value>{0:N0} αποθηκευμένες απαντήσεις σε αυτόν τον υπολογιστή.</value>
+  </data>
+  <data name="{0:N0} result ({1})" xml:space="preserve">
+    <value>{0:N0} αποτέλεσμα ({1})</value>
+  </data>
+  <data name="{0:N0} results ({1})" xml:space="preserve">
+    <value>{0:N0} αποτελέσματα ({1})</value>
+  </data>
+  <data name="{0:N0} similar track" xml:space="preserve">
+    <value>{0:N0} παρόμοιο κομμάτι</value>
+  </data>
+  <data name="{0:N0} similar tracks" xml:space="preserve">
+    <value>{0:N0} παρόμοια κομμάτια</value>
+  </data>
+  <data name="{0:N0} skipped (see the reasons below)" xml:space="preserve">
+    <value>{0:N0} παραλείφθηκαν (δες τους λόγους παρακάτω)</value>
+  </data>
+  <data name="{0:N0} tracks" xml:space="preserve">
+    <value>{0:N0} κομμάτια</value>
+  </data>
+  <data name="{0:N0} tracks are in it; they stay in your library and keep their embedded genre text, but lose this grouping." xml:space="preserve">
+    <value>Υπάρχουν {0:N0} κομμάτια σε αυτό· μένουν στη βιβλιοθήκη σου και κρατούν το ενσωματωμένο κείμενο είδους, αλλά χάνουν αυτή την ομαδοποίηση.</value>
+  </data>
+  <data name="{0:N0} tracks have remembered estimates." xml:space="preserve">
+    <value>{0:N0} κομμάτια έχουν αποθηκευμένες εκτιμήσεις.</value>
+  </data>
+  <data name="{0:N0} tracks. Counts come from what the library already knows; nothing is re-read from disk." xml:space="preserve">
+    <value>{0:N0} κομμάτια. Οι αριθμοί προέρχονται από όσα γνωρίζει ήδη η βιβλιοθήκη· τίποτα δεν διαβάζεται ξανά από τον δίσκο.</value>
+  </data>
+  <data name="{0:N0}+ results ({1})" xml:space="preserve">
+    <value>{0:N0}+ αποτελέσματα ({1})</value>
+  </data>
+  <data name="{0} (Windows default)" xml:space="preserve">
+    <value>{0} (προεπιλογή των Windows)</value>
+  </data>
+  <data name="{0} BPM values" xml:space="preserve">
+    <value>{0} τιμές BPM</value>
+  </data>
+  <data name="{0} already matched" xml:space="preserve">
+    <value>{0} ταίριαζαν ήδη</value>
+  </data>
+  <data name="{0} already up to date" xml:space="preserve">
+    <value>{0} ήδη ενημερωμένα</value>
+  </data>
+  <data name="{0} candidates" xml:space="preserve">
+    <value>{0} υποψήφια</value>
+  </data>
+  <data name="{0} changes" xml:space="preserve">
+    <value>{0} αλλαγές</value>
+  </data>
+  <data name="{0} channels" xml:space="preserve">
+    <value>{0} κανάλια</value>
+  </data>
+  <data name="{0} confirmed, {1} possible" xml:space="preserve">
+    <value>{0} επιβεβαιωμένα, {1} πιθανά</value>
+  </data>
+  <data name="{0} different values" xml:space="preserve">
+    <value>{0} διαφορετικές τιμές</value>
+  </data>
+  <data name="{0} failed" xml:space="preserve">
+    <value>{0} απέτυχαν</value>
+  </data>
+  <data name="{0} failed — those files were left untouched" xml:space="preserve">
+    <value>{0} απέτυχαν — αυτά τα αρχεία έμειναν άθικτα</value>
+  </data>
+  <data name="{0} file(s) written" xml:space="preserve">
+    <value>{0} αρχείο(α) γράφτηκαν</value>
+  </data>
+  <data name="{0} files" xml:space="preserve">
+    <value>{0} αρχεία</value>
+  </data>
+  <data name="{0} files written" xml:space="preserve">
+    <value>{0} αρχεία γράφτηκαν</value>
+  </data>
+  <data name="{0} files · different versions of one song" xml:space="preserve">
+    <value>{0} αρχεία · διαφορετικές εκδοχές ενός τραγουδιού</value>
+  </data>
+  <data name="{0} files · probably the same recording" xml:space="preserve">
+    <value>{0} αρχεία · πιθανότατα η ίδια ηχογράφηση</value>
+  </data>
+  <data name="{0} h ago" xml:space="preserve">
+    <value>πριν από {0} ώρες</value>
+  </data>
+  <data name="{0} h {1:00} min ago" xml:space="preserve">
+    <value>πριν από {0} ώρες και {1:00} λεπτά</value>
+  </data>
+  <data name="{0} identical files · {1} each · {2} in the extra copies" xml:space="preserve">
+    <value>{0} πανομοιότυπα αρχεία · {1} το καθένα · {2} στα επιπλέον αντίγραφα</value>
+  </data>
+  <data name="{0} in {1}. Nothing is written until you confirm." xml:space="preserve">
+    <value>{0} σε {1}. Τίποτα δεν γράφεται μέχρι να επιβεβαιώσεις.</value>
+  </data>
+  <data name="{0} in {1}; 1 file already matches and will not be touched." xml:space="preserve">
+    <value>{0} σε {1}· 1 αρχείο ταιριάζει ήδη και δεν θα τροποποιηθεί.</value>
+  </data>
+  <data name="{0} in {1}; {2} files already match and will not be touched." xml:space="preserve">
+    <value>{0} σε {1}· {2} αρχεία ταιριάζουν ήδη και δεν θα τροποποιηθούν.</value>
+  </data>
+  <data name="{0} is already used by another program (or by Windows). Choose a different shortcut." xml:space="preserve">
+    <value>Το {0} χρησιμοποιείται ήδη από άλλο πρόγραμμα (ή από τα Windows). Διάλεξε διαφορετική συντόμευση.</value>
+  </data>
+  <data name="{0} keys" xml:space="preserve">
+    <value>{0} τονικότητες</value>
+  </data>
+  <data name="{0} matches" xml:space="preserve">
+    <value>{0} αποτελέσματα</value>
+  </data>
+  <data name="{0} min ago" xml:space="preserve">
+    <value>πριν από {0} λεπτά</value>
+  </data>
+  <data name="{0} missing files were left out." xml:space="preserve">
+    <value>{0} αρχεία που λείπουν παραλείφθηκαν.</value>
+  </data>
+  <data name="{0} need your decision" xml:space="preserve">
+    <value>{0} χρειάζονται την απόφασή σου</value>
+  </data>
+  <data name="{0} not done" xml:space="preserve">
+    <value>{0} δεν έγιναν</value>
+  </data>
+  <data name="{0} of {1}" xml:space="preserve">
+    <value>{0} από {1}</value>
+  </data>
+  <data name="{0} of {1} analysed" xml:space="preserve">
+    <value>{0} από {1} αναλύθηκαν</value>
+  </data>
+  <data name="{0} of {1} looked up" xml:space="preserve">
+    <value>{0} από {1} αναζητήθηκαν</value>
+  </data>
+  <data name="{0} of {1} ready to write" xml:space="preserve">
+    <value>{0} από {1} έτοιμα για εγγραφή</value>
+  </data>
+  <data name="{0} plays" xml:space="preserve">
+    <value>{0} αναπαραγωγές</value>
+  </data>
+  <data name="{0} plays from your DJ software could not be matched to a track in the library." xml:space="preserve">
+    <value>{0} αναπαραγωγές από το λογισμικό DJ δεν αντιστοιχίστηκαν με κομμάτι της βιβλιοθήκης.</value>
+  </data>
+  <data name="{0} problems: those files were left untouched" xml:space="preserve">
+    <value>{0} προβλήματα: αυτά τα αρχεία έμειναν ανέγγιχτα</value>
+  </data>
+  <data name="{0} renamed" xml:space="preserve">
+    <value>{0} μετονομάστηκαν</value>
+  </data>
+  <data name="{0} results, best first:" xml:space="preserve">
+    <value>{0} αποτελέσματα, τα καλύτερα πρώτα:</value>
+  </data>
+  <data name="{0} selected" xml:space="preserve">
+    <value>{0} επιλεγμένα</value>
+  </data>
+  <data name="{0} tracks selected." xml:space="preserve">
+    <value>{0} κομμάτια επιλεγμένα.</value>
+  </data>
+  <data name="{0} undone" xml:space="preserve">
+    <value>{0} αναιρέθηκαν</value>
+  </data>
+  <data name="{0} with no match or a problem" xml:space="preserve">
+    <value>{0} χωρίς αντιστοίχιση ή με πρόβλημα</value>
+  </data>
+  <data name="{0}'s history folder was not found. Choose it with Browse." xml:space="preserve">
+    <value>Ο φάκελος ιστορικού του {0} δεν βρέθηκε. Διάλεξέ τον με το «Αναζήτηση…».</value>
+  </data>
+  <data name="{0}: {1:N0} in the backup, {2} now" xml:space="preserve">
+    <value>{0}: {1:N0} στο αντίγραφο, {2} τώρα</value>
+  </data>
+  <data name="·  drag this bar to move" xml:space="preserve">
+    <value>·  σύρε αυτή τη γραμμή για μετακίνηση</value>
+  </data>
+  <data name="· last scan" xml:space="preserve">
+    <value>· τελευταία σάρωση</value>
+  </data>
+  <data name="· planning…" xml:space="preserve">
+    <value>· προετοιμασία…</value>
+  </data>
+  <data name="½" xml:space="preserve">
+    <value>½</value>
+  </data>
+  <data name="×2" xml:space="preserve">
+    <value>×2</value>
+  </data>
+  <data name="…and {0} more." xml:space="preserve">
+    <value>…και {0} ακόμη.</value>
+  </data>
+</root>

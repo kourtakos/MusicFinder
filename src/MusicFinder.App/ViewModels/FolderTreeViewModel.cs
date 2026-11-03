@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -45,7 +46,7 @@ public partial class FolderTreeViewModel : ObservableObject
     }
 
     public long? SelectedFolderId => SelectedNode?.Id;
-    public string ScopeLabel => GlobalSearch || SelectedNode is null ? "All" : SelectedNode.Name;
+    public string ScopeLabel => GlobalSearch || SelectedNode is null ? Loc.T("All") : SelectedNode.Name;
 
     partial void OnSelectedNodeChanged(FolderNodeViewModel? value) => RaiseScope();
     partial void OnIncludeSubfoldersChanged(bool value) => RaiseScope();
@@ -108,7 +109,7 @@ public partial class FolderTreeViewModel : ObservableObject
         var path = _dialogs.PickFolder();
         if (path is null) return;
         var result = await _rootService.AddAsync(path);
-        if (!result.Success) _dialogs.ShowError("Cannot add folder", result.Message!);
+        if (!result.Success) _dialogs.ShowError(Loc.T("Cannot add folder"), result.Message!);
     }
 
     /// <summary>Rescans the root of the given node (or of the selected node; all roots when nothing is selected).</summary>
@@ -133,8 +134,8 @@ public partial class FolderTreeViewModel : ObservableObject
     private async Task ExcludeRootAsync(FolderNodeViewModel? node)
     {
         if (node is not { IsRoot: true }) return;
-        if (!_dialogs.Confirm("Exclude folder",
-                $"Stop indexing '{node.FullPath}'?\n\nYour music files are not touched. You can re-enable it in Settings."))
+        if (!_dialogs.Confirm(Loc.T("Exclude folder"),
+                Loc.T("Stop indexing '{0}'?\n\nYour music files are not touched. You can re-enable it in Settings.", node.FullPath)))
             return;
         await _rootService.SetEnabledAsync(node.RootId, false);
     }

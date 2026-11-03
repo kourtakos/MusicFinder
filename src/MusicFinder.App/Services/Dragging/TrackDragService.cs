@@ -1,6 +1,7 @@
 using MusicFinder.Application.Dj;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Services.Dragging;
 
@@ -32,7 +33,7 @@ public sealed class TrackDragService
         if (payload.IsEmpty)
         {
             var note = payload.SkippedMissing.Count > 0
-                ? "These files are not on disk right now, so there is nothing to drag. Rescan the folder or reconnect the drive."
+                ? Loc.T("These files are not on disk right now, so there is nothing to drag. Rescan the folder or reconnect the drive.")
                 : null;
             return new TrackDragResult(null, note, Task.CompletedTask);
         }
@@ -40,8 +41,8 @@ public sealed class TrackDragService
         var outcome = _source.StartDrag(payload.Included.Select(c => c.Path).ToList(), source);
 
         var notes = new List<string>();
-        if (payload.SkippedMissing.Count > 0) notes.Add($"{payload.SkippedMissing.Count} missing file(s) were left out.");
-        if (payload.Truncated > 0) notes.Add($"Only the first {DragPayloadPlanner.DefaultCap} files were dragged.");
+        if (payload.SkippedMissing.Count > 0) notes.Add(payload.SkippedMissing.Count == 1 ? Loc.T("1 missing file was left out.") : Loc.T("{0} missing files were left out.", payload.SkippedMissing.Count));
+        if (payload.Truncated > 0) notes.Add(Loc.T("Only the first {0} files were dragged.", DragPayloadPlanner.DefaultCap));
 
         var record = new DragRecord(payload.Included.Select(c => c.TrackId).ToList(), outcome.StartedUtc, outcome.CompletedUtc,
             outcome.Effect, outcome.ForegroundProcess);

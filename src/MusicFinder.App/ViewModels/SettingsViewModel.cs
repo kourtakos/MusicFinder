@@ -26,12 +26,24 @@ public sealed partial class RootItemViewModel : ObservableObject
         Id = root.Id;
         Path = root.Path;
         _enabled = root.Enabled;
-        StatusText = root.Status.ToString();
-        LastScanText = root.LastScanUtc?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) ?? "never";
+        StatusText = root.Status switch
+        {
+            Domain.Enums.ScanStatus.Pending => Localization.Loc.T("Pending"),
+            Domain.Enums.ScanStatus.Scanning => Localization.Loc.T("Scanning"),
+            Domain.Enums.ScanStatus.Indexed => Localization.Loc.T("Indexed"),
+            Domain.Enums.ScanStatus.Cancelled => Localization.Loc.T("Cancelled"),
+            Domain.Enums.ScanStatus.Error => Localization.Loc.T("Error"),
+            Domain.Enums.ScanStatus.Offline => Localization.Loc.T("Offline"),
+            _ => root.Status.ToString()
+        };
+        LastScanText = root.LastScanUtc?.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) ?? Localization.Loc.T("never");
     }
 
     async partial void OnEnabledChanged(bool value) => await _service.SetEnabledAsync(Id, value);
 }
+
+/// <summary>One entry of the language box: "auto", "en" or "el".</summary>
+public sealed record LanguageOption(string Code, string Label);
 
 public sealed partial class SettingsViewModel : ObservableObject
 {
@@ -59,8 +71,9 @@ public sealed partial class SettingsViewModel : ObservableObject
         ISettingsStore store, AppPaths paths, ScanCoordinator scans, Services.Artwork.ArtworkService artwork,
         Services.Hotkeys.QuickSearchService quickSearch, ISearchAliasService aliasService, ISearchDiagnostics diagnostics,
         IdentificationSettingsViewModel identification, AnalysisSettingsViewModel analysis, BackupSettingsViewModel backup, PreviewViewModel preview,
-        HistoryImportSettingsViewModel history, FirstRunViewModel firstRun)
+        HistoryImportSettingsViewModel history, FirstRunViewModel firstRun, IAppRestarter restarter)
     {
+        _restarter = restarter;
         _firstRun = firstRun;
         History = history;
         Backup = backup;
@@ -81,6 +94,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         SettingsPath = paths.SettingsPath;
         var saved = store.Load();
         _readerConcurrency = saved.ReaderConcurrency;
+        _selectedLanguage = Languages.FirstOrDefault(l => l.Code == (saved.Language ?? Localization.Loc.Auto).ToLowerInvariant()) ?? Languages[0];
         _useFolderArtwork = saved.UseFolderArtwork;
         _sessionHeuristicSeconds = Math.Clamp(saved.SessionHeuristicSeconds, 15, 20);
         _autoStartSessionOnDrag = saved.AutoStartSessionOnDrag;
@@ -134,6 +148,31 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         _firstRun.Open(toRecognition: true);
         _dialogs.ShowFirstRun(_firstRun);
+    }
+
+    // ===== Language =====
+
+    private readonly IAppRestarter _restarter;
+
+    /// <summary>What the language box offers. The names of the languages stay in their own language so they can always be found.</summary>
+    public static IReadOnlyList<LanguageOption> Languages { get; } =
+    [
+        new(Localization.Loc.Auto, Localization.Loc.T("Automatic (Windows language)")),
+        new(Localization.Loc.English, "English"),
+        new(Localization.Loc.Greek, "Ελληνικά"),
+    ];
+
+    [ObservableProperty] private LanguageOption _selectedLanguage;
+
+    partial void OnSelectedLanguageChanged(LanguageOption value)
+    {
+        var settings = _store.Load();
+        if (string.Equals(settings.Language, value.Code, StringComparison.OrdinalIgnoreCase)) return;
+        settings.Language = value.Code;
+        _store.Save(settings);
+        // The language is read once at start-up, so it applies after a restart; nothing is lost by restarting (the library is on disk).
+        if (_dialogs.Confirm(Localization.Loc.T("Language"), Localization.Loc.T("The language changes the next time MusicFinder starts. Restart it now?")))
+            _restarter.Restart();
     }
 
     // ===== Text size (zoom of the whole interface) =====
@@ -293,7 +332,7 @@ public sealed partial class SettingsViewModel : ObservableObject
             var x = await Task.Run(() => _diagnostics.ExplainAsync(ExplainQuery));
             ExplainOutput = SearchExplanationFormatter.Format(x);
         }
-        catch (Exception ex) { ExplainOutput = "Could not explain this search: " + ex.Message; }
+        catch (Exception ex) { ExplainOutput = Localization.Loc.T("Could not explain this search: {0}", ex.Message); }
     }
 
     partial void OnReaderConcurrencyChanged(int value)
@@ -310,7 +349,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         var path = _dialogs.PickFolder();
         if (path is null) return;
         var result = await _rootService.AddAsync(path);
-        if (!result.Success) _dialogs.ShowError("Cannot add folder", result.Message!);
+        if (!result.Success) _dialogs.ShowError(Localization.Loc.T("Cannot add folder"), result.Message!);
     }
 
     [RelayCommand]

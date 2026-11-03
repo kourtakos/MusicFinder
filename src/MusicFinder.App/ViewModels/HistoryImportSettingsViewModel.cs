@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -30,7 +31,7 @@ public sealed partial class HistoryProgramViewModel : ObservableObject
     public string DisplayName => _importer.DisplayName;
 
     /// <summary>"Written while you play" for VirtualDJ; "Sync after export/close" for Traktor (never promised to be live).</summary>
-    public string SyncText => _importer.SyncMode == HistorySyncMode.Live ? "Read while you play" : "Sync after export/close";
+    public string SyncText => _importer.SyncMode == HistorySyncMode.Live ? Loc.T("Read while you play") : Loc.T("Sync after export/close");
 
     [ObservableProperty] private string _folderText = "";
     [ObservableProperty] private string _folderHint = "";
@@ -47,14 +48,14 @@ public sealed partial class HistoryProgramViewModel : ObservableObject
         var chosen = Chosen;
         HasChosenFolder = !string.IsNullOrWhiteSpace(chosen);
         var resolved = _service.ResolveFolder(ProviderId);
-        FolderText = resolved ?? "No folder found";
+        FolderText = resolved ?? Loc.T("No folder found");
         FolderHint = _service.ChosenFolderIsMissing(ProviderId)
             ? (resolved is not null && resolved != chosen
-                ? "The folder you chose does not exist on this computer, so the one found automatically is used."
-                : "The folder you chose does not exist on this computer. Choose it with Browse.")
+                ? Loc.T("The folder you chose does not exist on this computer, so the one found automatically is used.")
+                : Loc.T("The folder you chose does not exist on this computer. Choose it with Browse."))
             : HasChosenFolder
-                ? "The folder you chose."
-                : resolved is null ? $"{DisplayName}'s history folder was not found. Choose it with Browse." : "Found automatically.";
+                ? Loc.T("The folder you chose.")
+                : resolved is null ? Loc.T("{0}'s history folder was not found. Choose it with Browse.", DisplayName) : Loc.T("Found automatically.");
     }
 
     private void Save(string? folder)
@@ -154,6 +155,8 @@ public sealed partial class HistoryImportSettingsViewModel : ObservableObject
     private async Task UpdatePendingAsync()
     {
         var count = await _store.CountPendingAsync();
-        PendingText = count == 0 ? "" : $"{count} play{(count == 1 ? "" : "s")} from your DJ software could not be matched to a track in the library.";
+        PendingText = count == 0 ? ""
+            : count == 1 ? Loc.T("1 play from your DJ software could not be matched to a track in the library.")
+            : Loc.T("{0} plays from your DJ software could not be matched to a track in the library.", count);
     }
 }

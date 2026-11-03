@@ -730,7 +730,7 @@ public class IdentifyUiTests
         Assert.Equal([true, true, false], vm.Queue.Select(q => q.Include));
         Assert.Contains("Needs your decision", vm.Queue[2].Attention);
         Assert.Contains("0.60", vm.Queue[2].Attention);
-        Assert.Equal("2 of 3 ready to write · 1 need your decision", vm.OverviewSummary);
+        Assert.Equal("2 of 3 ready to write · 1 needs your decision", vm.OverviewSummary);
         Assert.Equal("Write 2 files", vm.WriteButtonText);
         var first = vm.Queue[0];
         Assert.Equal("Ξανά στη ζωή μου — Χάρις Αλεξίου (AcoustID score 0.97)", first.MatchText);
@@ -754,7 +754,7 @@ public class IdentifyUiTests
 
         vm.ContinueCommand.Execute(null);
         Assert.Equal(IdentifyStep.Overview, vm.Step);
-        Assert.Equal("0 of 3 ready to write · 1 need your decision", vm.OverviewSummary);
+        Assert.Equal("0 of 3 ready to write · 1 needs your decision", vm.OverviewSummary);
     });
 
     [Fact]

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Application.Organize;
 using MusicFinder.Domain.Contracts;
@@ -30,10 +31,10 @@ public sealed class RenamePreviewRowViewModel
         var extras = item.Sidecars.Count > 0 ? " + " + string.Join(", ", item.Sidecars.Select(s => Path.GetExtension(s.NewPath))) : "";
         StatusText = item.Status switch
         {
-            PlanStatus.Rename => "Rename" + extras,
-            PlanStatus.CaseOnly => "Change case" + extras,
-            PlanStatus.Unchanged => "Already named so",
-            _ => "Skipped",
+            PlanStatus.Rename => Loc.T("Rename") + extras,
+            PlanStatus.CaseOnly => Loc.T("Change case") + extras,
+            PlanStatus.Unchanged => Loc.T("Already named so"),
+            _ => Loc.T("Skipped"),
         };
         Reason = item.Reason;
     }
@@ -50,10 +51,10 @@ public sealed class RenameBatchViewModel
     {
         Info = info;
         Title = info.CreatedUtc.ToLocalTime().ToString("g", CultureInfo.CurrentCulture) + "  ·  " + (info.Template ?? "");
-        var parts = new List<string> { $"{info.Done} renamed" };
-        if (info.Undone > 0) parts.Add($"{info.Undone} undone");
-        if (info.Failed > 0) parts.Add($"{info.Failed} failed");
-        if (info.Skipped > 0) parts.Add($"{info.Skipped} not done");
+        var parts = new List<string> { Loc.T("{0} renamed", info.Done) };
+        if (info.Undone > 0) parts.Add(Loc.T("{0} undone", info.Undone));
+        if (info.Failed > 0) parts.Add(Loc.T("{0} failed", info.Failed));
+        if (info.Skipped > 0) parts.Add(Loc.T("{0} not done", info.Skipped));
         Detail = string.Join(", ", parts);
     }
 }
@@ -114,13 +115,14 @@ public sealed partial class RenameViewModel : ObservableObject
     [ObservableProperty] private bool _hasTracks;
 
     public bool CanRename => RenameCount > 0 && !IsBusy;
-    private string Verb => MoveIntoFolders ? "Move" : "Rename";
-    public string HeadingText => MoveIntoFolders ? "Move files into folders" : "Rename files";
-    public string RenameButtonText => RenameCount switch { 0 => Verb, 1 => Verb + " 1 file", _ => $"{Verb} {RenameCount:N0} files" };
-    public string ReminderText =>
+    public string HeadingText => MoveIntoFolders ? Loc.T("Move files into folders") : Loc.T("Rename files");
+    public string RenameButtonText => MoveIntoFolders
+        ? RenameCount switch { 0 => Loc.T("Move"), 1 => Loc.T("Move 1 file"), _ => Loc.T("Move {0:N0} files", RenameCount) }
+        : RenameCount switch { 0 => Loc.T("Rename"), 1 => Loc.T("Rename 1 file"), _ => Loc.T("Rename {0:N0} files", RenameCount) };
+    public string ReminderText => Loc.T(
         "Traktor and VirtualDJ find files by their path. A file you rename or move that is in their library, playlists or crates is reported missing there, " +
         "and its cue points, beat grids and playlist entries are lost until you relocate it inside those programs. MusicFinder cannot change their databases. " +
-        "Save the old and new paths as a list after the rename, and use Undo here to put everything back.";
+        "Save the old and new paths as a list after the rename, and use Undo here to put everything back.");
 
     public event EventHandler? CloseRequested;
     /// <summary>Raised after files were renamed or restored, so the Library can reload what it shows.</summary>
@@ -139,7 +141,7 @@ public sealed partial class RenameViewModel : ObservableObject
         var saved = settings.Load();
         _template = string.IsNullOrWhiteSpace(saved.RenameTemplate) ? Presets[0] : saved.RenameTemplate!;
         _usePlaceholders = saved.RenameUsePlaceholders;
-        SummaryText = HasTracks ? "Working out the new names…" : "Select tracks in the Library and choose Rename files to preview a rename.";
+        SummaryText = HasTracks ? Loc.T("Working out the new names…") : Loc.T("Select tracks in the Library and choose Rename files to preview a rename.");
     }
 
     public async Task LoadAsync()
@@ -194,11 +196,14 @@ public sealed partial class RenameViewModel : ObservableObject
             RenameCount = plan.Count(p => p.WillMove);
             var skipped = plan.Count(p => p.Status == PlanStatus.Skipped);
             var same = plan.Count(p => p.Status == PlanStatus.Unchanged);
+            var willText = MoveIntoFolders
+                ? (RenameCount == 1 ? Loc.T("Will move 1 file") : Loc.T("Will move {0:N0} files", RenameCount))
+                : (RenameCount == 1 ? Loc.T("Will rename 1 file") : Loc.T("Will rename {0:N0} files", RenameCount));
             SummaryText = parsed.Error is not null
-                ? "Fix the template to see the new names."
-                : $"Will {Verb.ToLowerInvariant()} {RenameCount:N0} {(RenameCount == 1 ? "file" : "files")}"
-                  + (same > 0 ? $", {same:N0} already have this name" : "")
-                  + (skipped > 0 ? $", {skipped:N0} skipped (see the reasons below)" : "") + ".";
+                ? Loc.T("Fix the template to see the new names.")
+                : willText
+                  + (same > 0 ? ", " + Loc.T("{0:N0} already have this name", same) : "")
+                  + (skipped > 0 ? ", " + Loc.T("{0:N0} skipped (see the reasons below)", skipped) : "") + ".";
         }
         catch (OperationCanceledException) { /* a newer preview replaced this one */ }
     }
@@ -212,7 +217,7 @@ public sealed partial class RenameViewModel : ObservableObject
         var settings = _settings.Load();
         if (!settings.RenameWarningAccepted)
         {
-            if (!_dialogs.Confirm(WarningTitle, DjSoftwareWarning)) return;
+            if (!_dialogs.Confirm(Loc.T(WarningTitle), Loc.T(DjSoftwareWarning))) return;
             settings.RenameWarningAccepted = true;
             _settings.Save(settings);
         }
@@ -226,7 +231,7 @@ public sealed partial class RenameViewModel : ObservableObject
         _runCts = new CancellationTokenSource();
         ProgressMax = pending.Count;
         ProgressValue = 0;
-        StatusText = "Renaming…";
+        StatusText = Loc.T("Renaming…");
         try
         {
             var progress = new Progress<FileOperationProgress>(p => { ProgressValue = p.Done; });
@@ -235,8 +240,8 @@ public sealed partial class RenameViewModel : ObservableObject
             FilesChanged?.Invoke(this, EventArgs.Empty);
             await ReloadBatchesAsync();
             if (result.Failures.Count > 0)
-                _dialogs.ShowInfo("Some files were not renamed", string.Join("\n", result.Failures.Take(12).Select(f => Path.GetFileName(f.Path) + ": " + f.Reason))
-                    + (result.Failures.Count > 12 ? $"\n…and {result.Failures.Count - 12} more." : ""));
+                _dialogs.ShowInfo(Loc.T("Some files were not renamed"), string.Join("\n", result.Failures.Take(12).Select(f => Path.GetFileName(f.Path) + ": " + f.Reason))
+                    + (result.Failures.Count > 12 ? "\n" + Loc.T("…and {0} more.", result.Failures.Count - 12) : ""));
         }
         finally
         {
@@ -251,10 +256,12 @@ public sealed partial class RenameViewModel : ObservableObject
     private static string Describe(BatchResult r, bool moved)
     {
         if (r.Refused is not null) return r.Refused;
-        var text = $"{(moved ? "Moved" : "Renamed")} {r.Renamed:N0} {(r.Renamed == 1 ? "file" : "files")}";
-        if (r.SidecarsRenamed > 0) text += $" and {r.SidecarsRenamed:N0} lyrics/cue {(r.SidecarsRenamed == 1 ? "file" : "files")}";
-        if (r.Failures.Count > 0) text += $"; {r.Failures.Count:N0} could not be renamed";
-        if (r.Cancelled) text += "; stopped before the rest";
+        var text = moved
+            ? (r.Renamed == 1 ? Loc.T("Moved 1 file") : Loc.T("Moved {0:N0} files", r.Renamed))
+            : (r.Renamed == 1 ? Loc.T("Renamed 1 file") : Loc.T("Renamed {0:N0} files", r.Renamed));
+        if (r.SidecarsRenamed > 0) text += " " + (r.SidecarsRenamed == 1 ? Loc.T("and 1 lyrics/cue file") : Loc.T("and {0:N0} lyrics/cue files", r.SidecarsRenamed));
+        if (r.Failures.Count > 0) text += "; " + Loc.T("{0:N0} could not be renamed", r.Failures.Count);
+        if (r.Cancelled) text += "; " + Loc.T("stopped before the rest");
         return text + ".";
     }
 
@@ -269,10 +276,10 @@ public sealed partial class RenameViewModel : ObservableObject
         try
         {
             var result = await Task.Run(() => _operations.UndoAsync(batch.Info.Id, null, CancellationToken.None));
-            StatusText = $"Restored {result.Restored:N0} {(result.Restored == 1 ? "file" : "files")}"
-                         + (result.Refused.Count > 0 ? $"; {result.Refused.Count:N0} could not be restored" : "") + ".";
+            StatusText = (result.Restored == 1 ? Loc.T("Restored 1 file") : Loc.T("Restored {0:N0} files", result.Restored))
+                         + (result.Refused.Count > 0 ? "; " + Loc.T("{0:N0} could not be restored", result.Refused.Count) : "") + ".";
             if (result.Refused.Count > 0)
-                _dialogs.ShowInfo("Some files were not restored", string.Join("\n", result.Refused.Take(12).Select(f => Path.GetFileName(f.Path) + ": " + f.Reason)));
+                _dialogs.ShowInfo(Loc.T("Some files were not restored"), string.Join("\n", result.Refused.Take(12).Select(f => Path.GetFileName(f.Path) + ": " + f.Reason)));
             FilesChanged?.Invoke(this, EventArgs.Empty);
             await ReloadBatchesAsync();
         }
@@ -285,17 +292,17 @@ public sealed partial class RenameViewModel : ObservableObject
     {
         if (batch is null) return;
         var map = await _operations.GetPathMapAsync(batch.Info.Id, CancellationToken.None);
-        if (map.Count == 0) { _dialogs.ShowInfo("Path list", "This rename has nothing left to list (everything was undone or failed)."); return; }
-        var target = _dialogs.PickSaveFile("Save old and new paths", "CSV file|*.csv", "renamed-files.csv");
+        if (map.Count == 0) { _dialogs.ShowInfo(Loc.T("Path list"), Loc.T("This rename has nothing left to list (everything was undone or failed).")); return; }
+        var target = _dialogs.PickSaveFile(Loc.T("Save old and new paths"), Loc.T("CSV file") + "|*.csv", "renamed-files.csv");
         if (target is null) return;
         try
         {
             PathMapCsv.Write(target, map);
-            StatusText = $"Saved {map.Count:N0} old and new paths to {Path.GetFileName(target)}.";
+            StatusText = Loc.T("Saved {0:N0} old and new paths to {1}.", map.Count, Path.GetFileName(target));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            _dialogs.ShowError("Path list", "The list could not be saved: " + ex.Message);
+            _dialogs.ShowError(Loc.T("Path list"), Loc.T("The list could not be saved: {0}", ex.Message));
         }
     }
 

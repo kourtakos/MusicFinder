@@ -102,7 +102,7 @@ public class DragOutTests
         c.Search.DragOut(new object());
 
         Assert.Equal([Path.Combine(c.App.MusicDir, "a.mp3")], Assert.Single(c.Source.Drags));
-        Assert.Contains("1 missing file(s) were left out", c.Search.Warning);
+        Assert.Contains("1 missing file was left out", c.Search.Warning);
     });
 
     [Fact]

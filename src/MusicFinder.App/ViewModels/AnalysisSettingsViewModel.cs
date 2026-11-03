@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
 
@@ -20,9 +21,9 @@ public sealed partial class AnalysisSettingsViewModel : ObservableObject
 
     public static IReadOnlyList<KeyNotationOption> Notations { get; } =
     [
-        new(KeyNotation.Camelot, "Camelot, like 8A (default)"),
-        new(KeyNotation.OpenKey, "Open Key, like 1m"),
-        new(KeyNotation.NoteName, "Note name, like Am")
+        new(KeyNotation.Camelot, Loc.T("Camelot, like 8A (default)")),
+        new(KeyNotation.OpenKey, Loc.T("Open Key, like 1m")),
+        new(KeyNotation.NoteName, Loc.T("Note name, like Am"))
     ];
 
     public AnalysisSettingsViewModel(ISettingsStore store, IAudioAnalysisService service)
@@ -77,7 +78,7 @@ public sealed partial class AnalysisSettingsViewModel : ObservableObject
         try
         {
             var n = await _service.CountAsync(default);
-            CacheText = n == 0 ? "No estimates are remembered." : $"{n:N0} tracks have remembered estimates.";
+            CacheText = n == 0 ? Loc.T("No estimates are remembered.") : Loc.T("{0:N0} tracks have remembered estimates.", n);
         }
         catch (Exception) { CacheText = ""; }
     }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.ViewModels;
 
@@ -10,7 +11,7 @@ public sealed record PlaceholderViewModel(string Title, string Message);
 
 public sealed partial class MainViewModel : ObservableObject
 {
-    private readonly PlaceholderViewModel _history = new("History", "Play history and importers arrive in milestones M3–M4.");
+    private readonly PlaceholderViewModel _history = new(Loc.T("History"), Loc.T("Play history and importers arrive in milestones M3–M4."));
 
     public LibraryViewModel Library { get; }
     public SettingsViewModel Settings { get; }
@@ -79,7 +80,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         var result = await _fileOperations.RecoverAsync(CancellationToken.None);
         if (result.NeedAttention.Count > 0)
-            _dialogs.ShowInfo("Files need a look", "A rename was interrupted and these files could not be settled automatically:\n"
+            _dialogs.ShowInfo(Loc.T("Files need a look"), Loc.T("A rename was interrupted and these files could not be settled automatically:") + "\n"
                 + string.Join("\n", result.NeedAttention.Take(10).Select(f => Path.GetFileName(f.Path) + ": " + f.Reason)));
     }
 

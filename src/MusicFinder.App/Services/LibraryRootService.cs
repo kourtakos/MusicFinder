@@ -1,5 +1,6 @@
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Entities;
+using MusicFinder.App.Localization;
 
 namespace MusicFinder.App.Services;
 
@@ -26,16 +27,21 @@ public sealed class LibraryRootService
         try { full = Canonicalize(path); }
         catch (Exception ex) when (ex is ArgumentException or NotSupportedException or PathTooLongException)
         {
-            return new AddRootResult(false, $"'{path}' is not a valid folder path.", null);
+            return new AddRootResult(false, Loc.T("'{0}' is not a valid folder path.", path), null);
         }
 
         if (!Directory.Exists(full))
-            return new AddRootResult(false, $"The folder '{full}' does not exist or is not accessible.", null);
+            return new AddRootResult(false, Loc.T("The folder '{0}' does not exist or is not accessible.", full), null);
 
         foreach (var existing in await _roots.GetAllAsync())
         {
             if (Overlaps(existing.Path, full, out var relation))
-                return new AddRootResult(false, $"'{full}' {relation} the already indexed folder '{existing.Path}'.", null);
+                return new AddRootResult(false, relation switch
+                {
+                    "is the same as" => Loc.T("'{0}' is the same as the already indexed folder '{1}'.", full, existing.Path),
+                    "is inside" => Loc.T("'{0}' is inside the already indexed folder '{1}'.", full, existing.Path),
+                    _ => Loc.T("'{0}' contains the already indexed folder '{1}'.", full, existing.Path)
+                }, null);
         }
 
         var root = await _roots.AddAsync(full);

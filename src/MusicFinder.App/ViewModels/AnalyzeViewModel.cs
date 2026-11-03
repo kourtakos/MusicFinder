@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.Application.Analysis;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Entities;
@@ -20,7 +21,7 @@ public sealed partial class AnalyzeItem : ObservableObject
     public Track? Track { get; set; }
     public TrackAnalysis? Analysis { get; set; }
 
-    [ObservableProperty] private string _status = "Waiting";
+    [ObservableProperty] private string _status = Loc.T("Waiting");
     [ObservableProperty] private AnalysisFieldProposal? _bpm;
     [ObservableProperty] private AnalysisFieldProposal? _key;
     [ObservableProperty] private bool _writeBpm;
@@ -39,8 +40,8 @@ public sealed partial class AnalyzeItem : ObservableObject
 
     public string BpmNow => Track?.Bpm is > 0 ? Math.Round(Track.Bpm.Value).ToString(CultureInfo.InvariantCulture) : "—";
     public string KeyNow => string.IsNullOrWhiteSpace(Track?.MusicalKey) ? "—" : Track!.MusicalKey!.Trim();
-    public string BpmEstimateText => Bpm is null ? (Analysis is null ? "" : "no estimate") : $"≈{Bpm.Proposed} ({LevelText(Bpm.Level)})";
-    public string KeyEstimateText => Key is null ? (Analysis is null ? "" : "no estimate") : $"≈{Key.Proposed} ({LevelText(Key.Level)})";
+    public string BpmEstimateText => Bpm is null ? (Analysis is null ? "" : Loc.T("no estimate")) : $"≈{Bpm.Proposed} ({LevelText(Bpm.Level)})";
+    public string KeyEstimateText => Key is null ? (Analysis is null ? "" : Loc.T("no estimate")) : $"≈{Key.Proposed} ({LevelText(Key.Level)})";
     public string BpmNote => Bpm?.Note ?? "";
     public string KeyNote => Key?.Note ?? "";
     public bool CanWriteBpm => Bpm is { CanApply: true };
@@ -51,7 +52,7 @@ public sealed partial class AnalyzeItem : ObservableObject
 
     private static string LevelText(Confidence level) => level switch
     {
-        Confidence.High => "high", Confidence.Medium => "medium", Confidence.Low => "low", _ => "none"
+        Confidence.High => Loc.T("high"), Confidence.Medium => Loc.T("medium"), Confidence.Low => Loc.T("low"), _ => Loc.T("none")
     };
 
     public void Refresh() => OnPropertyChanged(string.Empty);
@@ -103,7 +104,7 @@ public sealed partial class AnalyzeViewModel : ObservableObject
     public IReadOnlyList<AnalyzeItem> Targets => Items.Where(i => i.WillWrite).ToList();
     public int WriteCount => Targets.Count;
     public bool CanWrite => WriteCount > 0 && !IsAnalysing;
-    public string WriteButtonText => WriteCount == 1 ? "Write 1 file" : $"Write {WriteCount} files";
+    public string WriteButtonText => WriteCount == 1 ? Loc.T("Write 1 file") : Loc.T("Write {0} files", WriteCount);
 
     /// <summary>"Will write 12 BPM and 9 keys to 14 files": what the button does, in words.</summary>
     public string WriteSummary
@@ -111,13 +112,13 @@ public sealed partial class AnalyzeViewModel : ObservableObject
         get
         {
             var targets = Targets;
-            if (targets.Count == 0) return "Nothing is ticked to write.";
+            if (targets.Count == 0) return Loc.T("Nothing is ticked to write.");
             var bpm = targets.Count(i => i.WillWriteBpm);
             var key = targets.Count(i => i.WillWriteKey);
             var parts = new List<string>();
-            if (bpm > 0) parts.Add(bpm == 1 ? "1 BPM" : $"{bpm} BPM values");
-            if (key > 0) parts.Add(key == 1 ? "1 key" : $"{key} keys");
-            return $"Will write {string.Join(" and ", parts)} to {(targets.Count == 1 ? "1 file" : targets.Count + " files")}.";
+            if (bpm > 0) parts.Add(bpm == 1 ? Loc.T("1 BPM") : Loc.T("{0} BPM values", bpm));
+            if (key > 0) parts.Add(key == 1 ? Loc.T("1 key") : Loc.T("{0} keys", key));
+            return Loc.T("Will write {0} to {1}.", string.Join(Loc.T(" and "), parts), targets.Count == 1 ? Loc.T("1 file") : Loc.T("{0} files", targets.Count));
         }
     }
 
@@ -135,7 +136,7 @@ public sealed partial class AnalyzeViewModel : ObservableObject
         var s = settings.Load();
         _keepBackup = s.KeepTagBackups;
         _allowOverwrite = s.AnalysisAllowOverwriteDefault;
-        Heading = trackIds.Count == 1 ? "Analyze BPM and key" : $"Analyze BPM and key of {trackIds.Count} tracks";
+        Heading = trackIds.Count == 1 ? Loc.T("Analyze BPM and key") : Loc.T("Analyze BPM and key of {0} tracks", trackIds.Count);
     }
 
     // ===== analysing =====
@@ -150,21 +151,21 @@ public sealed partial class AnalyzeViewModel : ObservableObject
             foreach (var id in _ids)
             {
                 var track = await _tracks.GetAsync(id);
-                var label = track is null ? $"(track {id})" : string.IsNullOrWhiteSpace(track.Artist) ? Display(track) : $"{track.Artist} — {Display(track)}";
+                var label = track is null ? Loc.T("(track {0})", id) : string.IsNullOrWhiteSpace(track.Artist) ? Display(track) : $"{track.Artist} — {Display(track)}";
                 Items.Add(new AnalyzeItem(id, label) { Track = track });
             }
         }
         else
         {
-            foreach (var item in Items) { item.Analysis = null; item.Bpm = null; item.Key = null; item.Status = "Waiting"; item.Refresh(); }
+            foreach (var item in Items) { item.Analysis = null; item.Bpm = null; item.Key = null; item.Status = Loc.T("Waiting"); item.Refresh(); }
         }
 
         var cts = _analysisCts = new CancellationTokenSource();
         IsAnalysing = true;
         ProgressDone = 0;
         ProgressTotal = Math.Max(1, _ids.Count);
-        ProgressText = $"0 of {_ids.Count} analysed";
-        foreach (var item in Items) item.Status = "Waiting";
+        ProgressText = Loc.T("0 of {0} analysed", _ids.Count);
+        foreach (var item in Items) item.Status = Loc.T("Waiting");
         var progress = new Progress<AnalysisProgress>(OnProgress);
         try
         {
@@ -175,7 +176,7 @@ public sealed partial class AnalyzeViewModel : ObservableObject
         finally
         {
             IsAnalysing = false;
-            foreach (var item in Items.Where(i => i.Status == "Waiting")) item.Status = "Not analysed";
+            foreach (var item in Items.Where(i => i.Status == Loc.T("Waiting"))) item.Status = Loc.T("Not analysed");
             if (ReferenceEquals(_analysisCts, cts)) _analysisCts = null;
             cts.Dispose();
             Summarise();
@@ -189,19 +190,19 @@ public sealed partial class AnalyzeViewModel : ObservableObject
         var item = Items.FirstOrDefault(i => i.TrackId == p.TrackId);
         if (item is null) return;
         ProgressDone = p.Done;
-        ProgressText = $"{p.Done} of {p.Total} analysed";
+        ProgressText = Loc.T("{0} of {1} analysed", p.Done, p.Total);
 
         var result = p.Result;
         item.Analysis = result.Analysis;
         item.Status = result.Outcome switch
         {
-            AnalysisOutcome.Analyzed or AnalysisOutcome.FromCache when result.Analysis is { Bpm: null, Key: null } => "No estimate",
-            AnalysisOutcome.Analyzed => "Analysed",
-            AnalysisOutcome.FromCache => "Analysed before",
-            AnalysisOutcome.TooShort => "Too short",
-            AnalysisOutcome.DecodeFailed => "Cannot be read",
-            AnalysisOutcome.Cancelled => "Stopped",
-            _ => "Problem"
+            AnalysisOutcome.Analyzed or AnalysisOutcome.FromCache when result.Analysis is { Bpm: null, Key: null } => Loc.T("No estimate"),
+            AnalysisOutcome.Analyzed => Loc.T("Analysed"),
+            AnalysisOutcome.FromCache => Loc.T("Analysed before"),
+            AnalysisOutcome.TooShort => Loc.T("Too short"),
+            AnalysisOutcome.DecodeFailed => Loc.T("Cannot be read"),
+            AnalysisOutcome.Cancelled => Loc.T("Stopped"),
+            _ => Loc.T("Problem")
         };
         if (result.Analysis is null && !string.IsNullOrEmpty(result.Message)) item.Status += ": " + result.Message;
         else if (result.Analysis is { Message: { Length: > 0 } msg }) item.Status += ": " + msg;
@@ -307,7 +308,7 @@ public sealed partial class AnalyzeViewModel : ObservableObject
         if (Step != AnalyzeStep.Review || IsAnalysing) return;
         Message = null;
         var targets = Targets;
-        if (targets.Count == 0) { Message = "Tick at least one BPM or key to write."; return; }
+        if (targets.Count == 0) { Message = Loc.T("Tick at least one BPM or key to write."); return; }
 
         Failures.Clear();
         OnPropertyChanged(nameof(HasFailures));
@@ -325,7 +326,7 @@ public sealed partial class AnalyzeViewModel : ObservableObject
             {
                 if (_writeCts.IsCancellationRequested) { cancelled = true; break; }
                 var item = targets[i];
-                ProgressText = $"Writing {i + 1} of {targets.Count}: {item.Label}";
+                ProgressText = Loc.T("Writing {0} of {1}: {2}", i + 1, targets.Count, item.Label);
                 var chosen = new List<AnalysisFieldProposal>();
                 if (item.WillWriteBpm) chosen.Add(item.Bpm! with { Selected = true });
                 if (item.WillWriteKey) chosen.Add(item.Key! with { Selected = true });
@@ -341,17 +342,17 @@ public sealed partial class AnalyzeViewModel : ObservableObject
                 {
                     written++;
                     await FollowTheFileAsync(item);
-                    item.Status = "Written";
+                    item.Status = Loc.T("Written");
                     if (file.Warning is not null) Failures.Add($"{item.Label}: {file.Warning}");
                 }
-                else if (file?.Outcome == TagEditOutcome.Unchanged) { unchanged++; item.Status = "Already up to date"; }
-                else Failures.Add($"{item.Label}: {file?.Error ?? "not written"} The file was left untouched.");
+                else if (file?.Outcome == TagEditOutcome.Unchanged) { unchanged++; item.Status = Loc.T("Already up to date"); }
+                else Failures.Add($"{item.Label}: {file?.Error ?? Loc.T("not written")} {Loc.T("The file was left untouched.")}");
                 ProgressDone = i + 1;
             }
         }
         catch (Exception ex)
         {
-            Failures.Add("The write stopped: " + ex.Message);
+            Failures.Add(Loc.T("The write stopped: ") + ex.Message);
         }
         finally
         {
@@ -359,10 +360,10 @@ public sealed partial class AnalyzeViewModel : ObservableObject
             _writeCts = null;
         }
 
-        var parts = new List<string> { written == 1 ? "1 file written" : $"{written} files written" };
-        if (unchanged > 0) parts.Add($"{unchanged} already up to date");
-        if (Failures.Count > 0) parts.Add($"{Failures.Count} problem(s): those files were left untouched");
-        if (cancelled) parts.Add("stopped before the remaining files");
+        var parts = new List<string> { written == 1 ? Loc.T("1 file written") : Loc.T("{0} files written", written) };
+        if (unchanged > 0) parts.Add(Loc.T("{0} already up to date", unchanged));
+        if (Failures.Count > 0) parts.Add(Failures.Count == 1 ? Loc.T("1 problem: that file was left untouched") : Loc.T("{0} problems: those files were left untouched", Failures.Count));
+        if (cancelled) parts.Add(Loc.T("stopped before the remaining files"));
         ResultSummary = string.Join(" · ", parts) + ".";
         OnPropertyChanged(nameof(HasFailures));
         Summarise();

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MusicFinder.App.Localization;
 using MusicFinder.App.Services;
 using MusicFinder.Domain.Contracts;
 using MusicFinder.Domain.Models;
@@ -27,7 +28,7 @@ public sealed class SongMemberViewModel
         VersionText = m.VersionLabel;
         var ext = m.Extension.TrimStart('.').ToUpperInvariant();
         FormatText = m.BitrateKbps is > 0 ? $"{ext} · {m.BitrateKbps} kbps" : ext;
-        PlaysText = m.PlayCount switch { 0 => "Never played", 1 => "1 play", _ => $"{m.PlayCount} plays" };
+        PlaysText = m.PlayCount switch { 0 => Loc.T("Never played"), 1 => Loc.T("1 play"), _ => Loc.T("{0} plays", m.PlayCount) };
         IsSuggested = isSuggested;
     }
 }
@@ -49,13 +50,13 @@ public sealed class SongGroupViewModel
         Members = g.Members.Select(m => new SongMemberViewModel(m, g.Kind == SongGroupKind.SameRecording && m.TrackId == g.SuggestedTrackId)).ToList();
         if (g.Kind == SongGroupKind.SameRecording)
         {
-            DetailText = $"{g.Members.Count} files · probably the same recording";
-            HintText = "Highlighted: the file that looks best to keep (" + g.SuggestionReason + "). This is a suggestion from the tags and file facts, not a check of the audio.";
+            DetailText = Loc.T("{0} files · probably the same recording", g.Members.Count);
+            HintText = Loc.T("Highlighted: the file that looks best to keep ({0}). This is a suggestion from the tags and file facts, not a check of the audio.", g.SuggestionReason);
         }
         else
         {
-            DetailText = $"{g.Members.Count} files · different versions of one song";
-            HintText = "These are not duplicates: they differ in version (remix, edit, live…) or length. Nothing here is a reason to remove a file.";
+            DetailText = Loc.T("{0} files · different versions of one song", g.Members.Count);
+            HintText = Loc.T("These are not duplicates: they differ in version (remix, edit, live…) or length. Nothing here is a reason to remove a file.");
         }
     }
 }
@@ -73,7 +74,7 @@ public sealed partial class ProbableDuplicatesViewModel : ObservableObject
     public ObservableCollection<SongGroupViewModel> SameRecording { get; } = [];
     public ObservableCollection<SongGroupViewModel> OtherVersions { get; } = [];
 
-    [ObservableProperty] private string _summaryText = "Looking…";
+    [ObservableProperty] private string _summaryText = Loc.T("Looking…");
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private bool _hasSame;
     [ObservableProperty] private bool _hasOther;
@@ -107,8 +108,8 @@ public sealed partial class ProbableDuplicatesViewModel : ObservableObject
         HasSame = SameRecording.Count > 0;
         HasOther = OtherVersions.Count > 0;
         SummaryText = HasSame || HasOther
-            ? $"{SameRecording.Count:N0} groups of probable duplicates, {OtherVersions.Count:N0} songs in more than one version."
-            : "Nothing found. Probable duplicates need the same artist and title tags, so tracks without them are not compared.";
+            ? Loc.T("{0:N0} groups of probable duplicates, {1:N0} songs in more than one version.", SameRecording.Count, OtherVersions.Count)
+            : Loc.T("Nothing found. Probable duplicates need the same artist and title tags, so tracks without them are not compared.");
     }
 
     [RelayCommand]
