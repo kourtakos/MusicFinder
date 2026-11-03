@@ -1,6 +1,6 @@
 # Third-party notices
 
-MusicFinder ships with the components below. Versions are the ones resolved in this build
+MusicFinder itself is released under the MIT licence (see `LICENSE`). It ships with the components below. Versions are the ones resolved in this build
 (`Directory.Packages.props`, plus the transitive packages the build pulls in). Licence identifiers are taken
 from each package's own metadata (SPDX).
 

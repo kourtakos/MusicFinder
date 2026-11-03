@@ -82,10 +82,16 @@ docs/                           architecture, database, search syntax, Greek sea
 - Find Similar compares metadata only (genre, BPM, key, DJ tags), never how the music sounds; tracks without BPM, key or genre cannot be compared (`docs/find-similar.md`).
 - Favorites (shown in the reference design) need a database migration and are not implemented.
 - Drag-out is verified with Windows Media Player and Winamp only; Traktor and VirtualDJ are untested (checklist in `docs/dj-session.md`).
-- No DJ-history import yet (M4), so nothing is "confirmed" except by you. File organisation, duplicates and Library Health (M6) and backup (M8) are later milestones.
+- VirtualDJ history is read (Settings > DJ history) and confirms plays; Traktor history is not read yet because the file format has not been checked on a real install.
 - BPM and key analysis was measured on 150 files of the author's own library: confident tempos agreed with the tags 92 % of the time, keys only about 6 in 10 even at high confidence (`docs/audio-analysis.md`). Which key notation Traktor and VirtualDJ read from a tag is not verified.
 - Online identification (including covers from the Cover Art Archive) is tested with fake services only; it has not yet been run against the real MusicBrainz and AcoustID with a real key and fpcalc. `fpcalc.exe` is not bundled (its licence is not verified); you supply it. BPM and key are never looked up online (`docs/identification.md`).
 
 ## Release package
 
 `.\build\publish.ps1` builds `dist\MusicFinder-<version>-win-x64.zip`: self-contained (no .NET install needed), portable, with `THIRD-PARTY-NOTICES.md`. See `docs/release-checklist.md` (includes the clean-VM test that still needs a person) and `CHANGELOG.md`.
+
+## Licence
+
+MusicFinder is released under the [MIT licence](LICENSE). The libraries it uses keep their own licences (listed in `THIRD-PARTY-NOTICES.md`; TagLibSharp is LGPL and ships as a separate DLL).
+
+The licence covers this program's code only. The AcoustID web service, which song recognition talks to, is free for **non-commercial use only** under its own terms, and Chromaprint's `fpcalc.exe` is not part of this project: you download it yourself from the Chromaprint page.
