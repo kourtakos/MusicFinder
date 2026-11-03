@@ -4,6 +4,12 @@ Fast, offline-first Windows DJ music library organizer and finder. Instant searc
 music folders, a folder tree, cover art, genre/tag organisation and a safe tag editor.
 See `CLAUDE.md` for the full implementation contract.
 
+## Download
+
+**[Download the latest version](https://github.com/kourtakos/MusicFinder/releases/latest)** (Windows 10/11, 64-bit). Run `MusicFinder-<version>-Setup.exe` and choose *Install* or *Portable*, or take the `win-x64.zip` and unzip it anywhere. No .NET installation is needed.
+The files are not code-signed yet, so Windows may show "Windows protected your PC": choose *More info*, then *Run anyway*.
+
+
 **Status: M1 (search), M2 (covers, genres, tags), M3 (DJ session and drag-out), the Quick Search pop-up, M7 (smart Greek search, Find Similar), M5 (online identification), a BPM/key audio analysis, M6 (library health, duplicates, rename/move) and M8 (backup/restore, self-contained package) are implemented.**
 MusicFinder only changes your music files when you press *Write* in the tag editor, or confirm a batch rename/move, after a full preview and never silently (rename and move have a journal and undo; Traktor and VirtualDJ lose cue points for renamed files).
 It never deletes files. It makes no network connection unless you turn on **online identification** in Settings, after being shown exactly what is sent (`docs/identification.md`).
