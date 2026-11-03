@@ -73,6 +73,13 @@ public sealed class AppSettings
     /// <summary>Preview volume, 0 to 1. Starts at half so a first preview is never a surprise.</summary>
     public double PreviewVolume { get; set; } = 0.5;
 
+    /// <summary>The folder with VirtualDJ's history files. Null: the folder found automatically (VirtualDJ's own default).</summary>
+    public string? VirtualDjHistoryFolder { get; set; }
+    /// <summary>The folder with Traktor's history files. Null: the folder found automatically.</summary>
+    public string? TraktorHistoryFolder { get; set; }
+    /// <summary>Read the DJ programs' history by itself (at start, with the session, every minute during one). Off: only "Import now".</summary>
+    public bool HistoryAutoImport { get; set; } = true;
+
     /// <summary>Seconds of a track the BPM and key analysis listens to (the middle of the track). 30 - 240.</summary>
     public int AnalysisSeconds { get; set; } = 90;
     /// <summary>How fast the duplicate scan may read files, in MB per second (0 = no limit).</summary>

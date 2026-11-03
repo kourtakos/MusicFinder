@@ -16,14 +16,14 @@ public class HistoryImportTests
 {
     private static readonly DateTime T0 = new(2026, 11, 3, 19, 0, 0, DateTimeKind.Utc);
 
-    private sealed class FakeSettings : ISettingsStore
+    internal sealed class FakeSettings : ISettingsStore
     {
         public AppSettings Value { get; } = new();
         public AppSettings Load() => Value;
         public void Save(AppSettings settings) { }
     }
 
-    private sealed class Env : IAsyncDisposable
+    internal sealed class Env : IAsyncDisposable
     {
         public TestDb Db { get; } = new();
         public FakeTimeProvider Clock { get; } = new(new DateTimeOffset(T0));
