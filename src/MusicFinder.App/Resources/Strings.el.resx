@@ -2687,4 +2687,34 @@
   <data name="Select a track, then list the tracks that fit next to it by genre, BPM, key and DJ tags (Ctrl+Shift+F)" xml:space="preserve">
     <value>Επίλεξε ένα κομμάτι και δες ποια κομμάτια ταιριάζουν δίπλα του ως προς είδος, BPM, τονικότητα και DJ tags (Ctrl+Shift+F)</value>
   </data>
+  <data name="Sort by BPM" xml:space="preserve">
+    <value>Ταξινόμηση κατά BPM</value>
+  </data>
+  <data name="Harmonic order" xml:space="preserve">
+    <value>Αρμονική σειρά</value>
+  </data>
+  <data name="Export .m3u8…" xml:space="preserve">
+    <value>Εξαγωγή .m3u8…</value>
+  </data>
+  <data name="Put the crate in order of tempo, slowest first. Tracks without a BPM stay at the end. Only this list changes." xml:space="preserve">
+    <value>Βάζει το crate σε σειρά ταχύτητας, από το πιο αργό. Τα κομμάτια χωρίς BPM μένουν στο τέλος. Αλλάζει μόνο αυτή η λίστα.</value>
+  </data>
+  <data name="Suggest a running order along the Camelot wheel, closest key and tempo next. It is a heuristic; tracks without BPM or key go last. Only this list changes." xml:space="preserve">
+    <value>Προτείνει σειρά παιξίματος πάνω στον τροχό Camelot, με πλησιέστερη τονικότητα και ταχύτητα στη συνέχεια. Είναι ευρετική μέθοδος· τα κομμάτια χωρίς BPM ή τονικότητα πάνε στο τέλος. Αλλάζει μόνο αυτή η λίστα.</value>
+  </data>
+  <data name="Save the crate, in this order, as a playlist file. Your music files are not touched." xml:space="preserve">
+    <value>Αποθηκεύει το crate, με αυτή τη σειρά, ως αρχείο playlist. Τα αρχεία μουσικής δεν αγγίζονται.</value>
+  </data>
+  <data name="Export crate" xml:space="preserve">
+    <value>Εξαγωγή crate</value>
+  </data>
+  <data name="Saved {0} tracks to {1}." xml:space="preserve">
+    <value>Αποθηκεύτηκαν {0} κομμάτια στο {1}.</value>
+  </data>
+  <data name="Saved {0} tracks to {1}; {2} missing files were left out." xml:space="preserve">
+    <value>Αποθηκεύτηκαν {0} κομμάτια στο {1}· {2} αρχεία που λείπουν δεν συμπεριλήφθηκαν.</value>
+  </data>
+  <data name="Could not save the playlist: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατή η αποθήκευση της playlist: {0}</value>
+  </data>
 </root>

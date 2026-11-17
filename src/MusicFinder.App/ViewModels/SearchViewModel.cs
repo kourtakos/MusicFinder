@@ -749,6 +749,44 @@ public partial class SearchViewModel : ObservableObject
         CratesChanged?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>Slowest first; tracks with no BPM stay at the end. Only the crate's list order changes.</summary>
+    [RelayCommand]
+    private Task SortCrateByBpm() => ReorderCrateAsync(MusicFinder.Application.Crates.CrateOrdering.ByBpm);
+
+    /// <summary>A suggested running order along the Camelot wheel (a heuristic). Only the crate's list order changes.</summary>
+    [RelayCommand]
+    private Task SortCrateHarmonic() => ReorderCrateAsync(MusicFinder.Application.Crates.CrateOrdering.Harmonic);
+
+    private async Task ReorderCrateAsync(Func<IReadOnlyList<MusicFinder.Domain.Models.SearchResultRow>, IReadOnlyList<long>> order)
+    {
+        if (_crateId is not { } id || Results.Count == 0) return;
+        var ids = order(Results.Select(r => r.Row).ToList());
+        await _crates.ReorderAsync(id, ids, CancellationToken.None);
+        await LoadCrateAsync();
+    }
+
+    /// <summary>Saves the open crate, in its order, as an .m3u8 playlist. It lists the files; nothing is copied or changed.</summary>
+    [RelayCommand]
+    private async Task ExportCrate()
+    {
+        if (!IsCrateMode || Results.Count == 0) return;
+        var rows = Results.Select(r => r.Row).ToList();
+        var path = _dialogs.PickSaveFile(Loc.T("Export crate"), "M3U8 playlist (*.m3u8)|*.m3u8", CrateName + ".m3u8");
+        if (path is null) return;
+        try
+        {
+            var skipped = 0;
+            await Task.Run(() => MusicFinder.Application.Crates.M3uWriter.Write(path, rows, out skipped));
+            Warning = skipped == 0
+                ? Loc.T("Saved {0} tracks to {1}.", rows.Count, path)
+                : Loc.T("Saved {0} tracks to {1}; {2} missing files were left out.", rows.Count - skipped, path, skipped);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            Warning = Loc.T("Could not save the playlist: {0}", ex.Message);
+        }
+    }
+
     /// <summary>Takes the selected tracks out of the open crate. The files and the library are untouched.</summary>
     [RelayCommand]
     private async Task RemoveFromCrate()

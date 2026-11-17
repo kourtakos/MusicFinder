@@ -117,8 +117,19 @@
                         <TextBlock Style="{StaticResource MF.Secondary}" FontSize="12" TextWrapping="Wrap"
                                    Text="Drag the tracks to your DJ software as usual. Removing a track here only takes it off this list."/>
                     </StackPanel>
-                    <Button Grid.Column="1" Content="Remove selected" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="12,0"
-                            Command="{Binding Search.RemoveFromCrateCommand}" ToolTip="Take the selected tracks off this crate (files are not touched)"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="12,0">
+                        <Button Content="Sort by BPM" Style="{StaticResource MF.PillButton}" Height="32" Padding="12,0" Margin="0,0,8,0"
+                                Command="{Binding Search.SortCrateByBpmCommand}"
+                                ToolTip="Put the crate in order of tempo, slowest first. Tracks without a BPM stay at the end. Only this list changes."/>
+                        <Button Content="Harmonic order" Style="{StaticResource MF.PillButton}" Height="32" Padding="12,0" Margin="0,0,8,0"
+                                Command="{Binding Search.SortCrateHarmonicCommand}"
+                                ToolTip="Suggest a running order along the Camelot wheel, closest key and tempo next. It is a heuristic; tracks without BPM or key go last. Only this list changes."/>
+                        <Button Content="Export .m3u8…" Style="{StaticResource MF.PillButton}" Height="32" Padding="12,0" Margin="0,0,8,0"
+                                Command="{Binding Search.ExportCrateCommand}"
+                                ToolTip="Save the crate, in this order, as a playlist file. Your music files are not touched."/>
+                        <Button Content="Remove selected" Style="{StaticResource MF.PillButton}" Height="32" Padding="12,0"
+                                Command="{Binding Search.RemoveFromCrateCommand}" ToolTip="Take the selected tracks off this crate (files are not touched)"/>
+                    </StackPanel>
                     <Button Grid.Column="2" Content="Close" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0"
                             Command="{Binding Search.CloseCrateCommand}" ToolTip="Back to your search"/>
                 </Grid>

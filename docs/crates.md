@@ -17,6 +17,16 @@ A crate name is unique regardless of case and at most 100 characters. One track 
 
 Tables `Crates` and `CrateTracks` (migration `0014_Crates.sql`), kept in the library database, so a library backup includes them.
 
+## Ordering and export
+
+With a crate open:
+
+- **Sort by BPM** puts it slowest first. Tracks with no BPM stay at the end.
+- **Harmonic order** suggests a running order: it starts at the slowest track that has a BPM and a readable key, then repeatedly takes the remaining track closest on the Camelot wheel (same key, relative key, neighbour; 12 and 1 are neighbours) and, among those, closest in tempo. It is a heuristic, not a verdict on what mixes. Tracks without BPM or key are never given made-up values; they go last.
+- **Export .m3u8** saves the crate in its order as an extended M3U8 playlist (UTF-8, absolute paths, duration and "Artist - Title"). Files marked missing are left out and the message says how many. Windows asks before replacing an existing file. Whether a DJ program imports it is up to that program; MusicFinder has not verified VirtualDJ or Traktor import.
+
+Sorting rewrites only the crate's own order; it cannot be undone, but nothing outside the list changes.
+
 ## Not yet
 
-Ordering a crate by BPM/key, manual reordering, `.m3u8` export and saved searches are planned next.
+Manual reordering and saved searches are planned next.

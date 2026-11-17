@@ -95,4 +95,32 @@ public class CratesTests
         Assert.Empty(library.Crates.Items);
         Assert.Equal(3, library.Search.Results.Count);
     });
+
+    [Fact]
+    public Task SortByBpm_ReordersTheOpenCrate_SlowestFirst() => Ui.RunAsync(async () =>
+    {
+        var (app, grid) = await ShowAsync();
+        await using var _ = app;
+        var library = app.Main.Library;
+        var search = library.Search;
+        // Seeded BPM: Le Freak 120, Good Times 119, the Greek track 100.
+        await SelectAsync(app, grid, "Le Freak", "Good Times");
+        library.Crates.NewName = "Set";
+        library.Crates.CreateCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => library.Crates.Items.Count == 1 && library.Crates.Items[0].TrackCount == 2, what: "crate");
+        await library.Crates.Items[0].OpenCommand.ExecuteAsync(null);
+        await Ui.WaitUntilAsync(() => search.IsCrateMode && search.Results.Count == 2, what: "crate open");
+        var before = search.Results.Select(r => r.Title).ToList();
+        Assert.Equal(["Le Freak", "Good Times"], before);
+
+        search.SortCrateByBpmCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => search.Results.Count == 2 && search.Results[0].Title == "Good Times", what: "sorted");
+        Assert.Equal(["Good Times", "Le Freak"], search.Results.Select(r => r.Title));
+
+        // The new order is the crate's order now: opening it again shows it.
+        search.CloseCrateCommand.Execute(null);
+        await library.Crates.Items[0].OpenCommand.ExecuteAsync(null);
+        await Ui.WaitUntilAsync(() => search.IsCrateMode && search.Results.Count == 2, what: "reopened");
+        Assert.Equal("Good Times", search.Results[0].Title);
+    });
 }
