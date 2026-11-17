@@ -104,6 +104,9 @@ public sealed partial class TrackRowViewModel : ObservableObject
         ? TimeSpan.FromMilliseconds(ms).ToString(ms >= 3_600_000 ? @"h\:mm\:ss" : @"m\:ss", CultureInfo.InvariantCulture)
         : "";
 
+    /// <summary>The bitrate the file reports, in kbps, or empty when unknown. For variable-bitrate files this is the average the tag reader gives.</summary>
+    public string BitrateText => Row.BitrateKbps is > 0 and var kbps ? kbps.ToString(CultureInfo.CurrentCulture) : "";
+
     public string SizeText => FormatSize(Row.FileSize);
 
     public string FormatText

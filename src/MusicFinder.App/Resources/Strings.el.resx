@@ -2753,4 +2753,10 @@
   <data name="A saved search named &quot;{0}&quot; already exists." xml:space="preserve">
     <value>Υπάρχει ήδη αποθηκευμένη αναζήτηση με όνομα «{0}».</value>
   </data>
+  <data name="kbps" xml:space="preserve">
+    <value>kbps</value>
+  </data>
+  <data name="Bitrate as reported by the file. Variable-bitrate files show their average." xml:space="preserve">
+    <value>Το bitrate όπως το αναφέρει το αρχείο. Τα αρχεία μεταβλητού bitrate δείχνουν τον μέσο όρο τους.</value>
+  </data>
 </root>

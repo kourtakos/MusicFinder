@@ -477,6 +477,15 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
+                            <DataGridTemplateColumn Header="kbps" Width="60" CanUserSort="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding BitrateText}" Foreground="{StaticResource MF.Brush.TextSecondary}"
+                                                   ToolTip="Bitrate as reported by the file. Variable-bitrate files show their average."/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
                             <DataGridTemplateColumn Header="Last Played" Width="170" SortMemberPath="LastPlayed">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
