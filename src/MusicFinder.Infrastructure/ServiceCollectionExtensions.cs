@@ -47,6 +47,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IGenreService, MusicFinder.Application.Genres.GenreService>();
         services.AddSingleton<IDjTagService, MusicFinder.Application.Genres.DjTagService>();
         services.AddSingleton<ICustomTagRepository, CustomTagRepository>();
+        services.AddSingleton<ICrateRepository, CrateRepository>();
         services.AddSingleton<GenreTaxonomySeeder>();
         services.AddSingleton<FtsVocabulary>(sp =>
         {

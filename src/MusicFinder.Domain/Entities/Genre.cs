@@ -22,3 +22,12 @@ public sealed class CustomTag
     public string Name { get; set; } = "";
     public int SortOrder { get; set; }
 }
+
+/// <summary>A named, ordered list of tracks for preparing a set. It only references tracks.</summary>
+public sealed class Crate
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = "";
+    /// <summary>Present (not missing) tracks in the crate.</summary>
+    public int TrackCount { get; set; }
+}

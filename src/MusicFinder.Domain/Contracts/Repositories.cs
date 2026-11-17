@@ -200,3 +200,21 @@ public interface ISimilarCandidateSource
     Task<IReadOnlyList<SimilarSignals>> GetCandidatesAsync(SimilarSignals seed, SimilarTracksOptions options,
         IReadOnlyCollection<long> relatedGenreIds, CancellationToken ct = default);
 }
+
+public interface ICrateRepository
+{
+    Task<IReadOnlyList<Crate>> GetAllAsync(CancellationToken ct = default);
+    /// <summary>Creates a crate; returns null when a crate with that name (any case) already exists.</summary>
+    Task<long?> CreateAsync(string name, CancellationToken ct = default);
+    /// <summary>Returns false when another crate already has that name.</summary>
+    Task<bool> RenameAsync(long id, string name, CancellationToken ct = default);
+    /// <summary>Deletes the crate and its list; tracks and files are untouched.</summary>
+    Task DeleteAsync(long id, CancellationToken ct = default);
+    /// <summary>Track ids in crate order, including tracks currently marked missing.</summary>
+    Task<IReadOnlyList<long>> GetTrackIdsAsync(long crateId, CancellationToken ct = default);
+    /// <summary>Appends tracks not already in the crate, keeping the given order; returns how many were added.</summary>
+    Task<int> AddTracksAsync(long crateId, IReadOnlyList<long> trackIds, CancellationToken ct = default);
+    Task RemoveTracksAsync(long crateId, IReadOnlyList<long> trackIds, CancellationToken ct = default);
+    /// <summary>Sets the crate order. Tracks not listed keep their relative order after the listed ones.</summary>
+    Task ReorderAsync(long crateId, IReadOnlyList<long> orderedTrackIds, CancellationToken ct = default);
+}
