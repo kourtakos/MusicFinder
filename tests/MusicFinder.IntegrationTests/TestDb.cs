@@ -19,6 +19,7 @@ public sealed class TestDb : IAsyncDisposable
     public GenreRepository Genres { get; }
     public CustomTagRepository Tags { get; }
     public CrateRepository Crates { get; }
+    public SavedSearchRepository SavedSearches { get; }
     public GenreTaxonomySeeder Seeder { get; }
     public DjSessionRepository Sessions { get; }
     public TrackEventRepository Events { get; }
@@ -49,6 +50,7 @@ public sealed class TestDb : IAsyncDisposable
         GenreJob = new MusicFinder.Application.Genres.GenreMappingJob(Genres, TrackGenres);
         Tags = new CustomTagRepository(Factory, Writes);
         Crates = new CrateRepository(Factory, Writes);
+        SavedSearches = new SavedSearchRepository(Factory, Writes);
         GenreService = new MusicFinder.Application.Genres.GenreService(Genres, TrackGenres, GenreJob);
         TagService = new MusicFinder.Application.Genres.DjTagService(Tags);
         Seeder = new GenreTaxonomySeeder(Writes);

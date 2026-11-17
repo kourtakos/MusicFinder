@@ -2717,4 +2717,40 @@
   <data name="Could not save the playlist: {0}" xml:space="preserve">
     <value>Δεν ήταν δυνατή η αποθήκευση της playlist: {0}</value>
   </data>
+  <data name="Type a name, then use + for a new crate (the selected tracks are added to it) or the disk button to save the current search under that name." xml:space="preserve">
+    <value>Γράψε ένα όνομα και μετά πάτα + για νέο crate (τα επιλεγμένα κομμάτια προστίθενται σε αυτό) ή το κουμπί δισκέτας για να αποθηκεύσεις την τρέχουσα αναζήτηση με αυτό το όνομα.</value>
+  </data>
+  <data name="Save the current search and filters under this name. Opening it later runs the search again." xml:space="preserve">
+    <value>Αποθηκεύει την τρέχουσα αναζήτηση και τα φίλτρα με αυτό το όνομα. Όταν την ανοίξεις αργότερα, η αναζήτηση τρέχει ξανά.</value>
+  </data>
+  <data name="Saved searches" xml:space="preserve">
+    <value>Αποθηκευμένες αναζητήσεις</value>
+  </data>
+  <data name="Run this search again" xml:space="preserve">
+    <value>Εκτέλεση αυτής της αναζήτησης ξανά</value>
+  </data>
+  <data name="Delete saved search…" xml:space="preserve">
+    <value>Διαγραφή αποθηκευμένης αναζήτησης…</value>
+  </data>
+  <data name="The saved search &quot;{0}&quot; could not be read." xml:space="preserve">
+    <value>Η αποθηκευμένη αναζήτηση «{0}» δεν μπορεί να διαβαστεί.</value>
+  </data>
+  <data name="Delete saved search" xml:space="preserve">
+    <value>Διαγραφή αποθηκευμένης αναζήτησης</value>
+  </data>
+  <data name="Delete the saved search &quot;{0}&quot;? No tracks are affected." xml:space="preserve">
+    <value>Να διαγραφεί η αποθηκευμένη αναζήτηση «{0}»; Κανένα κομμάτι δεν επηρεάζεται.</value>
+  </data>
+  <data name="Type a name for the search first." xml:space="preserve">
+    <value>Γράψε πρώτα ένα όνομα για την αναζήτηση.</value>
+  </data>
+  <data name="A name can be at most 100 characters." xml:space="preserve">
+    <value>Ένα όνομα μπορεί να έχει έως 100 χαρακτήρες.</value>
+  </data>
+  <data name="There is nothing to save: type a search or choose a filter first." xml:space="preserve">
+    <value>Δεν υπάρχει τίποτα να αποθηκευτεί: γράψε μια αναζήτηση ή διάλεξε φίλτρο πρώτα.</value>
+  </data>
+  <data name="A saved search named &quot;{0}&quot; already exists." xml:space="preserve">
+    <value>Υπάρχει ήδη αποθηκευμένη αναζήτηση με όνομα «{0}».</value>
+  </data>
 </root>

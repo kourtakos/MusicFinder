@@ -31,3 +31,11 @@ public sealed class Crate
     /// <summary>Present (not missing) tracks in the crate.</summary>
     public int TrackCount { get; set; }
 }
+
+/// <summary>A named query with its filters and sort, kept as JSON (see SavedSearchState in the application layer).</summary>
+public sealed class SavedSearch
+{
+    public long Id { get; set; }
+    public string Name { get; set; } = "";
+    public string StateJson { get; set; } = "";
+}

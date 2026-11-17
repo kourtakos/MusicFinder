@@ -123,4 +123,38 @@ public class CratesTests
         await Ui.WaitUntilAsync(() => search.IsCrateMode && search.Results.Count == 2, what: "reopened");
         Assert.Equal("Good Times", search.Results[0].Title);
     });
+
+    [Fact]
+    public Task ASavedSearch_KeepsTheQuery_AndRunsAgainWhenOpened() => Ui.RunAsync(async () =>
+    {
+        var (app, _) = await ShowAsync();
+        await using var _ = app;
+        var library = app.Main.Library;
+        var search = library.Search;
+
+        // Nothing to save yet.
+        library.Crates.NewName = "Empty";
+        library.Crates.SaveSearchCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => library.Crates.Message is not null, what: "empty message");
+        Assert.Empty(library.Crates.SavedSearches);
+
+        search.QueryText = "chic";
+        await Ui.WaitUntilAsync(() => search.Results.Count == 2, what: "chic results");
+        library.Crates.NewName = "Chic only";
+        library.Crates.SaveSearchCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => library.Crates.SavedSearches.Count == 1, what: "saved");
+        Assert.Equal("", library.Crates.NewName);
+
+        search.ResetCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => search.Results.Count == 3 && search.QueryText == "", what: "reset");
+
+        library.Crates.SavedSearches[0].OpenCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => search.QueryText == "chic" && search.Results.Count == 2, what: "saved search applied");
+        Assert.True(library.Tree.GlobalSearch);
+
+        library.Crates.NewName = "chic only";
+        library.Crates.SaveSearchCommand.Execute(null);
+        await Ui.WaitUntilAsync(() => library.Crates.Message is not null && library.Crates.Message.Contains("already exists"), what: "duplicate message");
+        Assert.Single(library.Crates.SavedSearches);
+    });
 }

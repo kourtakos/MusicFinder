@@ -27,6 +27,16 @@ With a crate open:
 
 Sorting rewrites only the crate's own order; it cannot be undone, but nothing outside the list changes.
 
+## Saved searches (smart crates)
+
+Type a name in the Crates box and press the disk button to keep the **current search**: the typed query (including `genre:`, `bpm:` and the other fields), the Genre / BPM / Decade / Tags / Played filters, the "hide played in session" options and the sort. Saved searches are listed under *Saved searches*; clicking one runs it again, so it always shows what matches now (a crate, by contrast, is a fixed list).
+
+- A saved search looks at the whole library: opening one ticks *Global search*, which you can untick.
+- It does not remember the selected folder, and it never stores tracks.
+- A filter that no longer exists (for example a deleted genre) is skipped; a saved search whose data cannot be read says so and changes nothing.
+- Names are unique regardless of case. Right-click a saved search to delete it; no tracks are affected.
+- Stored in table `SavedSearches` (migration `0015_SavedSearches.sql`), so a library backup includes them.
+
 ## Not yet
 
-Manual reordering and saved searches are planned next.
+Manual reordering of a crate by dragging.

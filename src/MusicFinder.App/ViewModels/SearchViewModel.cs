@@ -664,6 +664,61 @@ public partial class SearchViewModel : ObservableObject
     }
 
 
+    // ===== Saved searches =====
+
+    /// <summary>What the search looks like right now (query, filters, sort), for saving it under a name.</summary>
+    public MusicFinder.Application.Search.SavedSearchState CaptureSearchState()
+    {
+        var bpm = BpmOptions.FirstOrDefault(o => o.IsSelected);
+        var played = PlayedOptions.FirstOrDefault(o => o.IsSelected && o.Id < HideConfirmedId);
+        return new MusicFinder.Application.Search.SavedSearchState
+        {
+            Text = QueryText,
+            Genres = GenreOptions.Where(o => o.IsSelected).Select(o => new MusicFinder.Application.Search.SavedGenreRef((int)o.Kind, o.Id)).ToList(),
+            TagIds = TagOptions.Where(o => o.IsSelected).Select(o => o.Id).ToList(),
+            Decades = DecadeOptions.Where(o => o.IsSelected).Select(o => (int)o.Min).ToList(),
+            BpmMin = bpm?.Min,
+            BpmMax = bpm?.Max,
+            PlayedId = played is null ? null : (int)played.Id,
+            HideConfirmed = PlayedOptions.Any(o => o.Id == HideConfirmedId && o.IsSelected),
+            HidePossible = PlayedOptions.Any(o => o.Id == HidePossibleId && o.IsSelected),
+            SortField = (int)SortField,
+            SortDirection = (int)SortDirection
+        };
+    }
+
+    /// <summary>Shows a saved search: its text, filters and sort replace the current ones, over the whole library. Filters that no longer exist are skipped.</summary>
+    public void ApplySearchState(MusicFinder.Application.Search.SavedSearchState state)
+    {
+        ExitSimilarMode(); // also leaves an open crate
+        foreach (var o in GenreOptions.Concat(TagOptions).Concat(DecadeOptions).Concat(BpmOptions).Concat(PlayedOptions)) o.SetSilently(false);
+
+        var genres = state.Genres.Select(g => (g.Kind, g.Id)).ToHashSet();
+        foreach (var o in GenreOptions.Where(o => genres.Contains(((int)o.Kind, o.Id)))) o.SetSilently(true);
+        var tags = state.TagIds.ToHashSet();
+        foreach (var o in TagOptions.Where(o => tags.Contains(o.Id))) o.SetSilently(true);
+        var decades = state.Decades.ToHashSet();
+        foreach (var o in DecadeOptions.Where(o => decades.Contains((int)o.Min))) o.SetSilently(true);
+        if (state.BpmMin is { } lo && state.BpmMax is { } hi)
+            BpmOptions.FirstOrDefault(o => o.Min == lo && o.Max == hi)?.SetSilently(true);
+        foreach (var o in PlayedOptions)
+        {
+            if (o.Id == HideConfirmedId) o.SetSilently(state.HideConfirmed);
+            else if (o.Id == HidePossibleId) o.SetSilently(state.HidePossible);
+            else if (state.PlayedId is { } p && o.Id == p) o.SetSilently(true);
+        }
+
+        SortField = Enum.IsDefined(typeof(SortField), state.SortField) ? (SortField)state.SortField : SortField.Relevance;
+        SortDirection = Enum.IsDefined(typeof(SortDirection), state.SortDirection) ? (SortDirection)state.SortDirection : SortDirection.Asc;
+        _tree.GlobalSearch = true; // a saved search is about the whole library; the box stays visible and can be unticked
+
+        _session.NotifyActivity(UserActivity.Search);
+        var changed = QueryText != state.Text;
+        QueryText = state.Text;
+        OnPropertyChanged(nameof(HasActiveFilters));
+        if (!changed) ScheduleSearch(0);
+    }
+
     // ===== Crates =====
 
     private readonly ICrateRepository _crates;

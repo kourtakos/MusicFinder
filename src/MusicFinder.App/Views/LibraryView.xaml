@@ -241,15 +241,20 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBox Text="{Binding Crates.NewName, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center"
-                                     ToolTip="Name a new crate and press Enter. The tracks selected now are added to it.">
+                                     ToolTip="Type a name, then use + for a new crate (the selected tracks are added to it) or the disk button to save the current search under that name.">
                                 <TextBox.InputBindings>
                                     <KeyBinding Key="Return" Command="{Binding Crates.CreateCommand}"/>
                                 </TextBox.InputBindings>
                             </TextBox>
                             <Button Grid.Column="1" Style="{StaticResource MF.IconButton}" ToolTip="New crate" Command="{Binding Crates.CreateCommand}">
                                 <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE710;"/>
+                            </Button>
+                            <Button Grid.Column="2" Style="{StaticResource MF.IconButton}" Command="{Binding Crates.SaveSearchCommand}"
+                                    ToolTip="Save the current search and filters under this name. Opening it later runs the search again.">
+                                <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE74E;"/>
                             </Button>
                         </Grid>
                         <TextBlock Text="{Binding Crates.Message}" Foreground="{StaticResource MF.Brush.Warning}" FontSize="12" TextWrapping="Wrap"
@@ -276,6 +281,32 @@
                         </ItemsControl>
                         <TextBlock Text="No crates yet." Style="{StaticResource MF.Secondary}" FontSize="12" Margin="2,0,0,0"
                                    Visibility="{Binding Crates.Items.Count, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+
+                        <TextBlock Text="Saved searches" FontSize="13" FontWeight="SemiBold" Margin="2,10,0,4"
+                                   Visibility="{Binding Crates.SavedSearches.Count, Converter={StaticResource NotNullToVis}}"/>
+                        <ItemsControl ItemsSource="{Binding Crates.SavedSearches}" MaxHeight="110">
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsPresenter/></ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding OpenCommand}" Background="Transparent" BorderThickness="0" Padding="6,3"
+                                            HorizontalContentAlignment="Left" Cursor="Hand" ToolTip="Run this search again">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete saved search…" Command="{Binding DeleteCommand}"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE721;" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </StackPanel>
                 </Border>
 

@@ -218,3 +218,11 @@ public interface ICrateRepository
     /// <summary>Sets the crate order. Tracks not listed keep their relative order after the listed ones.</summary>
     Task ReorderAsync(long crateId, IReadOnlyList<long> orderedTrackIds, CancellationToken ct = default);
 }
+
+public interface ISavedSearchRepository
+{
+    Task<IReadOnlyList<SavedSearch>> GetAllAsync(CancellationToken ct = default);
+    /// <summary>Saves under a new name; returns null when that name (any case) is already used.</summary>
+    Task<long?> AddAsync(string name, string stateJson, CancellationToken ct = default);
+    Task DeleteAsync(long id, CancellationToken ct = default);
+}
