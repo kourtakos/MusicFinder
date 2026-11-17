@@ -91,5 +91,6 @@ public sealed partial class MainViewModel : ObservableObject
         await Settings.ReloadAsync();
         await Tags.ReloadAsync();
         await Session.ReloadAsync();
+        await Library.Crates.ReloadAsync();
     }
 }

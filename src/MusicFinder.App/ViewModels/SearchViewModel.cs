@@ -65,8 +65,9 @@ public partial class SearchViewModel : ObservableObject
     public SearchViewModel(ISearchService search, FolderTreeViewModel tree, IUserDialogs dialogs,
         IGenreService genres, IDjTagService tags, Services.Artwork.IArtworkService artwork, ITagEditingService tagEditing,
         ISessionService session, IPlayHistoryQuery playHistory, Services.Dragging.TrackDragService drag, ISettingsStore settings,
-        Services.SearchIndexCoordinator searchIndex, ISimilarTracksService similar)
+        Services.SearchIndexCoordinator searchIndex, ISimilarTracksService similar, ICrateRepository crates)
     {
+        _crates = crates;
         _drag = drag;
         _similar = similar;
         _loadingSimilarOptions = true;
@@ -160,7 +161,9 @@ public partial class SearchViewModel : ObservableObject
     }
 
     public string ScopeLabel => _tree.ScopeLabel;
-    public string ResultsText => IsSimilarMode
+    public string ResultsText => IsCrateMode
+        ? (Results.Count == 1 ? Loc.T("{0:N0} track in the crate", Results.Count) : Loc.T("{0:N0} tracks in the crate", Results.Count))
+        : IsSimilarMode
         ? (Results.Count == 1 ? Loc.T("{0:N0} similar track", Results.Count) : Loc.T("{0:N0} similar tracks", Results.Count))
         : IsCountReady
         ? (TotalCount == 1 ? Loc.T("{0:N0} result ({1})", TotalCount, ScopeLabel) : Loc.T("{0:N0} results ({1})", TotalCount, ScopeLabel))
@@ -462,7 +465,7 @@ public partial class SearchViewModel : ObservableObject
 
     private async Task RunSearchAsync(int delayMs)
     {
-        if (IsSimilarMode) return; // background refreshes (index finished, session changed) must not replace a similar list; a user action exits the mode first
+        if (IsSimilarMode || IsCrateMode) return; // background refreshes (index finished, session changed) must not replace a similar list; a user action exits the mode first
         _cts?.Cancel();
         var cts = _cts = new CancellationTokenSource();
         var ct = cts.Token;
@@ -593,6 +596,7 @@ public partial class SearchViewModel : ObservableObject
     public async Task EnterSimilarModeAsync(long trackId)
     {
         _cts?.Cancel(); // a normal search still in flight must not replace the list
+        ExitCrateMode();
         Warning = null;
         IsSimilarMode = true;
         _similarSeedId = trackId;
@@ -640,6 +644,7 @@ public partial class SearchViewModel : ObservableObject
     /// <summary>Leaves the similar list without searching (the caller starts the search it wants).</summary>
     private void ExitSimilarMode()
     {
+        ExitCrateMode();
         if (!IsSimilarMode) return;
         _similarCts?.Cancel();
         IsSimilarMode = false;
@@ -652,6 +657,102 @@ public partial class SearchViewModel : ObservableObject
     {
         ExitSimilarMode();
         ScheduleSearch(0);
+    }
+
+
+    // ===== Crates =====
+
+    private readonly ICrateRepository _crates;
+    private long? _crateId;
+
+    /// <summary>True while the grid lists one crate, in the crate's own order, instead of search results.</summary>
+    [ObservableProperty] private bool _isCrateMode;
+    [ObservableProperty] private string _crateName = "";
+
+    partial void OnIsCrateModeChanged(bool value) => OnPropertyChanged(nameof(ResultsText));
+
+    /// <summary>Raised when a crate's contents changed, so the crate list can refresh its counts.</summary>
+    public event EventHandler? CratesChanged;
+
+    public async Task ShowCrateAsync(long crateId, string name)
+    {
+        _cts?.Cancel();
+        ExitSimilarMode();
+        _crateId = crateId;
+        CrateName = name;
+        Warning = null;
+        IsCrateMode = true;
+        await LoadCrateAsync();
+    }
+
+    private async Task LoadCrateAsync()
+    {
+        if (_crateId is not { } id) return;
+        try
+        {
+            var ids = await _crates.GetTrackIdsAsync(id, CancellationToken.None);
+            var sessionId = _session.Active?.Id;
+            var rows = new List<MusicFinder.Domain.Models.SearchResultRow>();
+            foreach (var chunk in ids.Chunk(500))
+            {
+                var found = (await Task.Run(() => _search.GetRowsAsync(chunk, sessionId, CancellationToken.None))).ToDictionary(r => r.Id);
+                rows.AddRange(chunk.Where(found.ContainsKey).Select(t => found[t]));
+            }
+            if (!IsCrateMode || _crateId != id) return;
+            Results.Clear();
+            foreach (var row in rows) Results.Add(new TrackRowViewModel(row));
+            HasMore = false;
+            _nextCursor = null;
+            TotalCount = Results.Count;
+            IsCountReady = true;
+            OnPropertyChanged(nameof(ResultsText));
+        }
+        catch (Exception ex)
+        {
+            Warning = Loc.T("Could not open the crate: {0}", ex.Message);
+        }
+    }
+
+    private void ExitCrateMode()
+    {
+        if (!IsCrateMode) return;
+        IsCrateMode = false;
+        _crateId = null;
+    }
+
+    [RelayCommand]
+    private void CloseCrate()
+    {
+        ExitCrateMode();
+        ScheduleSearch(0);
+    }
+
+    /// <summary>Adds the selected tracks to the end of the crate; tracks already in it are skipped.</summary>
+    public async Task AddSelectedToCrateAsync(long crateId, string crateName)
+    {
+        var ids = SelectedItems.Select(r => r.Id).ToList();
+        if (ids.Count == 0)
+        {
+            Warning = Loc.T("Select one or more tracks to add to a crate.");
+            return;
+        }
+        var added = await _crates.AddTracksAsync(crateId, ids, CancellationToken.None);
+        Warning = null;
+        Warning = added == ids.Count
+            ? Loc.T("Added {0} to {1}.", added, crateName)
+            : Loc.T("Added {0} to {1}; {2} already there.", added, crateName, ids.Count - added);
+        if (IsCrateMode && _crateId == crateId) await LoadCrateAsync();
+        CratesChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>Takes the selected tracks out of the open crate. The files and the library are untouched.</summary>
+    [RelayCommand]
+    private async Task RemoveFromCrate()
+    {
+        if (_crateId is not { } id || SelectedItems.Count == 0) return;
+        await _crates.RemoveTracksAsync(id, SelectedItems.Select(r => r.Id).ToList(), CancellationToken.None);
+        await LoadCrateAsync();
+        CratesChanged?.Invoke(this, EventArgs.Empty);
     }
 
     // ===== Drag out to other applications =====

@@ -2615,4 +2615,73 @@
   <data name="…and {0} more." xml:space="preserve">
     <value>…και {0} ακόμη.</value>
   </data>
+  <data name="Add to crate" xml:space="preserve">
+    <value>Προσθήκη σε crate</value>
+  </data>
+  <data name="Crate" xml:space="preserve">
+    <value>Crate</value>
+  </data>
+  <data name="Crates" xml:space="preserve">
+    <value>Crates</value>
+  </data>
+  <data name="Delete crate…" xml:space="preserve">
+    <value>Διαγραφή crate…</value>
+  </data>
+  <data name="Drag the tracks to your DJ software as usual. Removing a track here only takes it off this list." xml:space="preserve">
+    <value>Σύρε τα κομμάτια στο DJ πρόγραμμά σου όπως συνήθως. Η αφαίρεση ενός κομματιού από εδώ το βγάζει μόνο από αυτή τη λίστα.</value>
+  </data>
+  <data name="Lists of tracks for preparing a set. Select tracks, then right-click and choose Add to crate." xml:space="preserve">
+    <value>Λίστες κομματιών για την προετοιμασία ενός set. Επίλεξε κομμάτια, δεξί κλικ και Προσθήκη σε crate.</value>
+  </data>
+  <data name="Name a new crate and press Enter. The tracks selected now are added to it." xml:space="preserve">
+    <value>Γράψε όνομα για νέο crate και πάτα Enter. Τα κομμάτια που είναι επιλεγμένα τώρα προστίθενται σε αυτό.</value>
+  </data>
+  <data name="New crate" xml:space="preserve">
+    <value>Νέο crate</value>
+  </data>
+  <data name="No crates yet." xml:space="preserve">
+    <value>Δεν υπάρχουν crates ακόμη.</value>
+  </data>
+  <data name="Open this crate" xml:space="preserve">
+    <value>Άνοιγμα αυτού του crate</value>
+  </data>
+  <data name="Remove from this crate" xml:space="preserve">
+    <value>Αφαίρεση από αυτό το crate</value>
+  </data>
+  <data name="Remove selected" xml:space="preserve">
+    <value>Αφαίρεση επιλεγμένων</value>
+  </data>
+  <data name="Take the selected tracks off this crate (files are not touched)" xml:space="preserve">
+    <value>Βγάζει τα επιλεγμένα κομμάτια από αυτό το crate (τα αρχεία δεν αγγίζονται)</value>
+  </data>
+  <data name="A crate name can be at most 100 characters." xml:space="preserve">
+    <value>Το όνομα ενός crate μπορεί να έχει έως 100 χαρακτήρες.</value>
+  </data>
+  <data name="A crate named &quot;{0}&quot; already exists." xml:space="preserve">
+    <value>Υπάρχει ήδη crate με όνομα «{0}».</value>
+  </data>
+  <data name="Added {0} to {1}." xml:space="preserve">
+    <value>Προστέθηκαν {0} στο {1}.</value>
+  </data>
+  <data name="Added {0} to {1}; {2} already there." xml:space="preserve">
+    <value>Προστέθηκαν {0} στο {1}· {2} ήταν ήδη εκεί.</value>
+  </data>
+  <data name="Could not open the crate: {0}" xml:space="preserve">
+    <value>Δεν ήταν δυνατό το άνοιγμα του crate: {0}</value>
+  </data>
+  <data name="Delete crate" xml:space="preserve">
+    <value>Διαγραφή crate</value>
+  </data>
+  <data name="Delete the crate &quot;{0}&quot;? Only the list is removed; the tracks and files stay where they are." xml:space="preserve">
+    <value>Να διαγραφεί το crate «{0}»; Αφαιρείται μόνο η λίστα· τα κομμάτια και τα αρχεία μένουν όπου είναι.</value>
+  </data>
+  <data name="Select one or more tracks to add to a crate." xml:space="preserve">
+    <value>Επίλεξε ένα ή περισσότερα κομμάτια για προσθήκη σε crate.</value>
+  </data>
+  <data name="{0:N0} track in the crate" xml:space="preserve">
+    <value>{0:N0} κομμάτι στο crate</value>
+  </data>
+  <data name="{0:N0} tracks in the crate" xml:space="preserve">
+    <value>{0:N0} κομμάτια στο crate</value>
+  </data>
 </root>

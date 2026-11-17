@@ -48,14 +48,18 @@ public partial class LibraryViewModel : ObservableObject
     /// <summary>The discreet player: a double-click on a row previews it.</summary>
     public PreviewViewModel Preview { get; }
 
+    /// <summary>Lists of tracks for preparing a set.</summary>
+    public CratesViewModel Crates { get; }
+
     public LibraryViewModel(FolderTreeViewModel tree, SearchViewModel search, ScanCoordinator scans,
         ILibraryRootRepository roots, ITrackRepository tracks, ISettingsStore settings, GenreMappingJob genreJob,
         ITagEditingService tagEditing, IUserDialogs dialogs, MusicFinder.Infrastructure.AppPaths paths,
         IIdentificationService identification, IdentificationSettingsViewModel identificationSettings, TimeProvider time, ICoverArtClient coverArt,
         IAudioAnalysisService analysis, MusicFinder.Application.Analysis.AnalysisRunner analysisRunner,
-        RenameViewModelFactory renameFactory, PreviewViewModel preview)
+        RenameViewModelFactory renameFactory, PreviewViewModel preview, CratesViewModel crates)
     {
         Preview = preview;
+        Crates = crates;
         _renameFactory = renameFactory;
         Tree = tree;
         Search = search;

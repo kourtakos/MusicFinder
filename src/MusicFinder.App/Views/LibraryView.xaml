@@ -96,6 +96,29 @@
                             Command="{Binding Search.CloseSimilarCommand}" ToolTip="Back to your search"/>
                 </Grid>
             </Border>
+
+            <!-- A crate is open: its own order, a way to take tracks out, and a way back. -->
+            <Border Style="{StaticResource MF.Panel}" Padding="14,10" Margin="0,0,0,10"
+                    Visibility="{Binding Search.IsCrateMode, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock>
+                            <Run Text="Crate " Foreground="{StaticResource MF.Brush.TextSecondary}"/><Run Text="{Binding Search.CrateName, Mode=OneWay}" FontWeight="SemiBold"/>
+                        </TextBlock>
+                        <TextBlock Style="{StaticResource MF.Secondary}" FontSize="12" TextWrapping="Wrap"
+                                   Text="Drag the tracks to your DJ software as usual. Removing a track here only takes it off this list."/>
+                    </StackPanel>
+                    <Button Grid.Column="1" Content="Remove selected" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0" Margin="12,0"
+                            Command="{Binding Search.RemoveFromCrateCommand}" ToolTip="Take the selected tracks off this crate (files are not touched)"/>
+                    <Button Grid.Column="2" Content="Close" Style="{StaticResource MF.PillButton}" Height="32" Padding="14,0"
+                            Command="{Binding Search.CloseCrateCommand}" ToolTip="Back to your search"/>
+                </Grid>
+            </Border>
         </StackPanel>
 
         <!-- ===== Body: folders | results | details ===== -->
@@ -112,6 +135,7 @@
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
@@ -193,7 +217,54 @@
                     </Grid>
                 </Border>
 
-                <Border Grid.Row="1" Style="{StaticResource MF.Panel}" Padding="14,12" Margin="0,10,0,0">
+                <!-- Crates: lists of tracks for preparing a set. They only point at tracks; files are never touched. -->
+                <Border Grid.Row="1" Style="{StaticResource MF.Panel}" Padding="10,10,10,8" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="Crates" FontSize="15" FontWeight="SemiBold" Margin="2,0,0,6"
+                                   ToolTip="Lists of tracks for preparing a set. Select tracks, then right-click and choose Add to crate."/>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding Crates.NewName, UpdateSourceTrigger=PropertyChanged}" Height="28" VerticalContentAlignment="Center"
+                                     ToolTip="Name a new crate and press Enter. The tracks selected now are added to it.">
+                                <TextBox.InputBindings>
+                                    <KeyBinding Key="Return" Command="{Binding Crates.CreateCommand}"/>
+                                </TextBox.InputBindings>
+                            </TextBox>
+                            <Button Grid.Column="1" Style="{StaticResource MF.IconButton}" ToolTip="New crate" Command="{Binding Crates.CreateCommand}">
+                                <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE710;"/>
+                            </Button>
+                        </Grid>
+                        <TextBlock Text="{Binding Crates.Message}" Foreground="{StaticResource MF.Brush.Warning}" FontSize="12" TextWrapping="Wrap"
+                                   Margin="2,0,0,6" Visibility="{Binding Crates.Message, Converter={StaticResource NotNullToVis}}"/>
+                        <ItemsControl ItemsSource="{Binding Crates.Items}" MaxHeight="140">
+                            <ItemsControl.Template>
+                                <ControlTemplate TargetType="ItemsControl">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsPresenter/></ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding OpenCommand}" Background="Transparent" BorderThickness="0" Padding="6,3"
+                                            HorizontalContentAlignment="Left" Cursor="Hand" ToolTip="Open this crate">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Delete crate…" Command="{Binding DeleteCommand}"/>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                        <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis"/>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="No crates yet." Style="{StaticResource MF.Secondary}" FontSize="12" Margin="2,0,0,0"
+                                   Visibility="{Binding Crates.Items.Count, Converter={StaticResource NotNullToVis}, ConverterParameter=Invert}"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Style="{StaticResource MF.Panel}" Padding="14,12" Margin="0,10,0,0">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
                             <TextBlock Style="{StaticResource MF.Icon}" Text="&#xE8F1;" Margin="0,0,8,0"/>
@@ -246,6 +317,18 @@
                                           Command="{Binding PlacementTarget.DataContext.RenameFilesCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <MenuItem Header="Find similar"
                                           Command="{Binding PlacementTarget.DataContext.Search.FindSimilarCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                <MenuItem Header="Add to crate"
+                                          ItemsSource="{Binding PlacementTarget.DataContext.Crates.Items, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                    <MenuItem.ItemContainerStyle>
+                                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                            <Setter Property="Header" Value="{Binding Display}"/>
+                                            <Setter Property="Command" Value="{Binding AddSelectedCommand}"/>
+                                        </Style>
+                                    </MenuItem.ItemContainerStyle>
+                                </MenuItem>
+                                <MenuItem Header="Remove from this crate"
+                                          Visibility="{Binding PlacementTarget.DataContext.Search.IsCrateMode, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource BoolToVis}}"
+                                          Command="{Binding PlacementTarget.DataContext.Search.RemoveFromCrateCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                 <Separator/>
                                 <MenuItem Header="Mark as played"
                                           Command="{Binding PlacementTarget.DataContext.Search.MarkPlayedCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>

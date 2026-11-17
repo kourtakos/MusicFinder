@@ -125,6 +125,7 @@ public partial class App : System.Windows.Application
 
         services.AddSingleton<FolderTreeViewModel>();
         services.AddSingleton<SearchViewModel>();
+        services.AddSingleton<CratesViewModel>();
         services.AddSingleton<LibraryViewModel>();
         services.AddSingleton<IdentificationSettingsViewModel>();
         services.AddSingleton<MusicFinder.Application.Analysis.AnalysisRunner>();
