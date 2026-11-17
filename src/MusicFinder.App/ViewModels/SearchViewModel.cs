@@ -192,8 +192,12 @@ public partial class SearchViewModel : ObservableObject
     partial void OnTotalCountChanged(int value) => OnPropertyChanged(nameof(ResultsText));
     partial void OnIsCountReadyChanged(bool value) => OnPropertyChanged(nameof(ResultsText));
 
+    /// <summary>Find Similar works from exactly one selected track.</summary>
+    public bool CanFindSimilar => SelectedCount == 1;
+
     partial void OnSelectedCountChanged(int value)
     {
+        OnPropertyChanged(nameof(CanFindSimilar));
         OnPropertyChanged(nameof(SelectedText));
         OnPropertyChanged(nameof(SelectionHint));
         OnPropertyChanged(nameof(IsMultiSelection));

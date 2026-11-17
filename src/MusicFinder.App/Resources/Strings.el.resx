@@ -2684,4 +2684,7 @@
   <data name="{0:N0} tracks in the crate" xml:space="preserve">
     <value>{0:N0} κομμάτια στο crate</value>
   </data>
+  <data name="Select a track, then list the tracks that fit next to it by genre, BPM, key and DJ tags (Ctrl+Shift+F)" xml:space="preserve">
+    <value>Επίλεξε ένα κομμάτι και δες ποια κομμάτια ταιριάζουν δίπλα του ως προς είδος, BPM, τονικότητα και DJ tags (Ctrl+Shift+F)</value>
+  </data>
 </root>

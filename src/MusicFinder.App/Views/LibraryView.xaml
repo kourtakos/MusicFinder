@@ -28,6 +28,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <Border Style="{StaticResource MF.InputBorder}" Height="44" Margin="0,0,12,0">
@@ -56,7 +57,10 @@
             <ctl:FilterDropDown Grid.Column="3" Header="Decade" Options="{Binding Search.DecadeOptions}" Margin="0,0,10,0"/>
             <ctl:FilterDropDown Grid.Column="4" Header="Tags" Options="{Binding Search.TagOptions}" Margin="0,0,10,0"/>
             <ctl:FilterDropDown Grid.Column="5" Header="Played" Options="{Binding Search.PlayedOptions}" Margin="0,0,10,0"/>
-            <Button Grid.Column="6" Content="Reset" Style="{StaticResource MF.PillButton}" Command="{Binding Search.ResetCommand}"/>
+            <Button Grid.Column="6" Content="Reset" Style="{StaticResource MF.PillButton}" Command="{Binding Search.ResetCommand}" Margin="0,0,10,0"/>
+            <Button Grid.Column="7" Content="Find similar" Style="{StaticResource MF.AccentButton}" Command="{Binding Search.FindSimilarCommand}"
+                    IsEnabled="{Binding Search.CanFindSimilar}"
+                    ToolTip="Select a track, then list the tracks that fit next to it by genre, BPM, key and DJ tags (Ctrl+Shift+F)"/>
         </Grid>
 
         <StackPanel Grid.Row="1">
